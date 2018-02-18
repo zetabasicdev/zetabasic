@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>15.0</VCProjectVersion>
+    <ProjectGuid>{909ABFEF-6319-4216-B34A-CC1D42C69498}</ProjectGuid>
+    <RootNamespace>ZetaBASIC</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0.16299.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup />
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <SDLCheck>true</SDLCheck>
+      <ConformanceMode>true</ConformanceMode>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <ConformanceMode>true</ConformanceMode>
+    </ClCompile>
+    <Link>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClInclude Include="..\src\Analyzer.h" />
+    <ClInclude Include="..\src\CompileError.h" />
+    <ClInclude Include="..\src\Compiler.h" />
+    <ClInclude Include="..\src\EndStatementNode.h" />
+    <ClInclude Include="..\src\ISourceStream.h" />
+    <ClInclude Include="..\src\Lexer.h" />
+    <ClInclude Include="..\src\MemoryPool.h" />
+    <ClInclude Include="..\src\ModuleNode.h" />
+    <ClInclude Include="..\src\Node.h" />
+    <ClInclude Include="..\src\NodePool.h" />
+    <ClInclude Include="..\src\Parser.h" />
+    <ClInclude Include="..\src\Program.h" />
+    <ClInclude Include="..\src\Range.h" />
+    <ClInclude Include="..\src\StatementNode.h" />
+    <ClInclude Include="..\src\String.h" />
+    <ClInclude Include="..\src\StringPool.h" />
+    <ClInclude Include="..\src\TextSourceStream.h" />
+    <ClInclude Include="..\src\TItemBuffer.h" />
+    <ClInclude Include="..\src\TNodeList.h" />
+    <ClInclude Include="..\src\TObjectList.h" />
+    <ClInclude Include="..\src\TItemPool.h" />
+    <ClInclude Include="..\src\TObjectPool.h" />
+    <ClInclude Include="..\src\Token.h" />
+    <ClInclude Include="..\src\Translator.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\src\Analyzer.cpp" />
+    <ClCompile Include="..\src\Compiler.cpp" />
+    <ClCompile Include="..\src\EndStatementNode.cpp" />
+    <ClCompile Include="..\src\Lexer.cpp" />
+    <ClCompile Include="..\src\main.cpp" />
+    <ClCompile Include="..\src\ModuleNode.cpp" />
+    <ClCompile Include="..\src\Node.cpp" />
+    <ClCompile Include="..\src\Parser.cpp" />
+    <ClCompile Include="..\src\StatementNode.cpp" />
+    <ClCompile Include="..\src\TextSourceStream.cpp" />
+    <ClCompile Include="..\src\Token.cpp" />
+    <ClCompile Include="..\src\Translator.cpp" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

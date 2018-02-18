@@ -1,0 +1,29 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.27130.2027
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ZetaBASIC", "ZetaBASIC.vcxproj", "{909ABFEF-6319-4216-B34A-CC1D42C69498}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Debug|x86 = Debug|x86
+		Release|x64 = Release|x64
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{909ABFEF-6319-4216-B34A-CC1D42C69498}.Debug|x64.ActiveCfg = Debug|x64
+		{909ABFEF-6319-4216-B34A-CC1D42C69498}.Debug|x64.Build.0 = Debug|x64
+		{909ABFEF-6319-4216-B34A-CC1D42C69498}.Debug|x86.ActiveCfg = Debug|x64
+		{909ABFEF-6319-4216-B34A-CC1D42C69498}.Release|x64.ActiveCfg = Release|x64
+		{909ABFEF-6319-4216-B34A-CC1D42C69498}.Release|x64.Build.0 = Release|x64
+		{909ABFEF-6319-4216-B34A-CC1D42C69498}.Release|x86.ActiveCfg = Release|x64
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {E74A0CEA-808C-4423-A219-4A400593F2B7}
+	EndGlobalSection
+EndGlobal
