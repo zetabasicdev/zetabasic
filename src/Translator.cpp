@@ -30,7 +30,7 @@
 
 #include "Translator.h"
 
-Translator::Translator(TItemBuffer<VmWord>& bytecode, Node& root)
+Translator::Translator(TItemBuffer<uint8_t>& bytecode, Node& root)
     :
     mBytecode(bytecode),
     mRoot(root)

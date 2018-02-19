@@ -43,7 +43,7 @@
 int main(int argc, char* argv[])
 {
     try {
-        const char* code = "EN$";
+        const char* code = "END";
 
         Compiler compiler;
         TextSourceStream stream(code);

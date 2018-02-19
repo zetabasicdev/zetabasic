@@ -30,8 +30,9 @@
 
 #pragma once
 
+#include <cstdint>
+
 #include "NodePool.h"
-#include "Program.h"
 #include "StringPool.h"
 #include "TItemBuffer.h"
 #include "Token.h"
@@ -53,5 +54,5 @@ private:
     TObjectList<Token> mTokens;
     StringPool mStringPool;
     NodePool mNodePool;
-    TItemBuffer<VmWord> mBytecode;
+    TItemBuffer<uint8_t> mBytecode;
 };
