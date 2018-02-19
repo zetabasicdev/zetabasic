@@ -28,42 +28,18 @@
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#ifdef _WIN32
-#include <Windows.h>
-#else
-#include <cstdio>
-#endif
+#pragma once
 
-#include <sstream>
+class Program;
 
-#include "CompileError.h"
-#include "Compiler.h"
-#include "Interpreter.h"
-#include "TextSourceStream.h"
-
-int main(int argc, char* argv[])
+class Interpreter
 {
-    try {
-        const char* code = "END";
+public:
+    Interpreter(const Program& program);
+    ~Interpreter();
 
-        Compiler compiler;
-        TextSourceStream stream(code);
+    void run();
 
-        auto& program = compiler.run(stream);
-
-        Interpreter interpreter(program);
-        interpreter.run();
-    }
-    catch (const CompileError& err) {
-        std::stringstream msg;
-        msg << "[" << err.getRange().getStartRow() << ":" << err.getRange().getStartCol() << "] " << err.what();
-#ifdef _WIN32
-        (void)MessageBoxA(nullptr, msg.str().c_str(), "Compile Error", MB_OK|MB_ICONERROR);
-#else
-        fprintf(stderr, "%s\n", msg.str().c_str());
-#endif
-        return -1;
-    }
-
-    return 0;
-}
+private:
+    const Program& mProgram;
+};

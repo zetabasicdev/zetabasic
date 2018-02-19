@@ -33,6 +33,7 @@
 #include <cstdint>
 
 #include "NodePool.h"
+#include "Program.h"
 #include "StringPool.h"
 #include "TItemBuffer.h"
 #include "Token.h"
@@ -47,7 +48,7 @@ public:
     Compiler();
     ~Compiler();
 
-    void run(ISourceStream& source);
+    const Program& run(ISourceStream& source);
 
 private:
     TObjectPool<Token> mTokenPool;
@@ -55,4 +56,5 @@ private:
     StringPool mStringPool;
     NodePool mNodePool;
     TItemBuffer<uint8_t> mBytecode;
+    Program mProgram;
 };

@@ -30,6 +30,45 @@
 
 #pragma once
 
+#include <cassert>
 #include <cstdint>
 
-typedef uint64_t VmWord;
+class Program
+{
+public:
+    Program()
+        :
+        mBytecode(nullptr),
+        mLength(0)
+    {
+        // intentionally left blank
+    }
+
+    Program(const uint8_t* bytecode, int length)
+        :
+        mBytecode(bytecode),
+        mLength(length)
+    {
+        assert(mBytecode);
+        assert(length > 0);
+    }
+
+    ~Program()
+    {
+        // intentionally left blank
+    }
+
+    const uint8_t* getBytecode() const
+    {
+        return mBytecode;
+    }
+
+    int getLength() const
+    {
+        return mLength;
+    }
+
+private:
+    const uint8_t* mBytecode;
+    int mLength;
+};

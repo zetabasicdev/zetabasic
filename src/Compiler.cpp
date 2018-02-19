@@ -40,7 +40,8 @@ Compiler::Compiler()
     mTokens(),
     mStringPool(),
     mNodePool(),
-    mBytecode(256)
+    mBytecode(256),
+    mProgram()
 {
     // intentionally left blank
 }
@@ -50,7 +51,7 @@ Compiler::~Compiler()
     // intentionally left blank
 }
 
-void Compiler::run(ISourceStream& source)
+const Program& Compiler::run(ISourceStream& source)
 {
     mTokenPool.reset();
     mTokens.reset();
@@ -69,4 +70,7 @@ void Compiler::run(ISourceStream& source)
 
     Translator translator(mBytecode, root);
     translator.run();
+
+    mProgram = Program(&mBytecode[0], mBytecode.getSize());
+    return mProgram;
 }

@@ -70,6 +70,7 @@
     <ClInclude Include="..\src\CompileError.h" />
     <ClInclude Include="..\src\Compiler.h" />
     <ClInclude Include="..\src\EndStatementNode.h" />
+    <ClInclude Include="..\src\Interpreter.h" />
     <ClInclude Include="..\src\ISourceStream.h" />
     <ClInclude Include="..\src\Lexer.h" />
     <ClInclude Include="..\src\MemoryPool.h" />
@@ -95,6 +96,7 @@
     <ClCompile Include="..\src\Analyzer.cpp" />
     <ClCompile Include="..\src\Compiler.cpp" />
     <ClCompile Include="..\src\EndStatementNode.cpp" />
+    <ClCompile Include="..\src\Interpreter.cpp" />
     <ClCompile Include="..\src\Lexer.cpp" />
     <ClCompile Include="..\src\main.cpp" />
     <ClCompile Include="..\src\ModuleNode.cpp" />
