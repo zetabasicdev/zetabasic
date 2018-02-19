@@ -78,7 +78,7 @@ public:
         }
 
         void* memory = mCurBlock->items + (mCurBlock->used * mItemSize);
-        mCurBlock += (mItemSize * count);
+        mCurBlock->used += int(mItemSize * count);
 
         return memory;
     }

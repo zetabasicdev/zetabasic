@@ -103,7 +103,7 @@ public:
     void push(T* item)
     {
         if (mLast)
-            mLast->next = item;
+            mLast->mNext = item;
         else
             mFirst = item;
         mLast = item;
