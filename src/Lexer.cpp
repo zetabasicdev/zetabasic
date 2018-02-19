@@ -84,6 +84,8 @@ void Lexer::run()
             mChar = mSource.read();
         }
     }
+
+    mTokens.push(mTokenPool.alloc(TokenId::EndOfSource, TokenTag::None, String(), Range()));
 }
 
 bool Lexer::runStartState()
