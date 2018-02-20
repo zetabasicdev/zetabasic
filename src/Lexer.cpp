@@ -35,9 +35,9 @@
 
 Lexer::Lexer(TObjectPool<Token>& tokenPool, TObjectList<Token>& tokens, StringPool& stringPool, ISourceStream& source)
     :
+    mStringPool(stringPool),
     mTokenPool(tokenPool),
     mTokens(tokens),
-    mStringPool(stringPool),
     mSource(source),
     mState(State::Start)
 {

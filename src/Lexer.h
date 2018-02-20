@@ -30,6 +30,7 @@
 
 #pragma once
 
+#include <string>
 #include "TObjectList.h"
 #include "TObjectPool.h"
 #include "Token.h"
