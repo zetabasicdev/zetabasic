@@ -28,6 +28,7 @@
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+#include "EndStatementNode.h"
 #include "Parser.h"
 #include "StatementNode.h"
 
@@ -45,5 +46,20 @@ StatementNode::~StatementNode()
 
 StatementNode* StatementNode::parseStatement(Parser& parser)
 {
-    return nullptr;
+    auto& token = parser.getToken();
+
+    StatementNode* node = nullptr;
+    if (token.getId() == TokenId::Name) {
+        switch (token.getTag()) {
+        case TokenTag::Key_End:
+            node = parser.getNodePool().alloc<EndStatementNode>();
+            break;
+        default:
+            break;
+        }
+    }
+
+    if (node)
+        node->parse(parser);
+    return node;
 }

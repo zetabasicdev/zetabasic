@@ -37,7 +37,8 @@
 enum class CompileErrorId
 {
     Unknown,
-    SyntaxError
+    SyntaxError,
+    ExpectedStatement
 };
 
 class CompileError

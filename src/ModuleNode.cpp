@@ -46,7 +46,14 @@ ModuleNode::~ModuleNode()
 
 void ModuleNode::parse(Parser& parser)
 {
+    auto stm = StatementNode::parseStatement(parser);
+    while (stm) {
+        mStatements.push(stm);
+        stm = StatementNode::parseStatement(parser);
+    }
 
+    if (!parser.isToken(TokenId::EndOfSource))
+        parser.raiseError(CompileErrorId::ExpectedStatement, "Expected Statement");
 }
 
 void ModuleNode::analyze(Analyzer& analyzer)

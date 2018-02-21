@@ -37,7 +37,8 @@ Parser::Parser(NodePool& nodePool, StringPool& stringPool, const TObjectList<Tok
     mNodePool(nodePool),
     mStringPool(stringPool),
     mTokens(tokens),
-    mTokenIndex(0)
+    mTokenIndex(0),
+    mToken(&mTokens[mTokenIndex])
 {
     // intentionally left blank
 }
@@ -45,6 +46,22 @@ Parser::Parser(NodePool& nodePool, StringPool& stringPool, const TObjectList<Tok
 Parser::~Parser()
 {
     // intentionally left blank
+}
+
+void Parser::raiseError(CompileErrorId id, const std::string& message) const
+{
+    throw CompileError(id, mToken->getRange(), message);
+}
+
+bool Parser::isToken(TokenId id) const
+{
+    return mToken->getId() == id;
+}
+
+void Parser::eatToken()
+{
+    ++mTokenIndex;
+    mToken = &mTokens[mTokenIndex];
 }
 
 Node& Parser::run()

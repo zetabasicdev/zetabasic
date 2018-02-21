@@ -113,6 +113,7 @@ bool Lexer::runEndState()
             const char* keyword;
             TokenTag tag;
         } keywords[] = {
+            { "END", TokenTag::Key_End },
             { nullptr, TokenTag::None }
         };
         for (int i = 0; keywords[i].tag != TokenTag::None; ++i) {
@@ -123,7 +124,7 @@ bool Lexer::runEndState()
         }
     }
 
-    auto token = mTokenPool.alloc(mId, TokenTag::None, text, Range(mStartRow, mStartCol, mRow, mCol));
+    auto token = mTokenPool.alloc(mId, tag, text, Range(mStartRow, mStartCol, mRow, mCol));
     mTokens.push(token);
 
     // reset state

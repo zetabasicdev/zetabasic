@@ -30,6 +30,7 @@
 
 #pragma once
 
+#include "CompileError.h"
 #include "NodePool.h"
 #include "StringPool.h"
 #include "TObjectList.h"
@@ -45,6 +46,10 @@ public:
 
     Node& run();
 
+    void raiseError(CompileErrorId id, const std::string& message) const;
+    bool isToken(TokenId id) const;
+    void eatToken();
+
     NodePool& getNodePool()
     {
         return mNodePool;
@@ -55,10 +60,16 @@ public:
         return mStringPool;
     }
 
+    const Token& getToken() const
+    {
+        return *mToken;
+    }
+
 private:
     NodePool& mNodePool;
     StringPool& mStringPool;
 
     const TObjectList<Token>& mTokens;
     int mTokenIndex;
+    const Token* mToken;
 };

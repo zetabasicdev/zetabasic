@@ -45,7 +45,8 @@ EndStatementNode::~EndStatementNode()
 
 void EndStatementNode::parse(Parser& parser)
 {
-
+    assert(parser.getToken().getTag() == TokenTag::Key_End);
+    parser.eatToken();
 }
 
 void EndStatementNode::analyze(Analyzer& analyzer)
