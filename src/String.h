@@ -71,13 +71,21 @@ public:
     bool operator==(const char* text) const
     {
         assert(text);
+#ifdef _WIN32
         return _strnicmp(mText, text, mLength) == 0;
+#else
+        return strncasecmp(mText, text, mLength) == 0;
+#endif
     }
 
     bool operator==(const String& str) const
     {
         if (str.mLength == mLength)
+#ifdef _WIN32
             return _strnicmp(mText, str.mText, mLength) == 0;
+#else
+            return strncasecmp(mText, str.mText, mLength) == 0;
+#endif
         return false;
     }
 
