@@ -39,7 +39,14 @@ Lexer::Lexer(TObjectPool<Token>& tokenPool, TObjectList<Token>& tokens, StringPo
     mTokenPool(tokenPool),
     mTokens(tokens),
     mSource(source),
-    mState(State::Start)
+    mState(State::Start),
+    mChar(0),
+    mId(TokenId::Unknown),
+    mRow(0),
+    mCol(0),
+    mStartRow(0),
+    mStartCol(0),
+    mText()
 {
     // intentionally left blank
 }
@@ -77,6 +84,8 @@ void Lexer::run()
             mChar = mSource.read();
         }
     }
+
+    mTokens.push(mTokenPool.alloc(TokenId::EndOfSource, TokenTag::None, String(), Range()));
 }
 
 bool Lexer::runStartState()
@@ -93,6 +102,8 @@ bool Lexer::runStartState()
 
 bool Lexer::runEndState()
 {
+    assert(mId > TokenId::Unknown);
+
     auto text = mStringPool.alloc(mText.data(), (int)mText.length());
     auto tag = TokenTag::None;
 
@@ -117,6 +128,7 @@ bool Lexer::runEndState()
 
     // reset state
     mState = State::Start;
+    mId = TokenId::Unknown;
     mText.clear();
     return false;
 }
@@ -124,6 +136,7 @@ bool Lexer::runEndState()
 bool Lexer::runNameState()
 {
     if (!(mChar >= 'a' && mChar <= 'z') && !(mChar >= 'A' && mChar <= 'Z') && !(mChar >= '0' && mChar <= '9')) {
+        mId = TokenId::Name;
         mState = State::End;
         return false;
     }
