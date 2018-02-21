@@ -29,6 +29,7 @@
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "Interpreter.h"
+#include "Opcodes.h"
 #include "Program.h"
 
 Interpreter::Interpreter(const Program& program)
@@ -45,5 +46,16 @@ Interpreter::~Interpreter()
 
 void Interpreter::run()
 {
-
+    auto code = mProgram.getBytecode();
+    int ip = 0;
+    while (ip < mProgram.getLength()) {
+        switch (code[ip]) {
+        case Op_end:
+            ip = mProgram.getLength();
+            break;
+        default:
+            break;
+        }
+    }
+    
 }
