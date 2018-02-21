@@ -28,39 +28,79 @@
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "Interpreter.h"
-#include "Opcodes.h"
-#include "Program.h"
-#include "Window.h"
+#pragma once
 
-Interpreter::Interpreter(Window& window, const Program& program)
-    :
-    mWindow(window),
-    mProgram(program)
-{
-    // intentionally left blank
-}
+#include <cstdint>
 
-Interpreter::~Interpreter()
+enum
 {
-    // intentionally left blank
-}
+    UP = 256,
+    DOWN,
+    LEFT,
+    RIGHT,
+    PAGE_UP,
+    PAGE_DOWN,
+    HOME,
+    END,
+    INS,
+    DEL,
+    BACKSPACE,
+    ENTER,
+    ESCAPE,
+    TAB,
+    F1,
+    F2,
+    F3,
+    F4,
+    F5,
+    F6,
+    F7,
+    F8,
+    F9,
+    F10,
+    F11,
+    F12,
+    QUIT = 1024
+};
 
-void Interpreter::run()
+class Window
 {
-    auto code = mProgram.getBytecode();
-    int ip = 0;
-    while (ip < mProgram.getLength()) {
-        switch (code[ip]) {
-        case Op_end:
-            mWindow.locate(25, 1);
-            mWindow.print("Press any key to continue");
-            (void)mWindow.runOnce();
-            ip = mProgram.getLength();
-            break;
-        default:
-            break;
-        }
-    }
-    
-}
+public:
+    Window();
+    ~Window();
+
+    int runOnce();
+
+    void print(const char* text);
+    void printf(const char* format, ...);
+    void printn(const char* text, int len);
+
+    void locate(int row, int col);
+    void color(int fg, int bg);
+
+    void showCursor();
+    void hideCursor();
+
+private:
+    void* mWindow;
+    void* mScreen;
+
+    struct Cell
+    {
+        char ch;
+        uint8_t color;
+    };
+    Cell* mCells;
+
+    int mCursorRow;
+    int mCursorCol;
+    bool mCursorVisible;
+    int mFg;
+    int mBg;
+    bool mDirty;
+
+    void renderCell(char ch, int row, int col, int fg, int bg);
+    void scroll();
+    void drawCursor();
+    void eraseCursor();
+};

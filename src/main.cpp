@@ -40,6 +40,7 @@
 #include "Compiler.h"
 #include "Interpreter.h"
 #include "TextSourceStream.h"
+#include "Window.h"
 
 int main(int argc, char* argv[])
 {
@@ -51,7 +52,9 @@ int main(int argc, char* argv[])
 
         auto& program = compiler.run(stream);
 
-        Interpreter interpreter(program);
+        Window window;
+
+        Interpreter interpreter(window, program);
         interpreter.run();
     }
     catch (const CompileError& err) {

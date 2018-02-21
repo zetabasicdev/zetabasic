@@ -31,15 +31,17 @@
 #pragma once
 
 class Program;
+class Window;
 
 class Interpreter
 {
 public:
-    Interpreter(const Program& program);
+    Interpreter(Window& window, const Program& program);
     ~Interpreter();
 
     void run();
 
 private:
+    Window& mWindow;
     const Program& mProgram;
 };

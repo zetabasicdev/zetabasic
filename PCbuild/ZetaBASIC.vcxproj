@@ -49,7 +49,12 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>$(SDL_INC_PATH)</AdditionalIncludeDirectories>
     </ClCompile>
+    <Link>
+      <AdditionalLibraryDirectories>$(SDL_LIB_PATH)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>$(SDL_LIBS);%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -70,6 +75,7 @@
     <ClInclude Include="..\src\CompileError.h" />
     <ClInclude Include="..\src\Compiler.h" />
     <ClInclude Include="..\src\EndStatementNode.h" />
+    <ClInclude Include="..\src\Font.h" />
     <ClInclude Include="..\src\Interpreter.h" />
     <ClInclude Include="..\src\ISourceStream.h" />
     <ClInclude Include="..\src\Lexer.h" />
@@ -92,6 +98,7 @@
     <ClInclude Include="..\src\TObjectPool.h" />
     <ClInclude Include="..\src\Token.h" />
     <ClInclude Include="..\src\Translator.h" />
+    <ClInclude Include="..\src\Window.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\Analyzer.cpp" />
@@ -107,6 +114,7 @@
     <ClCompile Include="..\src\TextSourceStream.cpp" />
     <ClCompile Include="..\src\Token.cpp" />
     <ClCompile Include="..\src\Translator.cpp" />
+    <ClCompile Include="..\src\Window.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
