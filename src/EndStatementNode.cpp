@@ -29,7 +29,9 @@
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "EndStatementNode.h"
+#include "Opcodes.h"
 #include "Parser.h"
+#include "Translator.h"
 
 EndStatementNode::EndStatementNode()
     :
@@ -51,10 +53,10 @@ void EndStatementNode::parse(Parser& parser)
 
 void EndStatementNode::analyze(Analyzer& analyzer)
 {
-
+    // intentionally left blank
 }
 
 void EndStatementNode::translate(Translator& translator)
 {
-
+    *translator.getBytecode().alloc(1) = Op_end;
 }

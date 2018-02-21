@@ -77,6 +77,7 @@
     <ClInclude Include="..\src\ModuleNode.h" />
     <ClInclude Include="..\src\Node.h" />
     <ClInclude Include="..\src\NodePool.h" />
+    <ClInclude Include="..\src\Opcodes.h" />
     <ClInclude Include="..\src\Parser.h" />
     <ClInclude Include="..\src\Program.h" />
     <ClInclude Include="..\src\Range.h" />

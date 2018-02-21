@@ -32,23 +32,7 @@
 
 #include <cstdint>
 
-#include "Node.h"
-#include "TItemBuffer.h"
-
-class Translator
+enum Opcode : uint8_t
 {
-public:
-    Translator(TItemBuffer<uint8_t>& bytecode, Node& root);
-    ~Translator();
-
-    void run();
-
-    TItemBuffer<uint8_t>& getBytecode()
-    {
-        return mBytecode;
-    }
-
-private:
-    TItemBuffer<uint8_t>& mBytecode;
-    Node& mRoot;
+    Op_end = 0x01
 };
