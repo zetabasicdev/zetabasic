@@ -107,6 +107,7 @@ public:
         else
             mFirst = item;
         mLast = item;
+        item->mNext = nullptr;
     }
 
     Iterator begin()
