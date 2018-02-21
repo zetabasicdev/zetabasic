@@ -29,8 +29,8 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 CC=g++
-CFLAGS=-Wall -O0 -g -DDEBUG -std=c++14
-LDFLAGS=
+CFLAGS=-Wall -O0 -g -DDEBUG -std=c++14 -I$(SDL_INC_PATH)
+LDFLAGS=-L$(SDL_LIB_PATH) $(SDL_LIBS)
 RM=rm -f
 CP=cp -f
 
@@ -48,6 +48,7 @@ OBJECTS=\
 	obj/TextSourceStream.o \
 	obj/Token.o \
 	obj/Translator.o \
+	obj/Window.o \
 	obj/main.o
 
 all: $(BINARY)
