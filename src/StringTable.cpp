@@ -49,7 +49,7 @@ void StringTable::reset()
 
 int StringTable::addString(const String& string)
 {
-    int len = (int)mStrings.size();
+    auto len = (int)mStrings.size();
     for (auto ix = 0; ix < len; ++ix)
         if (mStrings[ix] == string)
             return ix;

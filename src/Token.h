@@ -39,6 +39,7 @@ enum class TokenId
     EndOfSource,
     EndOfLine,
     Name,
+    Integer,
     String,
     Symbol
 };

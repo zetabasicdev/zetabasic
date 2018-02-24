@@ -28,51 +28,42 @@
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "Analyzer.h"
-#include "Compiler.h"
-#include "Lexer.h"
-#include "Parser.h"
-#include "Translator.h"
+#include <cassert>
+#include <cstring>
 
-Compiler::Compiler()
+#include "Stack.h"
+
+static const auto kDefaultStackCapacity = 2048;
+
+Stack::Stack()
     :
-    mTokenPool(256),
-    mTokens(),
-    mStringPool(),
-    mNodePool(),
-    mBytecode(256),
-    mStringTable(),
-    mConstantTable()
+    mCapacity(kDefaultStackCapacity),
+    mPointer(0),
+    mData(new int64_t[mCapacity])
 {
     // intentionally left blank
 }
 
-Compiler::~Compiler()
+Stack::~Stack()
 {
-    // intentionally left blank
+    delete[] mData;
 }
 
-Program Compiler::run(ISourceStream& source)
+void Stack::push(int64_t value)
 {
-    mTokenPool.reset();
-    mTokens.reset();
-    mStringPool.reset();
-    mNodePool.reset();
-    mBytecode.reset();
-    mStringTable.reset();
-    mConstantTable.reset();
+    if (mPointer == mCapacity) {
+        mCapacity *= 2;
+        int64_t* newData = new int64_t[mCapacity];
+        memcpy(newData, mData, sizeof(int64_t) * mPointer);
+        delete[] mData;
+        mData = newData;
+    }
 
-    Lexer lexer(mTokenPool, mTokens, mStringPool, source);
-    lexer.run();
+    mData[mPointer++] = value;
+}
 
-    Parser parser(mNodePool, mStringPool, mTokens);
-    Node& root = parser.run();
-
-    Analyzer analyzer(mNodePool, root);
-    analyzer.run();
-
-    Translator translator(mBytecode, mStringTable, mConstantTable, root);
-    translator.run();
-
-    return Program(&mBytecode[0], mBytecode.getSize(), mStringTable, mConstantTable);
+int64_t Stack::pop()
+{
+    assert(mPointer > 0);
+    return mData[--mPointer];
 }

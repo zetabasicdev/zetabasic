@@ -75,9 +75,11 @@
     <ClInclude Include="..\src\BinaryExpressionNode.h" />
     <ClInclude Include="..\src\CompileError.h" />
     <ClInclude Include="..\src\Compiler.h" />
+    <ClInclude Include="..\src\ConstantTable.h" />
     <ClInclude Include="..\src\EndStatementNode.h" />
     <ClInclude Include="..\src\ExpressionNode.h" />
     <ClInclude Include="..\src\Font.h" />
+    <ClInclude Include="..\src\IntegerLiteralExpressionNode.h" />
     <ClInclude Include="..\src\Interpreter.h" />
     <ClInclude Include="..\src\ISourceStream.h" />
     <ClInclude Include="..\src\Lexer.h" />
@@ -90,6 +92,7 @@
     <ClInclude Include="..\src\PrintStatementNode.h" />
     <ClInclude Include="..\src\Program.h" />
     <ClInclude Include="..\src\Range.h" />
+    <ClInclude Include="..\src\Stack.h" />
     <ClInclude Include="..\src\StatementNode.h" />
     <ClInclude Include="..\src\String.h" />
     <ClInclude Include="..\src\StringStack.h" />
@@ -112,8 +115,10 @@
     <ClCompile Include="..\src\Analyzer.cpp" />
     <ClCompile Include="..\src\BinaryExpressionNode.cpp" />
     <ClCompile Include="..\src\Compiler.cpp" />
+    <ClCompile Include="..\src\ConstantTable.cpp" />
     <ClCompile Include="..\src\EndStatementNode.cpp" />
     <ClCompile Include="..\src\ExpressionNode.cpp" />
+    <ClCompile Include="..\src\IntegerLiteralExpressionNode.cpp" />
     <ClCompile Include="..\src\Interpreter.cpp" />
     <ClCompile Include="..\src\Lexer.cpp" />
     <ClCompile Include="..\src\main.cpp" />
@@ -121,6 +126,7 @@
     <ClCompile Include="..\src\Node.cpp" />
     <ClCompile Include="..\src\Parser.cpp" />
     <ClCompile Include="..\src\PrintStatementNode.cpp" />
+    <ClCompile Include="..\src\Stack.cpp" />
     <ClCompile Include="..\src\StatementNode.cpp" />
     <ClCompile Include="..\src\StringStack.cpp" />
     <ClCompile Include="..\src\StringTable.cpp" />

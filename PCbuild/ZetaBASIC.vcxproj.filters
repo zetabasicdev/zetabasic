@@ -129,6 +129,15 @@
     <ClInclude Include="..\src\BinaryExpressionNode.h">
       <Filter>Header Files\Nodes</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\IntegerLiteralExpressionNode.h">
+      <Filter>Header Files\Nodes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\ConstantTable.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Stack.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\main.cpp">
@@ -189,6 +198,15 @@
       <Filter>Source Files\Nodes</Filter>
     </ClCompile>
     <ClCompile Include="..\src\StringStack.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\IntegerLiteralExpressionNode.cpp">
+      <Filter>Source Files\Nodes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\ConstantTable.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Stack.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

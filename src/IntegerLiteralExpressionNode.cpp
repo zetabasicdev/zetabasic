@@ -28,51 +28,47 @@
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "Analyzer.h"
-#include "Compiler.h"
-#include "Lexer.h"
+#include <stdlib.h>
+
+#include "ConstantTable.h"
+#include "IntegerLiteralExpressionNode.h"
+#include "Opcodes.h"
 #include "Parser.h"
 #include "Translator.h"
 
-Compiler::Compiler()
+IntegerLiteralExpressionNode::IntegerLiteralExpressionNode()
     :
-    mTokenPool(256),
-    mTokens(),
-    mStringPool(),
-    mNodePool(),
-    mBytecode(256),
-    mStringTable(),
-    mConstantTable()
+    mValue(0)
 {
     // intentionally left blank
 }
 
-Compiler::~Compiler()
+IntegerLiteralExpressionNode::~IntegerLiteralExpressionNode()
 {
     // intentionally left blank
 }
 
-Program Compiler::run(ISourceStream& source)
+void IntegerLiteralExpressionNode::parse(Parser& parser)
 {
-    mTokenPool.reset();
-    mTokens.reset();
-    mStringPool.reset();
-    mNodePool.reset();
-    mBytecode.reset();
-    mStringTable.reset();
-    mConstantTable.reset();
+    assert(parser.getToken().getId() == TokenId::Integer);
 
-    Lexer lexer(mTokenPool, mTokens, mStringPool, source);
-    lexer.run();
+    // todo : verify value of integer is not out-of-bounds
+    mValue = strtoll(parser.getToken().getText().getText(), nullptr, 10);
 
-    Parser parser(mNodePool, mStringPool, mTokens);
-    Node& root = parser.run();
+    parser.eatToken();
+}
 
-    Analyzer analyzer(mNodePool, root);
-    analyzer.run();
+void IntegerLiteralExpressionNode::analyze(Analyzer& analyzer)
+{
+    mTypename = Typename::Integer;
+}
 
-    Translator translator(mBytecode, mStringTable, mConstantTable, root);
-    translator.run();
+void IntegerLiteralExpressionNode::translate(Translator& translator)
+{
+    int ix = translator.getConstantTable().addInteger(mValue);
+    assert(ix >= 0 && ix < 256);
 
-    return Program(&mBytecode[0], mBytecode.getSize(), mStringTable, mConstantTable);
+    auto ops = translator.getBytecode().alloc(2);
+    ops[0] = Op_load_i;
+    ops[1] = (uint8_t)ix;
 }

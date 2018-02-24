@@ -28,51 +28,21 @@
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "Analyzer.h"
-#include "Compiler.h"
-#include "Lexer.h"
-#include "Parser.h"
-#include "Translator.h"
+#pragma once
 
-Compiler::Compiler()
-    :
-    mTokenPool(256),
-    mTokens(),
-    mStringPool(),
-    mNodePool(),
-    mBytecode(256),
-    mStringTable(),
-    mConstantTable()
+#include <cstdint>
+
+class Stack
 {
-    // intentionally left blank
-}
+public:
+    Stack();
+    ~Stack();
 
-Compiler::~Compiler()
-{
-    // intentionally left blank
-}
+    void push(int64_t value);
+    int64_t pop();
 
-Program Compiler::run(ISourceStream& source)
-{
-    mTokenPool.reset();
-    mTokens.reset();
-    mStringPool.reset();
-    mNodePool.reset();
-    mBytecode.reset();
-    mStringTable.reset();
-    mConstantTable.reset();
-
-    Lexer lexer(mTokenPool, mTokens, mStringPool, source);
-    lexer.run();
-
-    Parser parser(mNodePool, mStringPool, mTokens);
-    Node& root = parser.run();
-
-    Analyzer analyzer(mNodePool, root);
-    analyzer.run();
-
-    Translator translator(mBytecode, mStringTable, mConstantTable, root);
-    translator.run();
-
-    return Program(&mBytecode[0], mBytecode.getSize(), mStringTable, mConstantTable);
-}
+private:
+    int mCapacity;
+    int mPointer;
+    int64_t* mData;
+};

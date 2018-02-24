@@ -28,51 +28,23 @@
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "Analyzer.h"
-#include "Compiler.h"
-#include "Lexer.h"
-#include "Parser.h"
-#include "Translator.h"
+#pragma once
 
-Compiler::Compiler()
+#include <cstdint>
+#include "ExpressionNode.h"
+
+class IntegerLiteralExpressionNode
     :
-    mTokenPool(256),
-    mTokens(),
-    mStringPool(),
-    mNodePool(),
-    mBytecode(256),
-    mStringTable(),
-    mConstantTable()
+    public ExpressionNode
 {
-    // intentionally left blank
-}
+public:
+    IntegerLiteralExpressionNode();
+    virtual ~IntegerLiteralExpressionNode();
 
-Compiler::~Compiler()
-{
-    // intentionally left blank
-}
+    void parse(Parser& parser);
+    void analyze(Analyzer& analyzer);
+    void translate(Translator& translator);
 
-Program Compiler::run(ISourceStream& source)
-{
-    mTokenPool.reset();
-    mTokens.reset();
-    mStringPool.reset();
-    mNodePool.reset();
-    mBytecode.reset();
-    mStringTable.reset();
-    mConstantTable.reset();
-
-    Lexer lexer(mTokenPool, mTokens, mStringPool, source);
-    lexer.run();
-
-    Parser parser(mNodePool, mStringPool, mTokens);
-    Node& root = parser.run();
-
-    Analyzer analyzer(mNodePool, root);
-    analyzer.run();
-
-    Translator translator(mBytecode, mStringTable, mConstantTable, root);
-    translator.run();
-
-    return Program(&mBytecode[0], mBytecode.getSize(), mStringTable, mConstantTable);
-}
+private:
+    int64_t mValue;
+};

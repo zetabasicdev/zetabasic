@@ -32,6 +32,7 @@
 
 #include <cstdint>
 
+#include "ConstantTable.h"
 #include "NodePool.h"
 #include "Program.h"
 #include "StringPool.h"
@@ -58,4 +59,5 @@ private:
     NodePool mNodePool;
     TItemBuffer<uint8_t> mBytecode;
     StringTable mStringTable;
+    ConstantTable mConstantTable;
 };

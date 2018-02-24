@@ -30,6 +30,7 @@
 
 #include "BinaryExpressionNode.h"
 #include "ExpressionNode.h"
+#include "IntegerLiteralExpressionNode.h"
 #include "Parser.h"
 #include "StringLiteralExpressionNode.h"
 
@@ -58,6 +59,8 @@ ExpressionNode* ExpressionNode::parseExpression(Parser& parser, int precedence)
     ExpressionNode* expr = nullptr;
     if (parser.isToken(TokenId::String))
         expr = parser.getNodePool().alloc<StringLiteralExpressionNode>();
+    else if (parser.isToken(TokenId::Integer))
+        expr = parser.getNodePool().alloc<IntegerLiteralExpressionNode>();
     if (expr)
         expr->parse(parser);
 

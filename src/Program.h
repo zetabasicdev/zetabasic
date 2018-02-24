@@ -33,16 +33,18 @@
 #include <cassert>
 #include <cstdint>
 #include <vector>
+#include "ConstantTable.h"
 #include "StringTable.h"
 
 class Program
 {
 public:
-    Program(const uint8_t* bytecode, int length, const StringTable& stringTable)
+    Program(const uint8_t* bytecode, int length, const StringTable& stringTable, const ConstantTable& constantTable)
         :
         mBytecode(bytecode),
         mLength(length),
-        mStringTable(stringTable)
+        mStringTable(stringTable),
+        mConstantTable(constantTable)
     {
         assert(mBytecode);
         assert(length > 0);
@@ -68,9 +70,15 @@ public:
         return mStringTable.getString(index);
     }
 
+    int64_t getIntegerConstant(int index) const
+    {
+        return mConstantTable.getIntegerConstant(index);
+    }
+
 private:
     const uint8_t* mBytecode;
     int mLength;
 
-    const StringTable mStringTable;
+    const StringTable& mStringTable;
+    const ConstantTable& mConstantTable;
 };

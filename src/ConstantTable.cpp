@@ -28,51 +28,40 @@
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "Analyzer.h"
-#include "Compiler.h"
-#include "Lexer.h"
-#include "Parser.h"
-#include "Translator.h"
+#include <cassert>
 
-Compiler::Compiler()
+#include "ConstantTable.h"
+
+ConstantTable::ConstantTable()
     :
-    mTokenPool(256),
-    mTokens(),
-    mStringPool(),
-    mNodePool(),
-    mBytecode(256),
-    mStringTable(),
-    mConstantTable()
+    mConstants()
 {
     // intentionally left blank
 }
 
-Compiler::~Compiler()
+ConstantTable::~ConstantTable()
 {
     // intentionally left blank
 }
 
-Program Compiler::run(ISourceStream& source)
+void ConstantTable::reset()
 {
-    mTokenPool.reset();
-    mTokens.reset();
-    mStringPool.reset();
-    mNodePool.reset();
-    mBytecode.reset();
-    mStringTable.reset();
-    mConstantTable.reset();
+    mConstants.clear();
+}
 
-    Lexer lexer(mTokenPool, mTokens, mStringPool, source);
-    lexer.run();
+int ConstantTable::addInteger(int64_t value)
+{
+    // search for existing value first
+    auto len = (int)mConstants.size();
+    for (auto ix = 0; ix < len; ++ix)
+        if (mConstants[ix] == value)
+            return ix;
+    mConstants.push_back(value);
+    return len;
+}
 
-    Parser parser(mNodePool, mStringPool, mTokens);
-    Node& root = parser.run();
-
-    Analyzer analyzer(mNodePool, root);
-    analyzer.run();
-
-    Translator translator(mBytecode, mStringTable, mConstantTable, root);
-    translator.run();
-
-    return Program(&mBytecode[0], mBytecode.getSize(), mStringTable, mConstantTable);
+int64_t ConstantTable::getIntegerConstant(int index) const
+{
+    assert(index >= 0 && index < (int)mConstants.size());
+    return mConstants[index];
 }

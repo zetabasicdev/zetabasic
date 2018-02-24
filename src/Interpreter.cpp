@@ -40,6 +40,7 @@ Interpreter::Interpreter(Window& window, const Program& program)
     :
     mWindow(window),
     mProgram(program),
+    mStack(),
     mStringStack()
 {
     // intentionally left blank
@@ -61,6 +62,10 @@ static void dumpBytecode(const uint8_t* code, int length)
             break;
         case Op_load_cstr:
             std::cout << "load.cstr           #" << (int)code[1] << std::endl;
+            code += 2;
+            break;
+        case Op_load_i:
+            std::cout << "load.int            #" << (int)code[1] << std::endl;
             code += 2;
             break;
         case Op_syscall:
@@ -94,6 +99,10 @@ InterpreterResult Interpreter::run()
             mStringStack.pushConstant(mProgram.getString(code[ip + 1]));
             ip += 2;
             break;
+        case Op_load_i:
+            mStack.push(mProgram.getIntegerConstant(code[ip + 1]));
+            ip += 2;
+            break;
         case Op_syscall:
             DoSysCall(code[ip + 1]);
             ip += 2;
@@ -117,6 +126,12 @@ void Interpreter::DoSysCall(uint8_t ix)
     {
         String text = mStringStack.pop();
         mWindow.printn(text.getText(), text.getLength());
+        break;
+    }
+    case Syscall_printi:
+    {
+        int64_t value = mStack.pop();
+        mWindow.printf("%lld", value);
         break;
     }
     default:

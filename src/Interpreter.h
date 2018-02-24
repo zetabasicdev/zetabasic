@@ -31,6 +31,7 @@
 #pragma once
 
 #include <cstdint>
+#include "Stack.h"
 #include "StringStack.h"
 
 class Program;
@@ -54,6 +55,7 @@ private:
     Window& mWindow;
     const Program& mProgram;
 
+    Stack mStack;
     StringStack mStringStack;
 
     void DoSysCall(uint8_t ix);

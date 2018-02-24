@@ -58,7 +58,8 @@ private:
         Name,
         String,
         Whitespace,
-        Symbol
+        Symbol,
+        Integer
     };
     State mState;
 
@@ -77,4 +78,5 @@ private:
     bool runStringState();
     bool runWhitespaceState();
     bool runSymbolState();
+    bool runIntegerState();
 };

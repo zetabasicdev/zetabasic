@@ -28,51 +28,23 @@
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "Analyzer.h"
-#include "Compiler.h"
-#include "Lexer.h"
-#include "Parser.h"
-#include "Translator.h"
+#pragma once
 
-Compiler::Compiler()
-    :
-    mTokenPool(256),
-    mTokens(),
-    mStringPool(),
-    mNodePool(),
-    mBytecode(256),
-    mStringTable(),
-    mConstantTable()
+#include <cstdint>
+#include <vector>
+
+class ConstantTable
 {
-    // intentionally left blank
-}
+public:
+    ConstantTable();
+    ~ConstantTable();
 
-Compiler::~Compiler()
-{
-    // intentionally left blank
-}
+    void reset();
 
-Program Compiler::run(ISourceStream& source)
-{
-    mTokenPool.reset();
-    mTokens.reset();
-    mStringPool.reset();
-    mNodePool.reset();
-    mBytecode.reset();
-    mStringTable.reset();
-    mConstantTable.reset();
+    int addInteger(int64_t value);
 
-    Lexer lexer(mTokenPool, mTokens, mStringPool, source);
-    lexer.run();
+    int64_t getIntegerConstant(int index) const;
 
-    Parser parser(mNodePool, mStringPool, mTokens);
-    Node& root = parser.run();
-
-    Analyzer analyzer(mNodePool, root);
-    analyzer.run();
-
-    Translator translator(mBytecode, mStringTable, mConstantTable, root);
-    translator.run();
-
-    return Program(&mBytecode[0], mBytecode.getSize(), mStringTable, mConstantTable);
-}
+private:
+    std::vector<int64_t> mConstants;
+};

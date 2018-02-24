@@ -73,6 +73,10 @@ void PrintStatementNode::translate(Translator& translator)
             auto ops = translator.getBytecode().alloc(2);
             ops[0] = Op_syscall;
             ops[1] = Syscall_printstr;
+        } else if (mExpression->getTypename() == Typename::Integer) {
+            auto ops = translator.getBytecode().alloc(2);
+            ops[0] = Op_syscall;
+            ops[1] = Syscall_printi;
         }
     }
 }

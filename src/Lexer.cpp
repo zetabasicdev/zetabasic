@@ -83,6 +83,9 @@ void Lexer::run()
         case State::Symbol:
             advanceChar = runSymbolState();
             break;
+        case State::Integer:
+            advanceChar = runIntegerState();
+            break;
         default:
             break;
         }
@@ -128,6 +131,9 @@ bool Lexer::runStartState()
         return true;
     } else if (isSymbolStart(mChar)) {
         mState = State::Symbol;
+        return true;
+    } else if (mChar >= '0' && mChar <= '9') {
+        mState = State::Integer;
         return true;
     }
 
@@ -228,4 +234,15 @@ bool Lexer::runSymbolState()
     mId = TokenId::Symbol;
     mState = State::End;
     return false;
+}
+
+bool Lexer::runIntegerState()
+{
+    if (!(mChar >= '0' && mChar <= '9')) {
+        mId = TokenId::Integer;
+        mState = State::End;
+        return false;
+    }
+
+    return true;
 }
