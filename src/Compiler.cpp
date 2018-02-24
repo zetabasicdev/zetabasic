@@ -41,7 +41,7 @@ Compiler::Compiler()
     mStringPool(),
     mNodePool(),
     mBytecode(256),
-    mProgram()
+    mStringTable()
 {
     // intentionally left blank
 }
@@ -51,13 +51,14 @@ Compiler::~Compiler()
     // intentionally left blank
 }
 
-const Program& Compiler::run(ISourceStream& source)
+Program Compiler::run(ISourceStream& source)
 {
     mTokenPool.reset();
     mTokens.reset();
     mStringPool.reset();
     mNodePool.reset();
     mBytecode.reset();
+    mStringTable.reset();
 
     Lexer lexer(mTokenPool, mTokens, mStringPool, source);
     lexer.run();
@@ -68,9 +69,8 @@ const Program& Compiler::run(ISourceStream& source)
     Analyzer analyzer(mNodePool, root);
     analyzer.run();
 
-    Translator translator(mBytecode, root);
+    Translator translator(mBytecode, mStringTable, root);
     translator.run();
 
-    mProgram = Program(&mBytecode[0], mBytecode.getSize());
-    return mProgram;
+    return Program(&mBytecode[0], mBytecode.getSize(), mStringTable);
 }

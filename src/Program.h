@@ -32,22 +32,17 @@
 
 #include <cassert>
 #include <cstdint>
+#include <vector>
+#include "StringTable.h"
 
 class Program
 {
 public:
-    Program()
-        :
-        mBytecode(nullptr),
-        mLength(0)
-    {
-        // intentionally left blank
-    }
-
-    Program(const uint8_t* bytecode, int length)
+    Program(const uint8_t* bytecode, int length, const StringTable& stringTable)
         :
         mBytecode(bytecode),
-        mLength(length)
+        mLength(length),
+        mStringTable(stringTable)
     {
         assert(mBytecode);
         assert(length > 0);
@@ -68,7 +63,14 @@ public:
         return mLength;
     }
 
+    const String& getString(int index) const
+    {
+        return mStringTable.getString(index);
+    }
+
 private:
     const uint8_t* mBytecode;
     int mLength;
+
+    const StringTable mStringTable;
 };

@@ -28,36 +28,49 @@
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "EndStatementNode.h"
+#include <cassert>
+
 #include "Opcodes.h"
 #include "Parser.h"
+#include "StringLiteralExpressionNode.h"
+#include "StringTable.h"
 #include "Translator.h"
 
-EndStatementNode::EndStatementNode()
+StringLiteralExpressionNode::StringLiteralExpressionNode()
     :
-    StatementNode()
+    ExpressionNode(),
+    mValue()
 {
     // intentionally left blank
 }
 
-EndStatementNode::~EndStatementNode()
+StringLiteralExpressionNode::~StringLiteralExpressionNode()
 {
     // intentionally left blank
 }
 
-void EndStatementNode::parse(Parser& parser)
+void StringLiteralExpressionNode::parse(Parser& parser)
 {
-    assert(parser.getToken().getTag() == TokenTag::Key_End);
+    assert(parser.getToken().getId() == TokenId::String);
+
+    // create string value without quotes
+    auto& text = parser.getToken().getText();
+    mValue = String(text.getText() + 1, text.getLength() - 2);
+
     parser.eatToken();
-    parser.eatEndOfLine();
 }
 
-void EndStatementNode::analyze(Analyzer& analyzer)
+void StringLiteralExpressionNode::analyze(Analyzer& analyzer)
 {
-    // intentionally left blank
+    mTypename = Typename::String;
 }
 
-void EndStatementNode::translate(Translator& translator)
+void StringLiteralExpressionNode::translate(Translator& translator)
 {
-    *translator.getBytecode().alloc(1) = Op_end;
+    int ix = translator.getStringTable().addString(mValue);
+    assert(ix >= 0 && ix < 256);
+
+    auto ops = translator.getBytecode().alloc(2);
+    ops[0] = Op_load_cstr;
+    ops[1] = (uint8_t)ix;
 }

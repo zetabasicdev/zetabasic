@@ -64,6 +64,18 @@ void Parser::eatToken()
     mToken = &mTokens[mTokenIndex];
 }
 
+bool Parser::isEndOfLine() const
+{
+    return mToken->getId() == TokenId::EndOfLine;
+}
+
+void Parser::eatEndOfLine()
+{
+    if (mToken->getId() != TokenId::EndOfLine)
+        raiseError(CompileErrorId::SyntaxError, "Expected End-of-line");
+    eatToken();
+}
+
 Node& Parser::run()
 {
     ModuleNode* module = mNodePool.alloc<ModuleNode>();

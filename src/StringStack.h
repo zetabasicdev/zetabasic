@@ -28,36 +28,25 @@
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "EndStatementNode.h"
-#include "Opcodes.h"
-#include "Parser.h"
-#include "Translator.h"
+#pragma once
 
-EndStatementNode::EndStatementNode()
-    :
-    StatementNode()
-{
-    // intentionally left blank
-}
+#include "String.h"
 
-EndStatementNode::~EndStatementNode()
+class StringStack
 {
-    // intentionally left blank
-}
+public:
+    StringStack();
+    ~StringStack();
 
-void EndStatementNode::parse(Parser& parser)
-{
-    assert(parser.getToken().getTag() == TokenTag::Key_End);
-    parser.eatToken();
-    parser.eatEndOfLine();
-}
+    void pushConstant(const String& value);
 
-void EndStatementNode::analyze(Analyzer& analyzer)
-{
-    // intentionally left blank
-}
+    String pop();
 
-void EndStatementNode::translate(Translator& translator)
-{
-    *translator.getBytecode().alloc(1) = Op_end;
-}
+private:
+    int mCount;
+    int mDataCapacity;
+    int mDataUsed;
+    char* mData;
+    int mLengthCapacity;
+    int* mLengths;
+};

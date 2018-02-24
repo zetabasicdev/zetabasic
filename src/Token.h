@@ -37,14 +37,17 @@ enum class TokenId
 {
     Unknown,
     EndOfSource,
-    Name
+    EndOfLine,
+    Name,
+    String
 };
 const char* ToString(TokenId id);
 
 enum class TokenTag
 {
     None,
-    Key_End
+    Key_End,
+    Key_Print
 };
 const char* ToString(TokenTag tag);
 

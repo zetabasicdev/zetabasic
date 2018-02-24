@@ -55,7 +55,9 @@ private:
     enum class State {
         Start,
         End,
-        Name
+        Name,
+        String,
+        Whitespace
     };
     State mState;
 
@@ -66,8 +68,11 @@ private:
     int mStartRow;
     int mStartCol;
     std::string mText;
+    bool mSkip;
 
     bool runStartState();
     bool runEndState();
     bool runNameState();
+    bool runStringState();
+    bool runWhitespaceState();
 };

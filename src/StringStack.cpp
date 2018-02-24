@@ -28,36 +28,69 @@
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "EndStatementNode.h"
-#include "Opcodes.h"
-#include "Parser.h"
-#include "Translator.h"
+#include <cassert>
 
-EndStatementNode::EndStatementNode()
+#include "StringStack.h"
+
+static const auto kDefaultDataCapacity = 2048;
+static const auto kDefaultLengthCapacity = 64;
+static const auto kMaximumStringLength = 2048;
+
+StringStack::StringStack()
     :
-    StatementNode()
+    mCount(0),
+    mDataCapacity(kDefaultDataCapacity),
+    mDataUsed(0),
+    mData(new char[mDataCapacity]),
+    mLengthCapacity(kDefaultLengthCapacity),
+    mLengths(new int[mLengthCapacity])
 {
     // intentionally left blank
 }
 
-EndStatementNode::~EndStatementNode()
+StringStack::~StringStack()
 {
-    // intentionally left blank
+    delete[] mLengths;
+    delete[] mData;
 }
 
-void EndStatementNode::parse(Parser& parser)
+void StringStack::pushConstant(const String& value)
 {
-    assert(parser.getToken().getTag() == TokenTag::Key_End);
-    parser.eatToken();
-    parser.eatEndOfLine();
+    int len = value.getLength();
+    assert(len <= kMaximumStringLength);
+
+    if (mCount == mLengthCapacity) {
+        mLengthCapacity *= 2;
+        int* newLengths = new int[mLengthCapacity];
+        memcpy(newLengths, mLengths, sizeof(int) * mCount);
+        delete[] mLengths;
+        mLengths = newLengths;
+    }
+
+    if (mDataUsed + len > mDataCapacity) {
+        mDataCapacity *= 2;
+        char* newData = new char[mDataCapacity];
+        memcpy(newData, mData, sizeof(char) * mDataUsed);
+        delete[] mData;
+        mData = newData;
+    }
+
+    mLengths[mCount] = len;
+    memcpy(mData + mDataUsed, value.getText(), len);
+    mDataUsed += len;
+
+    ++mCount;
 }
 
-void EndStatementNode::analyze(Analyzer& analyzer)
+String StringStack::pop()
 {
-    // intentionally left blank
-}
+    assert(mCount > 0);
 
-void EndStatementNode::translate(Translator& translator)
-{
-    *translator.getBytecode().alloc(1) = Op_end;
+    const char* text = mData + mDataUsed - mLengths[mCount - 1];
+    int len = mLengths[mCount - 1];
+
+    --mCount;
+    mDataUsed -= mLengths[mCount];
+
+    return String(text, len);
 }

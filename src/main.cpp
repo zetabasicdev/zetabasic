@@ -42,30 +42,37 @@
 #include "TextSourceStream.h"
 #include "Window.h"
 
+void fatalError(const std::string& title, const std::string& message)
+{
+#ifdef _WIN32
+    (void)MessageBoxA(nullptr, message.c_str(), title.c_str(), MB_OK|MB_ICONERROR);
+#else
+    fprintf(stderr, "%s\n", msg.str().c_str());
+#endif
+    exit(-1);
+}
+
 int main(int argc, char* argv[])
 {
     try {
-        const char* code = "END";
+        const char* code = "PRINT \"Hello, World!\"\nEND";
 
         Compiler compiler;
         TextSourceStream stream(code);
 
-        auto& program = compiler.run(stream);
+        auto program = compiler.run(stream);
 
         Window window;
 
         Interpreter interpreter(window, program);
-        interpreter.run();
+        auto result = interpreter.run();
+        if (result == InterpreterResult::BadOpcode)
+            fatalError("Fatal Error", "Interpreter encountered bad opcode");
     }
     catch (const CompileError& err) {
         std::stringstream msg;
         msg << "[" << err.getRange().getStartRow() << ":" << err.getRange().getStartCol() << "] " << err.what();
-#ifdef _WIN32
-        (void)MessageBoxA(nullptr, msg.str().c_str(), "Compile Error", MB_OK|MB_ICONERROR);
-#else
-        fprintf(stderr, "%s\n", msg.str().c_str());
-#endif
-        return -1;
+        fatalError("Compile Error", msg.str());
     }
 
     return 0;

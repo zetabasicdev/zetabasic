@@ -30,8 +30,17 @@
 
 #pragma once
 
+#include <cstdint>
+#include "StringStack.h"
+
 class Program;
 class Window;
+
+enum class InterpreterResult
+{
+    ExecutionComplete,
+    BadOpcode
+};
 
 class Interpreter
 {
@@ -39,9 +48,13 @@ public:
     Interpreter(Window& window, const Program& program);
     ~Interpreter();
 
-    void run();
+    InterpreterResult run();
 
 private:
     Window& mWindow;
     const Program& mProgram;
+
+    StringStack mStringStack;
+
+    void DoSysCall(uint8_t ix);
 };

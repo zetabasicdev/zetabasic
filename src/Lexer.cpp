@@ -46,7 +46,8 @@ Lexer::Lexer(TObjectPool<Token>& tokenPool, TObjectList<Token>& tokens, StringPo
     mCol(0),
     mStartRow(0),
     mStartCol(0),
-    mText()
+    mText(),
+    mSkip(false)
 {
     // intentionally left blank
 }
@@ -73,6 +74,12 @@ void Lexer::run()
         case State::Name:
             advanceChar = runNameState();
             break;
+        case State::String:
+            advanceChar = runStringState();
+            break;
+        case State::Whitespace:
+            advanceChar = runWhitespaceState();
+            break;
         default:
             break;
         }
@@ -85,6 +92,8 @@ void Lexer::run()
         }
     }
 
+    if (mTokens.getSize() > 0)
+        mTokens.push(mTokenPool.alloc(TokenId::EndOfLine, TokenTag::None, String(), Range()));
     mTokens.push(mTokenPool.alloc(TokenId::EndOfSource, TokenTag::None, String(), Range()));
 }
 
@@ -95,6 +104,16 @@ bool Lexer::runStartState()
     if ((mChar >= 'a' && mChar <= 'z') || (mChar >= 'A' && mChar <= 'Z')) {
         mState = State::Name;
         return true;
+    } else if (mChar == '"') {
+        mState = State::String;
+        return true;
+    } else if (mChar == ' ' || mChar == '\t') {
+        mState = State::Whitespace;
+        return true;
+    } else if (mChar == '\n') {
+        mState = State::End;
+        mId = TokenId::EndOfLine;
+        return true;
     }
 
     throw CompileError(CompileErrorId::SyntaxError, Range(mRow, mCol), "Syntax Error");
@@ -102,32 +121,37 @@ bool Lexer::runStartState()
 
 bool Lexer::runEndState()
 {
-    assert(mId > TokenId::Unknown);
+    if (!mSkip) {
+        assert(mId > TokenId::Unknown);
+    
+        auto text = mStringPool.alloc(mText.data(), (int)mText.length());
+        auto tag = TokenTag::None;
 
-    auto text = mStringPool.alloc(mText.data(), (int)mText.length());
-    auto tag = TokenTag::None;
-
-    if (mId == TokenId::Name) {
-        // try to match a potential keyword
-        static struct {
-            const char* keyword;
-            TokenTag tag;
-        } keywords[] = {
-            { "END", TokenTag::Key_End },
-            { nullptr, TokenTag::None }
-        };
-        for (int i = 0; keywords[i].tag != TokenTag::None; ++i) {
-            if (text == keywords[i].keyword) {
-                tag = keywords[i].tag;
-                break;
+        if (mId == TokenId::Name) {
+            // try to match a potential keyword
+            static struct
+            {
+                const char* keyword;
+                TokenTag tag;
+            } keywords[] = {
+                { "END", TokenTag::Key_End },
+                { "PRINT", TokenTag::Key_Print },
+                { nullptr, TokenTag::None }
+            };
+            for (int i = 0; keywords[i].tag != TokenTag::None; ++i) {
+                if (text == keywords[i].keyword) {
+                    tag = keywords[i].tag;
+                    break;
+                }
             }
         }
+
+        auto token = mTokenPool.alloc(mId, tag, text, Range(mStartRow, mStartCol, mRow, mCol));
+        mTokens.push(token);
     }
 
-    auto token = mTokenPool.alloc(mId, tag, text, Range(mStartRow, mStartCol, mRow, mCol));
-    mTokens.push(token);
-
     // reset state
+    mSkip = false;
     mState = State::Start;
     mId = TokenId::Unknown;
     mText.clear();
@@ -141,5 +165,28 @@ bool Lexer::runNameState()
         mState = State::End;
         return false;
     }
+    return true;
+}
+
+bool Lexer::runStringState()
+{
+    if (mChar == '\n') {
+        throw CompileError(CompileErrorId::SyntaxError, Range(mRow, mCol), "Unterminated String Literal");
+    } else if (mChar == '"') {
+        mId = TokenId::String;
+        mState = State::End;
+    }
+
+    return true;
+}
+
+bool Lexer::runWhitespaceState()
+{
+    if (mChar != ' ' && mChar != '\t') {
+        mSkip = true;
+        mState = State::End;
+        return false;
+    }
+
     return true;
 }

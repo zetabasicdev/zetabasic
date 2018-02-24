@@ -28,36 +28,24 @@
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "EndStatementNode.h"
-#include "Opcodes.h"
-#include "Parser.h"
-#include "Translator.h"
+#pragma once
 
-EndStatementNode::EndStatementNode()
+#include "StatementNode.h"
+
+class ExpressionNode;
+
+class PrintStatementNode
     :
-    StatementNode()
+    public StatementNode
 {
-    // intentionally left blank
-}
+public:
+    PrintStatementNode();
+    virtual ~PrintStatementNode();
 
-EndStatementNode::~EndStatementNode()
-{
-    // intentionally left blank
-}
+    void parse(Parser& parser);
+    void analyze(Analyzer& analyzer);
+    void translate(Translator& translator);
 
-void EndStatementNode::parse(Parser& parser)
-{
-    assert(parser.getToken().getTag() == TokenTag::Key_End);
-    parser.eatToken();
-    parser.eatEndOfLine();
-}
-
-void EndStatementNode::analyze(Analyzer& analyzer)
-{
-    // intentionally left blank
-}
-
-void EndStatementNode::translate(Translator& translator)
-{
-    *translator.getBytecode().alloc(1) = Op_end;
-}
+private:
+    ExpressionNode* mExpression;
+};

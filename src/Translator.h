@@ -35,10 +35,12 @@
 #include "Node.h"
 #include "TItemBuffer.h"
 
+class StringTable;
+
 class Translator
 {
 public:
-    Translator(TItemBuffer<uint8_t>& bytecode, Node& root);
+    Translator(TItemBuffer<uint8_t>& bytecode, StringTable& stringTable, Node& root);
     ~Translator();
 
     void run();
@@ -48,7 +50,13 @@ public:
         return mBytecode;
     }
 
+    StringTable& getStringTable()
+    {
+        return mStringTable;
+    }
+
 private:
     TItemBuffer<uint8_t>& mBytecode;
+    StringTable& mStringTable;
     Node& mRoot;
 };

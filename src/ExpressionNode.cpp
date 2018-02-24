@@ -28,36 +28,30 @@
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "EndStatementNode.h"
-#include "Opcodes.h"
+#include "ExpressionNode.h"
 #include "Parser.h"
-#include "Translator.h"
+#include "StringLiteralExpressionNode.h"
 
-EndStatementNode::EndStatementNode()
+ExpressionNode::ExpressionNode()
     :
-    StatementNode()
+    Node(),
+    mTypename(Typename::Unknown)
 {
     // intentionally left blank
 }
 
-EndStatementNode::~EndStatementNode()
+ExpressionNode::~ExpressionNode()
 {
     // intentionally left blank
 }
 
-void EndStatementNode::parse(Parser& parser)
+ExpressionNode* ExpressionNode::parseExpression(Parser& parser)
 {
-    assert(parser.getToken().getTag() == TokenTag::Key_End);
-    parser.eatToken();
-    parser.eatEndOfLine();
-}
+    ExpressionNode* expr = nullptr;
+    if (parser.isToken(TokenId::String))
+        expr = parser.getNodePool().alloc<StringLiteralExpressionNode>();
+    if (expr)
+        expr->parse(parser);
 
-void EndStatementNode::analyze(Analyzer& analyzer)
-{
-    // intentionally left blank
-}
-
-void EndStatementNode::translate(Translator& translator)
-{
-    *translator.getBytecode().alloc(1) = Op_end;
+    return expr;
 }

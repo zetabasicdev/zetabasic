@@ -31,12 +31,14 @@
 #include "Interpreter.h"
 #include "Opcodes.h"
 #include "Program.h"
+#include "SystemCalls.h"
 #include "Window.h"
 
 Interpreter::Interpreter(Window& window, const Program& program)
     :
     mWindow(window),
-    mProgram(program)
+    mProgram(program),
+    mStringStack()
 {
     // intentionally left blank
 }
@@ -46,7 +48,7 @@ Interpreter::~Interpreter()
     // intentionally left blank
 }
 
-void Interpreter::run()
+InterpreterResult Interpreter::run()
 {
     auto code = mProgram.getBytecode();
     int ip = 0;
@@ -58,9 +60,32 @@ void Interpreter::run()
             (void)mWindow.runOnce();
             ip = mProgram.getLength();
             break;
-        default:
+        case Op_load_cstr:
+            mStringStack.pushConstant(mProgram.getString(code[ip + 1]));
+            ip += 2;
             break;
+        case Op_syscall:
+            DoSysCall(code[ip + 1]);
+            ip += 2;
+            break;
+        default:
+            return InterpreterResult::BadOpcode;
         }
     }
     
+    return InterpreterResult::ExecutionComplete;
+}
+
+void Interpreter::DoSysCall(uint8_t ix)
+{
+    switch (ix) {
+    case Syscall_printstr:
+    {
+        String text = mStringStack.pop();
+        mWindow.printn(text.getText(), text.getLength());
+        break;
+    }
+    default:
+        break;
+    }
 }

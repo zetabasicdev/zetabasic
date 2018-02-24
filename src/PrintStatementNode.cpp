@@ -28,36 +28,51 @@
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "EndStatementNode.h"
+#include "ExpressionNode.h"
 #include "Opcodes.h"
 #include "Parser.h"
+#include "PrintStatementNode.h"
+#include "SystemCalls.h"
 #include "Translator.h"
 
-EndStatementNode::EndStatementNode()
+PrintStatementNode::PrintStatementNode()
     :
-    StatementNode()
+    StatementNode(),
+    mExpression(nullptr)
 {
     // intentionally left blank
 }
 
-EndStatementNode::~EndStatementNode()
+PrintStatementNode::~PrintStatementNode()
 {
     // intentionally left blank
 }
 
-void EndStatementNode::parse(Parser& parser)
+void PrintStatementNode::parse(Parser& parser)
 {
-    assert(parser.getToken().getTag() == TokenTag::Key_End);
+    assert(parser.getToken().getTag() == TokenTag::Key_Print);
     parser.eatToken();
+
+    mExpression = ExpressionNode::parseExpression(parser);
+
     parser.eatEndOfLine();
 }
 
-void EndStatementNode::analyze(Analyzer& analyzer)
+void PrintStatementNode::analyze(Analyzer& analyzer)
 {
-    // intentionally left blank
+    if (mExpression)
+        mExpression->analyze(analyzer);
 }
 
-void EndStatementNode::translate(Translator& translator)
+void PrintStatementNode::translate(Translator& translator)
 {
-    *translator.getBytecode().alloc(1) = Op_end;
+    if (mExpression) {
+        mExpression->translate(translator);
+
+        if (mExpression->getTypename() == Typename::String) {
+            auto ops = translator.getBytecode().alloc(2);
+            ops[0] = Op_syscall;
+            ops[1] = Syscall_printstr;
+        }
+    }
 }

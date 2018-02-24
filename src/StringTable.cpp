@@ -28,36 +28,36 @@
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "EndStatementNode.h"
-#include "Opcodes.h"
-#include "Parser.h"
-#include "Translator.h"
+#include "StringTable.h"
 
-EndStatementNode::EndStatementNode()
+StringTable::StringTable()
     :
-    StatementNode()
+    mStrings()
 {
     // intentionally left blank
 }
 
-EndStatementNode::~EndStatementNode()
+StringTable::~StringTable()
 {
     // intentionally left blank
 }
 
-void EndStatementNode::parse(Parser& parser)
+void StringTable::reset()
 {
-    assert(parser.getToken().getTag() == TokenTag::Key_End);
-    parser.eatToken();
-    parser.eatEndOfLine();
+    mStrings.clear();
 }
 
-void EndStatementNode::analyze(Analyzer& analyzer)
+int StringTable::addString(const String& string)
 {
-    // intentionally left blank
+    int len = (int)mStrings.size();
+    for (auto ix = 0; ix < len; ++ix)
+        if (mStrings[ix] == string)
+            return ix;
+    mStrings.push_back(string);
+    return len;
 }
 
-void EndStatementNode::translate(Translator& translator)
+const String& StringTable::getString(int index) const
 {
-    *translator.getBytecode().alloc(1) = Op_end;
+    return mStrings[index];
 }

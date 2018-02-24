@@ -30,6 +30,7 @@
 
 #include "EndStatementNode.h"
 #include "Parser.h"
+#include "PrintStatementNode.h"
 #include "StatementNode.h"
 
 StatementNode::StatementNode()
@@ -46,13 +47,18 @@ StatementNode::~StatementNode()
 
 StatementNode* StatementNode::parseStatement(Parser& parser)
 {
-    auto& token = parser.getToken();
+    while (parser.getToken().getId() == TokenId::EndOfLine)
+        parser.eatToken();
 
+    auto& token = parser.getToken();
     StatementNode* node = nullptr;
     if (token.getId() == TokenId::Name) {
         switch (token.getTag()) {
         case TokenTag::Key_End:
             node = parser.getNodePool().alloc<EndStatementNode>();
+            break;
+        case TokenTag::Key_Print:
+            node = parser.getNodePool().alloc<PrintStatementNode>();
             break;
         default:
             break;

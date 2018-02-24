@@ -49,6 +49,8 @@ public:
     void raiseError(CompileErrorId id, const std::string& message) const;
     bool isToken(TokenId id) const;
     void eatToken();
+    bool isEndOfLine() const;
+    void eatEndOfLine();
 
     NodePool& getNodePool()
     {

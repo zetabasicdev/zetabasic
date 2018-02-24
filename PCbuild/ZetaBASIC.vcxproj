@@ -75,6 +75,7 @@
     <ClInclude Include="..\src\CompileError.h" />
     <ClInclude Include="..\src\Compiler.h" />
     <ClInclude Include="..\src\EndStatementNode.h" />
+    <ClInclude Include="..\src\ExpressionNode.h" />
     <ClInclude Include="..\src\Font.h" />
     <ClInclude Include="..\src\Interpreter.h" />
     <ClInclude Include="..\src\ISourceStream.h" />
@@ -85,11 +86,16 @@
     <ClInclude Include="..\src\NodePool.h" />
     <ClInclude Include="..\src\Opcodes.h" />
     <ClInclude Include="..\src\Parser.h" />
+    <ClInclude Include="..\src\PrintStatementNode.h" />
     <ClInclude Include="..\src\Program.h" />
     <ClInclude Include="..\src\Range.h" />
     <ClInclude Include="..\src\StatementNode.h" />
     <ClInclude Include="..\src\String.h" />
+    <ClInclude Include="..\src\StringStack.h" />
+    <ClInclude Include="..\src\StringTable.h" />
+    <ClInclude Include="..\src\StringLiteralExpressionNode.h" />
     <ClInclude Include="..\src\StringPool.h" />
+    <ClInclude Include="..\src\SystemCalls.h" />
     <ClInclude Include="..\src\TextSourceStream.h" />
     <ClInclude Include="..\src\TItemBuffer.h" />
     <ClInclude Include="..\src\TNodeList.h" />
@@ -98,19 +104,25 @@
     <ClInclude Include="..\src\TObjectPool.h" />
     <ClInclude Include="..\src\Token.h" />
     <ClInclude Include="..\src\Translator.h" />
+    <ClInclude Include="..\src\Typename.h" />
     <ClInclude Include="..\src\Window.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\Analyzer.cpp" />
     <ClCompile Include="..\src\Compiler.cpp" />
     <ClCompile Include="..\src\EndStatementNode.cpp" />
+    <ClCompile Include="..\src\ExpressionNode.cpp" />
     <ClCompile Include="..\src\Interpreter.cpp" />
     <ClCompile Include="..\src\Lexer.cpp" />
     <ClCompile Include="..\src\main.cpp" />
     <ClCompile Include="..\src\ModuleNode.cpp" />
     <ClCompile Include="..\src\Node.cpp" />
     <ClCompile Include="..\src\Parser.cpp" />
+    <ClCompile Include="..\src\PrintStatementNode.cpp" />
     <ClCompile Include="..\src\StatementNode.cpp" />
+    <ClCompile Include="..\src\StringStack.cpp" />
+    <ClCompile Include="..\src\StringTable.cpp" />
+    <ClCompile Include="..\src\StringLiteralExpressionNode.cpp" />
     <ClCompile Include="..\src\TextSourceStream.cpp" />
     <ClCompile Include="..\src\Token.cpp" />
     <ClCompile Include="..\src\Translator.cpp" />
