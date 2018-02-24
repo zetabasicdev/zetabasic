@@ -30,30 +30,27 @@
 
 #pragma once
 
-class NodePool;
-class Node;
-class SymbolTable;
+#include "StatementNode.h"
+#include "String.h"
 
-class Analyzer
+class Symbol;
+
+class ExpressionNode;
+
+class AssignmentStatementNode
+    :
+    public StatementNode
 {
 public:
-    Analyzer(NodePool& nodePool, SymbolTable& symbolTable, Node& root);
-    ~Analyzer();
+    AssignmentStatementNode();
+    virtual ~AssignmentStatementNode();
 
-    void run();
-
-    NodePool& getNodePool()
-    {
-        return mNodePool;
-    }
-
-    SymbolTable& getSymbolTable()
-    {
-        return mSymbolTable;
-    }
+    void parse(Parser& parser);
+    void analyze(Analyzer& analyzer);
+    void translate(Translator& translator);
 
 private:
-    NodePool& mNodePool;
-    SymbolTable& mSymbolTable;
-    Node& mRoot;
+    String mName;
+    Symbol* mSymbol;
+    ExpressionNode* mValue;
 };

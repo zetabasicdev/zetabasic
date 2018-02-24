@@ -28,6 +28,7 @@
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+#include "AssignmentStatementNode.h"
 #include "EndStatementNode.h"
 #include "Parser.h"
 #include "PrintStatementNode.h"
@@ -56,6 +57,9 @@ StatementNode* StatementNode::parseStatement(Parser& parser)
         switch (token.getTag()) {
         case TokenTag::Key_End:
             node = parser.getNodePool().alloc<EndStatementNode>();
+            break;
+        case TokenTag::Key_Let:
+            node = parser.getNodePool().alloc<AssignmentStatementNode>();
             break;
         case TokenTag::Key_Print:
             node = parser.getNodePool().alloc<PrintStatementNode>();

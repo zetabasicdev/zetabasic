@@ -35,8 +35,11 @@
 enum Opcode : uint8_t
 {
     Op_end = 0x01,
+    Op_reserve,
     Op_load_cstr,
     Op_load_i,
+    Op_load_local,
+    Op_store_local,
     Op_syscall,
     Op_add_str,
     Op_add_i

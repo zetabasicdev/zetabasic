@@ -31,9 +31,10 @@
 #include "Analyzer.h"
 #include "Node.h"
 
-Analyzer::Analyzer(NodePool& nodePool, Node& root)
+Analyzer::Analyzer(NodePool& nodePool, SymbolTable& symbolTable, Node& root)
     :
     mNodePool(nodePool),
+    mSymbolTable(symbolTable),
     mRoot(root)
 {
     // intentionally left blank

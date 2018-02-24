@@ -37,11 +37,12 @@
 
 class ConstantTable;
 class StringTable;
+class SymbolTable;
 
 class Translator
 {
 public:
-    Translator(TItemBuffer<uint8_t>& bytecode, StringTable& stringTable, ConstantTable& constantTable, Node& root);
+    Translator(TItemBuffer<uint8_t>& bytecode, StringTable& stringTable, ConstantTable& constantTable, SymbolTable& symbolTable, Node& root);
     ~Translator();
 
     void run();
@@ -61,9 +62,15 @@ public:
         return mConstantTable;
     }
 
+    SymbolTable& getSymbolTable()
+    {
+        return mSymbolTable;
+    }
+
 private:
     TItemBuffer<uint8_t>& mBytecode;
     StringTable& mStringTable;
     ConstantTable& mConstantTable;
+    SymbolTable& mSymbolTable;
     Node& mRoot;
 };

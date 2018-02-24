@@ -28,32 +28,39 @@
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#pragma once
+#include "Symbol.h"
+#include "SymbolTable.h"
 
-class NodePool;
-class Node;
-class SymbolTable;
-
-class Analyzer
+SymbolTable::SymbolTable()
+    :
+    mSymbolPool(64),
+    mSymbols()
 {
-public:
-    Analyzer(NodePool& nodePool, SymbolTable& symbolTable, Node& root);
-    ~Analyzer();
+    // intentionally left blank
+}
 
-    void run();
+SymbolTable::~SymbolTable()
+{
+    // intentionally left blank
+}
 
-    NodePool& getNodePool()
-    {
-        return mNodePool;
-    }
+void SymbolTable::reset()
+{
+    mSymbolPool.reset();
+    mSymbols.reset();
+}
 
-    SymbolTable& getSymbolTable()
-    {
-        return mSymbolTable;
-    }
+Symbol* SymbolTable::getSymbol(const Range& range, const String& name, Typename type)
+{
+    // first determine if symbol by this name already exists
+    for (auto ix = 0; ix < mSymbols.getSize(); ++ix)
+        if (mSymbols[ix].getName() == name)
+            // simply use this symbol
+            return &mSymbols[ix];
 
-private:
-    NodePool& mNodePool;
-    SymbolTable& mSymbolTable;
-    Node& mRoot;
-};
+    // need to instance a new symbol
+    auto symbol = mSymbolPool.alloc(mSymbols.getSize(), range, name, type);
+    mSymbols.push(symbol);
+
+    return symbol;
+}

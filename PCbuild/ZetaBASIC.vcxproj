@@ -72,6 +72,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="..\src\Analyzer.h" />
+    <ClInclude Include="..\src\AssignmentStatementNode.h" />
     <ClInclude Include="..\src\BinaryExpressionNode.h" />
     <ClInclude Include="..\src\CompileError.h" />
     <ClInclude Include="..\src\Compiler.h" />
@@ -79,6 +80,7 @@
     <ClInclude Include="..\src\EndStatementNode.h" />
     <ClInclude Include="..\src\ExpressionNode.h" />
     <ClInclude Include="..\src\Font.h" />
+    <ClInclude Include="..\src\IdentifierExpressionNode.h" />
     <ClInclude Include="..\src\IntegerLiteralExpressionNode.h" />
     <ClInclude Include="..\src\Interpreter.h" />
     <ClInclude Include="..\src\ISourceStream.h" />
@@ -99,6 +101,8 @@
     <ClInclude Include="..\src\StringTable.h" />
     <ClInclude Include="..\src\StringLiteralExpressionNode.h" />
     <ClInclude Include="..\src\StringPool.h" />
+    <ClInclude Include="..\src\Symbol.h" />
+    <ClInclude Include="..\src\SymbolTable.h" />
     <ClInclude Include="..\src\SystemCalls.h" />
     <ClInclude Include="..\src\TextSourceStream.h" />
     <ClInclude Include="..\src\TItemBuffer.h" />
@@ -113,11 +117,13 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\Analyzer.cpp" />
+    <ClCompile Include="..\src\AssignmentStatementNode.cpp" />
     <ClCompile Include="..\src\BinaryExpressionNode.cpp" />
     <ClCompile Include="..\src\Compiler.cpp" />
     <ClCompile Include="..\src\ConstantTable.cpp" />
     <ClCompile Include="..\src\EndStatementNode.cpp" />
     <ClCompile Include="..\src\ExpressionNode.cpp" />
+    <ClCompile Include="..\src\IdentifierExpressionNode.cpp" />
     <ClCompile Include="..\src\IntegerLiteralExpressionNode.cpp" />
     <ClCompile Include="..\src\Interpreter.cpp" />
     <ClCompile Include="..\src\Lexer.cpp" />
@@ -131,6 +137,7 @@
     <ClCompile Include="..\src\StringStack.cpp" />
     <ClCompile Include="..\src\StringTable.cpp" />
     <ClCompile Include="..\src\StringLiteralExpressionNode.cpp" />
+    <ClCompile Include="..\src\SymbolTable.cpp" />
     <ClCompile Include="..\src\TextSourceStream.cpp" />
     <ClCompile Include="..\src\Token.cpp" />
     <ClCompile Include="..\src\Translator.cpp" />

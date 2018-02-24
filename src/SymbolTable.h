@@ -30,30 +30,31 @@
 
 #pragma once
 
-class NodePool;
-class Node;
-class SymbolTable;
+#include "TObjectList.h"
+#include "TObjectPool.h"
+#include "Typename.h"
 
-class Analyzer
+class Range;
+class String;
+
+class Symbol;
+
+class SymbolTable
 {
 public:
-    Analyzer(NodePool& nodePool, SymbolTable& symbolTable, Node& root);
-    ~Analyzer();
+    SymbolTable();
+    ~SymbolTable();
 
-    void run();
+    void reset();
 
-    NodePool& getNodePool()
+    int getSize() const
     {
-        return mNodePool;
+        return mSymbols.getSize();
     }
 
-    SymbolTable& getSymbolTable()
-    {
-        return mSymbolTable;
-    }
+    Symbol* getSymbol(const Range& range, const String& name, Typename type);
 
 private:
-    NodePool& mNodePool;
-    SymbolTable& mSymbolTable;
-    Node& mRoot;
+    TObjectPool<Symbol> mSymbolPool;
+    TObjectList<Symbol> mSymbols;
 };

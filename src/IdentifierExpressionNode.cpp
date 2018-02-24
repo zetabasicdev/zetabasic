@@ -28,32 +28,57 @@
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#pragma once
+#include <cassert>
 
-class NodePool;
-class Node;
-class SymbolTable;
+#include "Analyzer.h"
+#include "IdentifierExpressionNode.h"
+#include "Opcodes.h"
+#include "Parser.h"
+#include "Symbol.h"
+#include "SymbolTable.h"
+#include "Translator.h"
 
-class Analyzer
+IdentifierExpressionNode::IdentifierExpressionNode()
+    :
+    mName(),
+    mSymbol(nullptr)
 {
-public:
-    Analyzer(NodePool& nodePool, SymbolTable& symbolTable, Node& root);
-    ~Analyzer();
+    // intentionally left blank
+}
 
-    void run();
+IdentifierExpressionNode::~IdentifierExpressionNode()
+{
+    // intentionally left blank
+}
 
-    NodePool& getNodePool()
-    {
-        return mNodePool;
-    }
+void IdentifierExpressionNode::parse(Parser& parser)
+{
+    assert(parser.getToken().getId() == TokenId::Name);
+    assert(parser.getToken().getTag() == TokenTag::None);
 
-    SymbolTable& getSymbolTable()
-    {
-        return mSymbolTable;
-    }
+    mName = parser.getToken().getText();
+    
+    parser.eatToken();
+}
 
-private:
-    NodePool& mNodePool;
-    SymbolTable& mSymbolTable;
-    Node& mRoot;
-};
+void IdentifierExpressionNode::analyze(Analyzer& analyzer)
+{
+    char lastChar = mName.getText()[mName.getLength() - 1];
+    if (lastChar == '$')
+        mTypename = Typename::String;
+    else
+        mTypename = Typename::Integer;
+
+    mSymbol = analyzer.getSymbolTable().getSymbol(mRange, mName, mTypename);
+}
+
+void IdentifierExpressionNode::translate(Translator& translator)
+{
+    // todo...
+    assert(mTypename == Typename::Integer);
+    assert(mSymbol->getLocation() < 256);
+
+    auto code = translator.getBytecode().alloc(2);
+    code[0] = Op_load_local;
+    code[1] = (uint8_t)mSymbol->getLocation();
+}

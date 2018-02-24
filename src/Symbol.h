@@ -30,30 +30,50 @@
 
 #pragma once
 
-class NodePool;
-class Node;
-class SymbolTable;
+#include "Range.h"
+#include "String.h"
+#include "Typename.h"
 
-class Analyzer
+class Symbol
 {
 public:
-    Analyzer(NodePool& nodePool, SymbolTable& symbolTable, Node& root);
-    ~Analyzer();
-
-    void run();
-
-    NodePool& getNodePool()
+    Symbol(int location, const Range& range, const String& name, Typename type)
+        :
+        mLocation(location),
+        mName(name),
+        mType(type)
     {
-        return mNodePool;
+        // intentionally left blank
     }
 
-    SymbolTable& getSymbolTable()
+    ~Symbol()
     {
-        return mSymbolTable;
+        // intentionally left blank
+    }
+
+    int getLocation() const
+    {
+        return mLocation;
+    }
+
+    const Range& getRange() const
+    {
+        return mRange;
+    }
+
+    const String& getName() const
+    {
+        return mName;
+    }
+
+    Typename getType() const
+    {
+        return mType;
     }
 
 private:
-    NodePool& mNodePool;
-    SymbolTable& mSymbolTable;
-    Node& mRoot;
+    int mLocation;
+    Range mRange;
+    String mName;
+    Typename mType;
 };

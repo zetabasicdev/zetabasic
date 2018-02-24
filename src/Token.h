@@ -49,8 +49,10 @@ enum class TokenTag
 {
     None,
     Key_End,
+    Key_Let,
     Key_Print,
-    Sym_Add
+    Sym_Add,
+    Sym_Equals
 };
 const char* ToString(TokenTag tag);
 

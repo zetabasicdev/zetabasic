@@ -49,6 +49,22 @@ Stack::~Stack()
     delete[] mData;
 }
 
+void Stack::reserve(int count)
+{
+    assert(count < kDefaultStackCapacity);
+
+    if (mPointer + count > mCapacity) {
+        mCapacity *= 2;
+        int64_t* newData = new int64_t[mCapacity];
+        memcpy(newData, mData, sizeof(int64_t) * mPointer);
+        delete[] mData;
+        mData = newData;
+    }
+
+    memset(&mData[mPointer], 0, sizeof(int64_t) * count);
+    mPointer += count;
+}
+
 void Stack::push(int64_t value)
 {
     if (mPointer == mCapacity) {
@@ -66,4 +82,16 @@ int64_t Stack::pop()
 {
     assert(mPointer > 0);
     return mData[--mPointer];
+}
+
+int64_t Stack::getLocal(int index)
+{
+    assert(mPointer > index);
+    return mData[index];
+}
+
+void Stack::setLocal(int index, int64_t value)
+{
+    assert(mPointer > index);
+    mData[index] = value;
 }

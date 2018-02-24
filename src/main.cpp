@@ -55,7 +55,7 @@ void fatalError(const std::string& title, const std::string& message)
 int main(int argc, char* argv[])
 {
     try {
-        const char* code = "PRINT 33 + 10\nEND";
+        const char* code = "LET N = 33\nPRINT N\nEND";
 
         Compiler compiler;
         TextSourceStream stream(code);

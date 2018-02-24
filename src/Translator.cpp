@@ -30,11 +30,12 @@
 
 #include "Translator.h"
 
-Translator::Translator(TItemBuffer<uint8_t>& bytecode, StringTable& stringTable, ConstantTable& constantTable, Node& root)
+Translator::Translator(TItemBuffer<uint8_t>& bytecode, StringTable& stringTable, ConstantTable& constantTable, SymbolTable& symbolTable, Node& root)
     :
     mBytecode(bytecode),
     mStringTable(stringTable),
     mConstantTable(constantTable),
+    mSymbolTable(symbolTable),
     mRoot(root)
 {
     // intentionally left blank

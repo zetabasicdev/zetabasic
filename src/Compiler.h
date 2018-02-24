@@ -37,6 +37,7 @@
 #include "Program.h"
 #include "StringPool.h"
 #include "StringTable.h"
+#include "SymbolTable.h"
 #include "TItemBuffer.h"
 #include "Token.h"
 #include "TObjectPool.h"
@@ -60,4 +61,5 @@ private:
     TItemBuffer<uint8_t> mBytecode;
     StringTable mStringTable;
     ConstantTable mConstantTable;
+    SymbolTable mSymbolTable;
 };

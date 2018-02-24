@@ -28,52 +28,74 @@
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "ModuleNode.h"
+#include "Analyzer.h"
+#include "AssignmentStatementNode.h"
+#include "ExpressionNode.h"
 #include "Opcodes.h"
 #include "Parser.h"
+#include "Symbol.h"
 #include "SymbolTable.h"
-#include "StatementNode.h"
 #include "Translator.h"
 
-ModuleNode::ModuleNode()
+AssignmentStatementNode::AssignmentStatementNode()
     :
-    mStatements()
+    mName(),
+    mValue(nullptr)
 {
     // intentionally left blank
 }
 
-ModuleNode::~ModuleNode()
+AssignmentStatementNode::~AssignmentStatementNode()
 {
     // intentionally left blank
 }
 
-void ModuleNode::parse(Parser& parser)
+void AssignmentStatementNode::parse(Parser& parser)
 {
-    auto stm = StatementNode::parseStatement(parser);
-    while (stm) {
-        mStatements.push(stm);
-        stm = StatementNode::parseStatement(parser);
-    }
+    assert(parser.getToken().getTag() == TokenTag::Key_Let);
+    parser.eatToken();
 
-    if (!parser.isToken(TokenId::EndOfSource))
-        parser.raiseError(CompileErrorId::SyntaxError, "Expected Statement");
+    if (parser.getToken().getId() != TokenId::Name || parser.getToken().getTag() != TokenTag::None)
+        parser.raiseError(CompileErrorId::SyntaxError, "Expected Identifier");
+
+    mName = parser.getToken().getText();
+    parser.eatToken();
+
+    if (parser.getToken().getTag() != TokenTag::Sym_Equals)
+        parser.raiseError(CompileErrorId::SyntaxError, "Expected =");
+    parser.eatToken();
+
+    mValue = ExpressionNode::parseExpression(parser);
+    if (!mValue)
+        parser.raiseError(CompileErrorId::SyntaxError, "Expected Expression");
+
+    parser.eatEndOfLine();
 }
 
-void ModuleNode::analyze(Analyzer& analyzer)
+void AssignmentStatementNode::analyze(Analyzer& analyzer)
 {
-    for (auto& stm : mStatements)
-        stm.analyze(analyzer);
+    mValue->analyze(analyzer);
+
+    Typename type = Typename::Unknown;
+    char lastChar = mName.getText()[mName.getLength() - 1];
+    if (lastChar == '$')
+        type = Typename::String;
+    else
+        type = Typename::Integer;
+
+    if (type != mValue->getTypename())
+        throw CompileError(CompileErrorId::TypeError, mRange, "Incompatible Types For Assignment");
+
+    mSymbol = analyzer.getSymbolTable().getSymbol(mRange, mName, type);
 }
 
-void ModuleNode::translate(Translator& translator)
+void AssignmentStatementNode::translate(Translator& translator)
 {
-    assert(translator.getSymbolTable().getSize() < 256);
+    mValue->translate(translator);
+
+    assert(mSymbol->getLocation() < 256);
 
     auto code = translator.getBytecode().alloc(2);
-    code[0] = Op_reserve;
-    code[1] = (uint8_t)translator.getSymbolTable().getSize();
-
-    for (auto& stm : mStatements)
-        stm.translate(translator);
-
+    code[0] = Op_store_local;
+    code[1] = (uint8_t)mSymbol->getLocation();
 }

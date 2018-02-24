@@ -60,12 +60,24 @@ static void dumpBytecode(const uint8_t* code, int length)
             std::cout << "end" << std::endl;
             ++code;
             break;
+        case Op_reserve:
+            std::cout << "reserve             " << (int)code[1] << std::endl;
+            code += 2;
+            break;
         case Op_load_cstr:
             std::cout << "load.cstr           #" << (int)code[1] << std::endl;
             code += 2;
             break;
         case Op_load_i:
             std::cout << "load.int            #" << (int)code[1] << std::endl;
+            code += 2;
+            break;
+        case Op_load_local:
+            std::cout << "load.local          #" << (int)code[1] << std::endl;
+            code += 2;
+            break;
+        case Op_store_local:
+            std::cout << "store.local         #" << (int)code[1] << std::endl;
             code += 2;
             break;
         case Op_syscall:
@@ -99,12 +111,24 @@ InterpreterResult Interpreter::run()
             (void)mWindow.runOnce();
             ip = mProgram.getLength();
             break;
+        case Op_reserve:
+            mStack.reserve(code[ip + 1]);
+            ip += 2;
+            break;
         case Op_load_cstr:
             mStringStack.pushConstant(mProgram.getString(code[ip + 1]));
             ip += 2;
             break;
         case Op_load_i:
             mStack.push(mProgram.getIntegerConstant(code[ip + 1]));
+            ip += 2;
+            break;
+        case Op_load_local:
+            mStack.push(mStack.getLocal(code[ip + 1]));
+            ip += 2;
+            break;
+        case Op_store_local:
+            mStack.setLocal(code[ip + 1], mStack.pop());
             ip += 2;
             break;
         case Op_syscall:

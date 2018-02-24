@@ -38,8 +38,13 @@ public:
     Stack();
     ~Stack();
 
+    void reserve(int count);
+
     void push(int64_t value);
     int64_t pop();
+
+    int64_t getLocal(int index);
+    void setLocal(int index, int64_t value);
 
 private:
     int mCapacity;
