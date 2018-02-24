@@ -28,44 +28,72 @@
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+#include "Analyzer.h"
 #include "BinaryExpressionNode.h"
-#include "ExpressionNode.h"
+#include "Opcodes.h"
 #include "Parser.h"
-#include "StringLiteralExpressionNode.h"
+#include "Translator.h"
 
-ExpressionNode::ExpressionNode()
+BinaryExpressionNode::BinaryExpressionNode(ExpressionNode* lhs)
     :
-    Node(),
-    mTypename(Typename::Unknown)
+    mOp(Operator::Unknown),
+    mLhs(lhs),
+    mRhs(nullptr)
 {
     // intentionally left blank
 }
 
-ExpressionNode::~ExpressionNode()
+BinaryExpressionNode::~BinaryExpressionNode()
 {
     // intentionally left blank
 }
 
-int ExpressionNode::getPrecedence(TokenTag tag)
+void BinaryExpressionNode::parse(Parser& parser)
 {
-    if (tag == TokenTag::Sym_Add) return 3;
-    return 0;
-}
-
-ExpressionNode* ExpressionNode::parseExpression(Parser& parser, int precedence)
-{
-    // first parse potential prefix expression
-    ExpressionNode* expr = nullptr;
-    if (parser.isToken(TokenId::String))
-        expr = parser.getNodePool().alloc<StringLiteralExpressionNode>();
-    if (expr)
-        expr->parse(parser);
-
-    // then search for infix expressions
-    while (precedence < getPrecedence(parser.getToken().getTag())) {
-        expr = parser.getNodePool().alloc<BinaryExpressionNode>(expr);
-        expr->parse(parser);
+    int precedence = ExpressionNode::getPrecedence(parser.getToken().getTag());
+    switch (parser.getToken().getTag()) {
+    case TokenTag::Sym_Add:
+        mOp = Operator::Addition;
+        break;
+    default:
+        assert(false);
+        break;
     }
+    parser.eatToken();
 
-    return expr;
+    // parse sub-expressions on the right-hand side
+    mRhs = ExpressionNode::parseExpression(parser, precedence);
+    if (!mRhs)
+        parser.raiseError(CompileErrorId::SyntaxError, "Expected Expression");
+}
+
+void BinaryExpressionNode::analyze(Analyzer& analyzer)
+{
+    mLhs->analyze(analyzer);
+    mRhs->analyze(analyzer);
+
+    Typename leftType = mLhs->getTypename();
+    Typename rightType = mRhs->getTypename();
+
+    assert(leftType != Typename::Unknown);
+    assert(rightType != Typename::Unknown);
+
+    if (leftType != rightType)
+        throw CompileError(CompileErrorId::TypeError, mRange, "Mis-matched Expression Types");
+
+    mTypename = leftType;
+}
+
+void BinaryExpressionNode::translate(Translator& translator)
+{
+    mLhs->translate(translator);
+    mRhs->translate(translator);
+
+    switch (mOp) {
+    case Operator::Addition:
+        *translator.getBytecode().alloc(1) = Op_add_str;
+        break;
+    default:
+        break;
+    }
 }

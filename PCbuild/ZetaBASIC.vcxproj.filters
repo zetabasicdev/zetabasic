@@ -126,6 +126,9 @@
     <ClInclude Include="..\src\StringStack.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\BinaryExpressionNode.h">
+      <Filter>Header Files\Nodes</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\main.cpp">
@@ -182,8 +185,11 @@
     <ClCompile Include="..\src\StringTable.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\BinaryExpressionNode.cpp">
+      <Filter>Source Files\Nodes</Filter>
+    </ClCompile>
     <ClCompile Include="..\src\StringStack.cpp">
-      <Filter>Header Files</Filter>
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

@@ -31,6 +31,7 @@
 #pragma once
 
 #include "Node.h"
+#include "Token.h"
 #include "Typename.h"
 
 class ExpressionNode
@@ -41,7 +42,8 @@ public:
     ExpressionNode();
     virtual ~ExpressionNode();
 
-    static ExpressionNode* parseExpression(Parser& parser);
+    static int getPrecedence(TokenTag tag);
+    static ExpressionNode* parseExpression(Parser& parser, int precedence = 0);
 
     Typename getTypename() const
     {

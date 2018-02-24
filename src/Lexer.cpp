@@ -80,6 +80,9 @@ void Lexer::run()
         case State::Whitespace:
             advanceChar = runWhitespaceState();
             break;
+        case State::Symbol:
+            advanceChar = runSymbolState();
+            break;
         default:
             break;
         }
@@ -95,6 +98,15 @@ void Lexer::run()
     if (mTokens.getSize() > 0)
         mTokens.push(mTokenPool.alloc(TokenId::EndOfLine, TokenTag::None, String(), Range()));
     mTokens.push(mTokenPool.alloc(TokenId::EndOfSource, TokenTag::None, String(), Range()));
+}
+
+static bool isSymbolStart(char ch)
+{
+    const char* chars = "+";
+    for (auto ix = 0; chars[ix]; ++ix)
+        if (chars[ix] == ch)
+            return true;
+    return false;
 }
 
 bool Lexer::runStartState()
@@ -114,6 +126,9 @@ bool Lexer::runStartState()
         mState = State::End;
         mId = TokenId::EndOfLine;
         return true;
+    } else if (isSymbolStart(mChar)) {
+        mState = State::Symbol;
+        return true;
     }
 
     throw CompileError(CompileErrorId::SyntaxError, Range(mRow, mCol), "Syntax Error");
@@ -131,7 +146,7 @@ bool Lexer::runEndState()
             // try to match a potential keyword
             static struct
             {
-                const char* keyword;
+                const char* text;
                 TokenTag tag;
             } keywords[] = {
                 { "END", TokenTag::Key_End },
@@ -139,11 +154,28 @@ bool Lexer::runEndState()
                 { nullptr, TokenTag::None }
             };
             for (int i = 0; keywords[i].tag != TokenTag::None; ++i) {
-                if (text == keywords[i].keyword) {
+                if (text == keywords[i].text) {
                     tag = keywords[i].tag;
                     break;
                 }
             }
+        } else if (mId == TokenId::Symbol) {
+            // try to match the symbol
+            static struct
+            {
+                const char* text;
+                TokenTag tag;
+            } symbols[] = {
+                { "+", TokenTag::Sym_Add },
+                { nullptr, TokenTag::None }
+            };
+            for (int i = 0; symbols[i].tag != TokenTag::None; ++i) {
+                if (text == symbols[i].text) {
+                    tag = symbols[i].tag;
+                    break;
+                }
+            }
+            assert(tag != TokenTag::None);
         }
 
         auto token = mTokenPool.alloc(mId, tag, text, Range(mStartRow, mStartCol, mRow, mCol));
@@ -189,4 +221,11 @@ bool Lexer::runWhitespaceState()
     }
 
     return true;
+}
+
+bool Lexer::runSymbolState()
+{
+    mId = TokenId::Symbol;
+    mState = State::End;
+    return false;
 }

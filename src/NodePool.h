@@ -55,13 +55,13 @@ public:
             kv.second->reset();
     }
 
-    template<typename T>
-    T* alloc()
+    template<typename T, typename... Args>
+    T* alloc(Args&&... args)
     {
         auto iter = mMemoryPools.find(sizeof(T));
         if (iter == mMemoryPools.end())
             mMemoryPools[sizeof(T)] = new MemoryPool(sizeof(T), 32);
-        return new(mMemoryPools[sizeof(T)]->allocItems(1)) T();
+        return new(mMemoryPools[sizeof(T)]->allocItems(1)) T(std::forward<Args>(args)...);
     }
 
 private:

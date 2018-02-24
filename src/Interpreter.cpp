@@ -28,6 +28,8 @@
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+#include <iostream>
+
 #include "Interpreter.h"
 #include "Opcodes.h"
 #include "Program.h"
@@ -48,9 +50,37 @@ Interpreter::~Interpreter()
     // intentionally left blank
 }
 
+static void dumpBytecode(const uint8_t* code, int length)
+{
+    const uint8_t* end = code + length;
+    while (code < end) {
+        switch (*code) {
+        case Op_end:
+            std::cout << "end" << std::endl;
+            ++code;
+            break;
+        case Op_load_cstr:
+            std::cout << "load.cstr           #" << (int)code[1] << std::endl;
+            code += 2;
+            break;
+        case Op_syscall:
+            std::cout << "syscall             #" << (int)code[1] << std::endl;
+            code += 2;
+            break;
+        case Op_add_str:
+            std::cout << "add.string" << std::endl;
+            ++code;
+            break;
+        default:
+            break;
+        }
+    }
+}
+
 InterpreterResult Interpreter::run()
 {
     auto code = mProgram.getBytecode();
+    dumpBytecode(code, mProgram.getLength());
     int ip = 0;
     while (ip < mProgram.getLength()) {
         switch (code[ip]) {
@@ -67,6 +97,10 @@ InterpreterResult Interpreter::run()
         case Op_syscall:
             DoSysCall(code[ip + 1]);
             ip += 2;
+            break;
+        case Op_add_str:
+            mStringStack.add();
+            ++ip;
             break;
         default:
             return InterpreterResult::BadOpcode;

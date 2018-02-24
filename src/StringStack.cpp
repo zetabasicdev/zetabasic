@@ -82,6 +82,15 @@ void StringStack::pushConstant(const String& value)
     ++mCount;
 }
 
+void StringStack::add()
+{
+    assert(mCount >= 2);
+
+    // simply combine top two strings into a single string
+    mLengths[mCount - 2] += mLengths[mCount - 1];
+    --mCount;
+}
+
 String StringStack::pop()
 {
     assert(mCount > 0);

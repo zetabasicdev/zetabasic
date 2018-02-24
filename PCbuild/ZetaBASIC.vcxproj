@@ -72,6 +72,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="..\src\Analyzer.h" />
+    <ClInclude Include="..\src\BinaryExpressionNode.h" />
     <ClInclude Include="..\src\CompileError.h" />
     <ClInclude Include="..\src\Compiler.h" />
     <ClInclude Include="..\src\EndStatementNode.h" />
@@ -109,6 +110,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\Analyzer.cpp" />
+    <ClCompile Include="..\src\BinaryExpressionNode.cpp" />
     <ClCompile Include="..\src\Compiler.cpp" />
     <ClCompile Include="..\src\EndStatementNode.cpp" />
     <ClCompile Include="..\src\ExpressionNode.cpp" />

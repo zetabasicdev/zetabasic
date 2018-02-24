@@ -39,6 +39,7 @@ public:
     ~StringStack();
 
     void pushConstant(const String& value);
+    void add();
 
     String pop();
 

@@ -53,7 +53,7 @@ void ModuleNode::parse(Parser& parser)
     }
 
     if (!parser.isToken(TokenId::EndOfSource))
-        parser.raiseError(CompileErrorId::ExpectedStatement, "Expected Statement");
+        parser.raiseError(CompileErrorId::SyntaxError, "Expected Statement");
 }
 
 void ModuleNode::analyze(Analyzer& analyzer)

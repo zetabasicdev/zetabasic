@@ -28,44 +28,30 @@
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "BinaryExpressionNode.h"
+#pragma once
+
 #include "ExpressionNode.h"
-#include "Parser.h"
-#include "StringLiteralExpressionNode.h"
 
-ExpressionNode::ExpressionNode()
+class BinaryExpressionNode
     :
-    Node(),
-    mTypename(Typename::Unknown)
+    public ExpressionNode
 {
-    // intentionally left blank
-}
+public:
+    enum class Operator
+    {
+        Unknown,
+        Addition
+    };
 
-ExpressionNode::~ExpressionNode()
-{
-    // intentionally left blank
-}
+    BinaryExpressionNode(ExpressionNode* lhs);
+    virtual ~BinaryExpressionNode();
 
-int ExpressionNode::getPrecedence(TokenTag tag)
-{
-    if (tag == TokenTag::Sym_Add) return 3;
-    return 0;
-}
+    void parse(Parser& parser);
+    void analyze(Analyzer& analyzer);
+    void translate(Translator& translator);
 
-ExpressionNode* ExpressionNode::parseExpression(Parser& parser, int precedence)
-{
-    // first parse potential prefix expression
-    ExpressionNode* expr = nullptr;
-    if (parser.isToken(TokenId::String))
-        expr = parser.getNodePool().alloc<StringLiteralExpressionNode>();
-    if (expr)
-        expr->parse(parser);
-
-    // then search for infix expressions
-    while (precedence < getPrecedence(parser.getToken().getTag())) {
-        expr = parser.getNodePool().alloc<BinaryExpressionNode>(expr);
-        expr->parse(parser);
-    }
-
-    return expr;
-}
+private:
+    Operator mOp;
+    ExpressionNode* mLhs;
+    ExpressionNode* mRhs;
+};

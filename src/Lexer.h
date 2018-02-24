@@ -57,7 +57,8 @@ private:
         End,
         Name,
         String,
-        Whitespace
+        Whitespace,
+        Symbol
     };
     State mState;
 
@@ -75,4 +76,5 @@ private:
     bool runNameState();
     bool runStringState();
     bool runWhitespaceState();
+    bool runSymbolState();
 };

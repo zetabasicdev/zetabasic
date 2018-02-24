@@ -39,7 +39,8 @@ enum class TokenId
     EndOfSource,
     EndOfLine,
     Name,
-    String
+    String,
+    Symbol
 };
 const char* ToString(TokenId id);
 
@@ -47,7 +48,8 @@ enum class TokenTag
 {
     None,
     Key_End,
-    Key_Print
+    Key_Print,
+    Sym_Add
 };
 const char* ToString(TokenTag tag);
 
