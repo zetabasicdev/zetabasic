@@ -76,6 +76,10 @@ static void dumpBytecode(const uint8_t* code, int length)
             std::cout << "add.string" << std::endl;
             ++code;
             break;
+        case Op_add_i:
+            std::cout << "add.int" << std::endl;
+            ++code;
+            break;
         default:
             break;
         }
@@ -111,6 +115,14 @@ InterpreterResult Interpreter::run()
             mStringStack.add();
             ++ip;
             break;
+        case Op_add_i:
+        {
+            int64_t rhs = mStack.pop();
+            int64_t lhs = mStack.pop();
+            mStack.push(lhs + rhs);
+            ++ip;
+            break;
+        }
         default:
             return InterpreterResult::BadOpcode;
         }

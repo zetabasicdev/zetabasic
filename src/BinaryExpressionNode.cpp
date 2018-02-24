@@ -91,7 +91,10 @@ void BinaryExpressionNode::translate(Translator& translator)
 
     switch (mOp) {
     case Operator::Addition:
-        *translator.getBytecode().alloc(1) = Op_add_str;
+        if (mTypename == Typename::Integer)
+            *translator.getBytecode().alloc(1) = Op_add_i;
+        else
+            *translator.getBytecode().alloc(1) = Op_add_str;
         break;
     default:
         break;
