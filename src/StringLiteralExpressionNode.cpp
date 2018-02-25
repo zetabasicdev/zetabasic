@@ -71,6 +71,6 @@ void StringLiteralExpressionNode::translate(Translator& translator)
     assert(ix >= 0 && ix < 256);
 
     auto ops = translator.getBytecode().alloc(2);
-    ops[0] = Op_load_cstr;
+    ops[0] = Op_load_const_str;
     ops[1] = (uint8_t)ix;
 }

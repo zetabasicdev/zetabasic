@@ -32,6 +32,7 @@
 
 #include <cstdint>
 #include "Stack.h"
+#include "StringManager.h"
 #include "StringStack.h"
 
 class Program;
@@ -57,6 +58,7 @@ private:
 
     Stack mStack;
     StringStack mStringStack;
+    StringManager mStringManager;
 
     void DoSysCall(uint8_t ix);
 };

@@ -28,61 +28,70 @@
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include <cassert>
+#include "StringManager.h"
+#include "StringStack.h"
 
-#include "Analyzer.h"
-#include "IdentifierExpressionNode.h"
-#include "Opcodes.h"
-#include "Parser.h"
-#include "Symbol.h"
-#include "SymbolTable.h"
-#include "Translator.h"
-
-IdentifierExpressionNode::IdentifierExpressionNode()
+StringManager::StringManager(StringStack& stringStack)
     :
-    mName(),
-    mSymbol(nullptr)
+    mStringStack(stringStack)
 {
     // intentionally left blank
 }
 
-IdentifierExpressionNode::~IdentifierExpressionNode()
+StringManager::~StringManager()
 {
-    // intentionally left blank
-}
-
-void IdentifierExpressionNode::parse(Parser& parser)
-{
-    assert(parser.getToken().getId() == TokenId::Name);
-    assert(parser.getToken().getTag() == TokenTag::None);
-
-    mName = parser.getToken().getText();
-    
-    parser.eatToken();
-}
-
-void IdentifierExpressionNode::analyze(Analyzer& analyzer)
-{
-    char lastChar = mName.getText()[mName.getLength() - 1];
-    if (lastChar == '$')
-        mTypename = Typename::String;
-    else
-        mTypename = Typename::Integer;
-
-    mSymbol = analyzer.getSymbolTable().getSymbol(mRange, mName, mTypename);
-}
-
-void IdentifierExpressionNode::translate(Translator& translator)
-{
-    assert(mSymbol->getLocation() < 256);
-
-    if (mSymbol->getType() == Typename::String) {
-        auto code = translator.getBytecode().alloc(2);
-        code[0] = Op_load_local_str;
-        code[1] = (uint8_t)mSymbol->getLocation();
-    } else {
-        auto code = translator.getBytecode().alloc(2);
-        code[0] = Op_load_local;
-        code[1] = (uint8_t)mSymbol->getLocation();
+    for (auto instance : mStrings) {
+        delete instance->data;
+        delete instance;
     }
+}
+
+int64_t StringManager::storeString(int64_t desc)
+{
+    String value = mStringStack.pop();
+    
+    if (desc != 0) {
+        removeInstance(desc);
+    }
+
+    return newInstance(value.getText(), value.getLength());
+}
+
+void StringManager::loadString(int64_t desc)
+{
+    if (desc == 0) {
+        // load empty string
+        mStringStack.pushConstant(String());
+    } else {
+        StringObject* instance = (StringObject*)desc;
+        mStringStack.pushConstant(String(instance->data, instance->length));
+    }
+}
+
+void StringManager::removeInstance(int64_t desc)
+{
+    StringObject* instance = (StringObject*)desc;
+    for (auto iter = mStrings.begin(); iter != mStrings.end(); ++iter) {
+        if (*iter == instance) {
+            delete[] instance->data;
+            delete instance;
+            mStrings.erase(iter);
+            break;
+        }
+    }
+}
+
+int64_t StringManager::newInstance(const char* text, int length)
+{
+    StringObject* instance = new StringObject;
+    instance->length = length;
+    if (length > 0) {
+        instance->data = new char[length];
+        memcpy(instance->data, text, length);
+    } else {
+        instance->data = nullptr;
+    }
+
+    mStrings.push_back(instance);
+    return (int64_t)instance;
 }

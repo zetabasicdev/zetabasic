@@ -28,61 +28,33 @@
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include <cassert>
+#pragma once
 
-#include "Analyzer.h"
-#include "IdentifierExpressionNode.h"
-#include "Opcodes.h"
-#include "Parser.h"
-#include "Symbol.h"
-#include "SymbolTable.h"
-#include "Translator.h"
+#include <cstdint>
+#include <vector>
 
-IdentifierExpressionNode::IdentifierExpressionNode()
-    :
-    mName(),
-    mSymbol(nullptr)
+class StringStack;
+
+class StringManager
 {
-    // intentionally left blank
-}
+public:
+    StringManager(StringStack& stringStack);
+    ~StringManager();
 
-IdentifierExpressionNode::~IdentifierExpressionNode()
-{
-    // intentionally left blank
-}
+    int64_t storeString(int64_t desc);
+    void loadString(int64_t desc);
 
-void IdentifierExpressionNode::parse(Parser& parser)
-{
-    assert(parser.getToken().getId() == TokenId::Name);
-    assert(parser.getToken().getTag() == TokenTag::None);
+private:
+    StringStack& mStringStack;
 
-    mName = parser.getToken().getText();
-    
-    parser.eatToken();
-}
+    struct StringObject
+    {
+        int length;
+        char* data;
+    };
 
-void IdentifierExpressionNode::analyze(Analyzer& analyzer)
-{
-    char lastChar = mName.getText()[mName.getLength() - 1];
-    if (lastChar == '$')
-        mTypename = Typename::String;
-    else
-        mTypename = Typename::Integer;
+    std::vector<StringObject*> mStrings;
 
-    mSymbol = analyzer.getSymbolTable().getSymbol(mRange, mName, mTypename);
-}
-
-void IdentifierExpressionNode::translate(Translator& translator)
-{
-    assert(mSymbol->getLocation() < 256);
-
-    if (mSymbol->getType() == Typename::String) {
-        auto code = translator.getBytecode().alloc(2);
-        code[0] = Op_load_local_str;
-        code[1] = (uint8_t)mSymbol->getLocation();
-    } else {
-        auto code = translator.getBytecode().alloc(2);
-        code[0] = Op_load_local;
-        code[1] = (uint8_t)mSymbol->getLocation();
-    }
-}
+    void removeInstance(int64_t desc);
+    int64_t newInstance(const char* text, int length);
+};

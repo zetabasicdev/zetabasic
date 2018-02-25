@@ -28,7 +28,7 @@
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include <iostream>
+#include <cstdio>
 
 #include "Interpreter.h"
 #include "Opcodes.h"
@@ -41,7 +41,8 @@ Interpreter::Interpreter(Window& window, const Program& program)
     mWindow(window),
     mProgram(program),
     mStack(),
-    mStringStack()
+    mStringStack(),
+    mStringManager(mStringStack)
 {
     // intentionally left blank
 }
@@ -53,47 +54,61 @@ Interpreter::~Interpreter()
 
 static void dumpBytecode(const uint8_t* code, int length)
 {
+    enum
+    {
+        Type_NoArgs,
+        Type_OneInt,
+        Type_OneIndex
+    };
+    static struct {
+        uint8_t op;
+        const char* name;
+        int size;
+        int type;
+    } mapping[] = {
+        { Op_end, "end", 1, Type_NoArgs },
+        { Op_reserve, "reserve", 2, Type_OneInt },
+        { Op_load_const_str, "load.const.str", 2, Type_OneIndex },
+        { Op_load_const, "load.const", 2, Type_OneIndex },
+        { Op_load_local_str, "load.local.str", 2, Type_OneIndex },
+        { Op_load_local, "load.local", 2, Type_OneIndex },
+        { Op_store_local_str, "store.local.str", 2, Type_OneIndex },
+        { Op_store_local, "store.local", 2, Type_OneIndex },
+        { Op_syscall, "syscall", 2, Type_OneIndex },
+        { Op_add_str, "add.str", 1, Type_NoArgs },
+        { Op_add_int, "add.int", 1, Type_NoArgs },
+        { 0, nullptr, 0, 0 }
+    };
+
     const uint8_t* end = code + length;
     while (code < end) {
-        switch (*code) {
-        case Op_end:
-            std::cout << "end" << std::endl;
-            ++code;
-            break;
-        case Op_reserve:
-            std::cout << "reserve             " << (int)code[1] << std::endl;
-            code += 2;
-            break;
-        case Op_load_cstr:
-            std::cout << "load.cstr           #" << (int)code[1] << std::endl;
-            code += 2;
-            break;
-        case Op_load_i:
-            std::cout << "load.int            #" << (int)code[1] << std::endl;
-            code += 2;
-            break;
-        case Op_load_local:
-            std::cout << "load.local          #" << (int)code[1] << std::endl;
-            code += 2;
-            break;
-        case Op_store_local:
-            std::cout << "store.local         #" << (int)code[1] << std::endl;
-            code += 2;
-            break;
-        case Op_syscall:
-            std::cout << "syscall             #" << (int)code[1] << std::endl;
-            code += 2;
-            break;
-        case Op_add_str:
-            std::cout << "add.string" << std::endl;
-            ++code;
-            break;
-        case Op_add_i:
-            std::cout << "add.int" << std::endl;
-            ++code;
-            break;
-        default:
-            break;
+        bool found = false;
+        for (auto ix = 0; mapping[ix].name; ++ix) {
+            if (mapping[ix].op == *code) {
+                if (mapping[ix].size == 1)
+                    printf("%02X     ", (int)code[0]);
+                else if (mapping[ix].size == 2)
+                    printf("%02X %02X  ", (int)code[0], (int)code[1]);
+                switch (mapping[ix].type) {
+                case Type_NoArgs:
+                    printf("%s\n", mapping[ix].name);
+                    break;
+                case Type_OneInt:
+                    printf("%s %d\n", mapping[ix].name, (int)code[1]);
+                    break;
+                case Type_OneIndex:
+                    printf("%s #%d\n", mapping[ix].name, (int)code[1]);
+                    break;
+                default:
+                    break;
+                }
+                code += mapping[ix].size;
+                found = true;
+                break;
+            }
+        }
+        if (!found) {
+            printf("unknown opcode : %02X\n", (int)*code);
         }
     }
 }
@@ -115,16 +130,24 @@ InterpreterResult Interpreter::run()
             mStack.reserve(code[ip + 1]);
             ip += 2;
             break;
-        case Op_load_cstr:
+        case Op_load_const_str:
             mStringStack.pushConstant(mProgram.getString(code[ip + 1]));
             ip += 2;
             break;
-        case Op_load_i:
+        case Op_load_const:
             mStack.push(mProgram.getIntegerConstant(code[ip + 1]));
+            ip += 2;
+            break;
+        case Op_load_local_str:
+            mStringManager.loadString(mStack.getLocal(code[ip + 1]));
             ip += 2;
             break;
         case Op_load_local:
             mStack.push(mStack.getLocal(code[ip + 1]));
+            ip += 2;
+            break;
+        case Op_store_local_str:
+            mStack.setLocal(code[ip + 1], mStringManager.storeString(mStack.getLocal(code[ip + 1])));
             ip += 2;
             break;
         case Op_store_local:
@@ -139,7 +162,7 @@ InterpreterResult Interpreter::run()
             mStringStack.add();
             ++ip;
             break;
-        case Op_add_i:
+        case Op_add_int:
         {
             int64_t rhs = mStack.pop();
             int64_t lhs = mStack.pop();

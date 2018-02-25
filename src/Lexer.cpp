@@ -200,12 +200,17 @@ bool Lexer::runEndState()
 
 bool Lexer::runNameState()
 {
-    if (!(mChar >= 'a' && mChar <= 'z') && !(mChar >= 'A' && mChar <= 'Z') && !(mChar >= '0' && mChar <= '9')) {
+    if ((mChar >= 'a' && mChar <= 'z') || (mChar >= 'A' && mChar <= 'Z') || (mChar >= '0' && mChar <= '9')) {
+        return true;
+    } else if (mChar == '$') {
         mId = TokenId::Name;
         mState = State::End;
-        return false;
+        return true;
     }
-    return true;
+
+    mId = TokenId::Name;
+    mState = State::End;
+    return false;
 }
 
 bool Lexer::runStringState()

@@ -97,6 +97,7 @@
     <ClInclude Include="..\src\Stack.h" />
     <ClInclude Include="..\src\StatementNode.h" />
     <ClInclude Include="..\src\String.h" />
+    <ClInclude Include="..\src\StringManager.h" />
     <ClInclude Include="..\src\StringStack.h" />
     <ClInclude Include="..\src\StringTable.h" />
     <ClInclude Include="..\src\StringLiteralExpressionNode.h" />
@@ -134,6 +135,7 @@
     <ClCompile Include="..\src\PrintStatementNode.cpp" />
     <ClCompile Include="..\src\Stack.cpp" />
     <ClCompile Include="..\src\StatementNode.cpp" />
+    <ClCompile Include="..\src\StringManager.cpp" />
     <ClCompile Include="..\src\StringStack.cpp" />
     <ClCompile Include="..\src\StringTable.cpp" />
     <ClCompile Include="..\src\StringLiteralExpressionNode.cpp" />

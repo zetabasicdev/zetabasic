@@ -92,7 +92,7 @@ void BinaryExpressionNode::translate(Translator& translator)
     switch (mOp) {
     case Operator::Addition:
         if (mTypename == Typename::Integer)
-            *translator.getBytecode().alloc(1) = Op_add_i;
+            *translator.getBytecode().alloc(1) = Op_add_int;
         else
             *translator.getBytecode().alloc(1) = Op_add_str;
         break;

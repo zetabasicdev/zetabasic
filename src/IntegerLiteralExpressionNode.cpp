@@ -69,6 +69,6 @@ void IntegerLiteralExpressionNode::translate(Translator& translator)
     assert(ix >= 0 && ix < 256);
 
     auto ops = translator.getBytecode().alloc(2);
-    ops[0] = Op_load_i;
+    ops[0] = Op_load_const;
     ops[1] = (uint8_t)ix;
 }
