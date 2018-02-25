@@ -64,7 +64,7 @@ void StringManager::loadString(int64_t desc)
         mStringStack.pushConstant(String());
     } else {
         StringObject* instance = (StringObject*)desc;
-        mStringStack.pushConstant(String(instance->data, instance->length));
+        mStringStack.pushConstant(String(instance->data ? instance->data : "", instance->length));
     }
 }
 
