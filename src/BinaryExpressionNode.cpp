@@ -84,7 +84,11 @@ void BinaryExpressionNode::analyze(Analyzer& analyzer)
     if (leftType != rightType)
         throw CompileError(CompileErrorId::TypeError, mRange, "Mis-matched Expression Types");
 
-    mType = leftType;
+    // certain types of operators result in different types
+    if (mOp == Operator::Equals)
+        mType = Typename::Integer;
+    else
+        mType = leftType;
 }
 
 void BinaryExpressionNode::translate(Translator& translator)
@@ -92,15 +96,18 @@ void BinaryExpressionNode::translate(Translator& translator)
     mLhs->translate(translator);
     mRhs->translate(translator);
 
+    // need to base this on operand type, not result type
+    auto opType = mLhs->getType();
+
     switch (mOp) {
     case Operator::Addition:
-        if (mType == Typename::Integer)
+        if (opType == Typename::Integer)
             *translator.getBytecode().alloc(1) = Op_add_int;
         else
             *translator.getBytecode().alloc(1) = Op_add_str;
         break;
     case Operator::Equals:
-        if (mType == Typename::Integer)
+        if (opType == Typename::Integer)
             *translator.getBytecode().alloc(1) = Op_eq_int;
         else
             *translator.getBytecode().alloc(1) = Op_eq_str;
