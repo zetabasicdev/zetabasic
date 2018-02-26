@@ -50,8 +50,9 @@ ExpressionNode::~ExpressionNode()
 
 int ExpressionNode::getPrecedence(TokenTag tag)
 {
-    if (tag == TokenTag::Sym_Add) return 3;
-    if (tag == TokenTag::Sym_Equals) return 2;
+    if (tag == TokenTag::Sym_Add) return 6;
+    if (tag == TokenTag::Sym_Equals) return 3;
+    if (tag == TokenTag::Key_Or) return 1;
     return 0;
 }
 

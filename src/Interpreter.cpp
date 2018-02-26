@@ -80,6 +80,7 @@ static void dumpBytecode(const uint8_t* code, int length)
         { Op_add_int, "add.int", 1, Type_NoArgs },
         { Op_eq_str, "equals.str", 1, Type_NoArgs },
         { Op_eq_int, "equals.int", 1, Type_NoArgs },
+        { Op_or_int, "or.int", 1, Type_NoArgs },
         { Op_jmp_zero, "jump.if.zero", 2, Type_Offset },
         { 0, nullptr, 0, 0 }
     };
@@ -188,6 +189,14 @@ InterpreterResult Interpreter::run()
             int64_t rhs = mStack.pop();
             int64_t lhs = mStack.pop();
             mStack.push(lhs == rhs);
+            ++ip;
+            break;
+        }
+        case Op_or_int:
+        {
+            int64_t rhs = mStack.pop();
+            int64_t lhs = mStack.pop();
+            mStack.push(lhs | rhs);
             ++ip;
             break;
         }

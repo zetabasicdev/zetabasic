@@ -41,7 +41,8 @@ public:
     {
         Unknown,
         Addition,
-        Equals
+        Equals,
+        BitwiseOr
     };
 
     BinaryExpressionNode(ExpressionNode* lhs);

@@ -56,8 +56,9 @@ int main(int argc, char* argv[])
 {
     try {
         const char* code =
-            "LET S$ = \"Y\"\n"
-            "IF S$ = \"Y\" THEN PRINT \"Correct\"\n"
+            "LET I = 10\n"
+            "LET S$ = \"y\"\n"
+            "IF S$ = \"Y\" OR I = 10 THEN PRINT \"Correct\"\n"
             "END";
 
         Compiler compiler;

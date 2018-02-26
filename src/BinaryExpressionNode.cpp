@@ -58,6 +58,9 @@ void BinaryExpressionNode::parse(Parser& parser)
     case TokenTag::Sym_Equals:
         mOp = Operator::Equals;
         break;
+    case TokenTag::Key_Or:
+        mOp = Operator::BitwiseOr;
+        break;
     default:
         assert(false);
         break;
@@ -83,6 +86,10 @@ void BinaryExpressionNode::analyze(Analyzer& analyzer)
 
     if (leftType != rightType)
         throw CompileError(CompileErrorId::TypeError, mRange, "Mis-matched Expression Types");
+
+    // todo - fix this...
+    if (mOp == Operator::BitwiseOr && leftType != Typename::Integer)
+        throw CompileError(CompileErrorId::TypeError, mRange, "Bad Type For Bitwise OR");
 
     // certain types of operators result in different types
     if (mOp == Operator::Equals)
@@ -111,6 +118,9 @@ void BinaryExpressionNode::translate(Translator& translator)
             *translator.getBytecode().alloc(1) = Op_eq_int;
         else
             *translator.getBytecode().alloc(1) = Op_eq_str;
+        break;
+    case Operator::BitwiseOr:
+        *translator.getBytecode().alloc(1) = Op_or_int;
         break;
     default:
         break;

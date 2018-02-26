@@ -109,6 +109,7 @@ void Lexer::run()
                ToString(token.getId()), ToString(token.getTag()),
                (token.getId() != TokenId::EndOfLine) ? token.getText().getText() : "");
     }
+    printf("\n");
 }
 
 static bool isSymbolStart(char ch)
