@@ -35,6 +35,11 @@ const char* ToString(TokenId id)
     switch (id) {
     case TokenId::Unknown: return "unknown";
     case TokenId::EndOfSource: return "end-of-source";
+    case TokenId::EndOfLine: return "end-of-line";
+    case TokenId::Name: return "name";
+    case TokenId::Integer: return "integer";
+    case TokenId::String: return "string";
+    case TokenId::Symbol: return "symbol";
     default:
         break;
     }
@@ -45,6 +50,14 @@ const char* ToString(TokenTag tag)
 {
     switch (tag) {
     case TokenTag::None: return "none";
+    case TokenTag::Key_End: return "END";
+    case TokenTag::Key_If: return "IF";
+    case TokenTag::Key_Let: return "LET";
+    case TokenTag::Key_Or: return "OR";
+    case TokenTag::Key_Print: return "PRINT";
+    case TokenTag::Key_Then: return "THEN";
+    case TokenTag::Sym_Add: return "+";
+    case TokenTag::Sym_Equals: return "=";
     default:
         break;
     }

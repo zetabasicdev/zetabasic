@@ -51,6 +51,7 @@ enum class TokenTag
     Key_End,
     Key_If,
     Key_Let,
+    Key_Or,
     Key_Print,
     Key_Then,
     Sym_Add,
