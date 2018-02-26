@@ -58,7 +58,8 @@ static void dumpBytecode(const uint8_t* code, int length)
     {
         Type_NoArgs,
         Type_OneInt,
-        Type_OneIndex
+        Type_OneIndex,
+        Type_Offset
     };
     static struct {
         uint8_t op;
@@ -77,18 +78,22 @@ static void dumpBytecode(const uint8_t* code, int length)
         { Op_syscall, "syscall", 2, Type_OneIndex },
         { Op_add_str, "add.str", 1, Type_NoArgs },
         { Op_add_int, "add.int", 1, Type_NoArgs },
+        { Op_eq_str, "equals.str", 1, Type_NoArgs },
+        { Op_eq_int, "equals.int", 1, Type_NoArgs },
+        { Op_jmp_zero, "jump.if.zero", 2, Type_Offset },
         { 0, nullptr, 0, 0 }
     };
 
+    const uint8_t* start = code;
     const uint8_t* end = code + length;
     while (code < end) {
         bool found = false;
         for (auto ix = 0; mapping[ix].name; ++ix) {
             if (mapping[ix].op == *code) {
                 if (mapping[ix].size == 1)
-                    printf("%02X     ", (int)code[0]);
+                    printf("%04X: %02X     ", (int)(code - start), (int)code[0]);
                 else if (mapping[ix].size == 2)
-                    printf("%02X %02X  ", (int)code[0], (int)code[1]);
+                    printf("%04X: %02X %02X  ", (int)(code - start), (int)code[0], (int)code[1]);
                 switch (mapping[ix].type) {
                 case Type_NoArgs:
                     printf("%s\n", mapping[ix].name);
@@ -98,6 +103,9 @@ static void dumpBytecode(const uint8_t* code, int length)
                     break;
                 case Type_OneIndex:
                     printf("%s #%d\n", mapping[ix].name, (int)code[1]);
+                    break;
+                case Type_Offset:
+                    printf("%s %+d (%04X)\n", mapping[ix].name, (int)code[1], (int)(code - start) + (int)code[1]);
                     break;
                 default:
                     break;
@@ -109,6 +117,7 @@ static void dumpBytecode(const uint8_t* code, int length)
         }
         if (!found) {
             printf("unknown opcode : %02X\n", (int)*code);
+            break;
         }
     }
 }
@@ -170,6 +179,24 @@ InterpreterResult Interpreter::run()
             ++ip;
             break;
         }
+        case Op_eq_str:
+            mStack.push((mStringStack.compare() == 0) ? 1 : 0);
+            ++ip;
+            break;
+        case Op_eq_int:
+        {
+            int64_t rhs = mStack.pop();
+            int64_t lhs = mStack.pop();
+            mStack.push(lhs == rhs);
+            ++ip;
+            break;
+        }
+        case Op_jmp_zero:
+            if (mStack.pop() == 0)
+                ip += code[ip + 1];
+            else
+                ip += 2;
+            break;
         default:
             return InterpreterResult::BadOpcode;
         }

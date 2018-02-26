@@ -60,7 +60,7 @@ void IntegerLiteralExpressionNode::parse(Parser& parser)
 
 void IntegerLiteralExpressionNode::analyze(Analyzer& analyzer)
 {
-    mTypename = Typename::Integer;
+    mType = Typename::Integer;
 }
 
 void IntegerLiteralExpressionNode::translate(Translator& translator)

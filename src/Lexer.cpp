@@ -156,8 +156,10 @@ bool Lexer::runEndState()
                 TokenTag tag;
             } keywords[] = {
                 { "END", TokenTag::Key_End },
+                { "IF", TokenTag::Key_If },
                 { "LET", TokenTag::Key_Let },
                 { "PRINT", TokenTag::Key_Print },
+                { "THEN", TokenTag::Key_Then },
                 { nullptr, TokenTag::None }
             };
             for (int i = 0; keywords[i].tag != TokenTag::None; ++i) {

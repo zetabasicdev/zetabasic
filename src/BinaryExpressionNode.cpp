@@ -55,6 +55,9 @@ void BinaryExpressionNode::parse(Parser& parser)
     case TokenTag::Sym_Add:
         mOp = Operator::Addition;
         break;
+    case TokenTag::Sym_Equals:
+        mOp = Operator::Equals;
+        break;
     default:
         assert(false);
         break;
@@ -72,8 +75,8 @@ void BinaryExpressionNode::analyze(Analyzer& analyzer)
     mLhs->analyze(analyzer);
     mRhs->analyze(analyzer);
 
-    Typename leftType = mLhs->getTypename();
-    Typename rightType = mRhs->getTypename();
+    Typename leftType = mLhs->getType();
+    Typename rightType = mRhs->getType();
 
     assert(leftType != Typename::Unknown);
     assert(rightType != Typename::Unknown);
@@ -81,7 +84,7 @@ void BinaryExpressionNode::analyze(Analyzer& analyzer)
     if (leftType != rightType)
         throw CompileError(CompileErrorId::TypeError, mRange, "Mis-matched Expression Types");
 
-    mTypename = leftType;
+    mType = leftType;
 }
 
 void BinaryExpressionNode::translate(Translator& translator)
@@ -91,10 +94,16 @@ void BinaryExpressionNode::translate(Translator& translator)
 
     switch (mOp) {
     case Operator::Addition:
-        if (mTypename == Typename::Integer)
+        if (mType == Typename::Integer)
             *translator.getBytecode().alloc(1) = Op_add_int;
         else
             *translator.getBytecode().alloc(1) = Op_add_str;
+        break;
+    case Operator::Equals:
+        if (mType == Typename::Integer)
+            *translator.getBytecode().alloc(1) = Op_eq_int;
+        else
+            *translator.getBytecode().alloc(1) = Op_eq_str;
         break;
     default:
         break;

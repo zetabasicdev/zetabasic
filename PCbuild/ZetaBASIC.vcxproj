@@ -81,6 +81,7 @@
     <ClInclude Include="..\src\ExpressionNode.h" />
     <ClInclude Include="..\src\Font.h" />
     <ClInclude Include="..\src\IdentifierExpressionNode.h" />
+    <ClInclude Include="..\src\IfStatementNode.h" />
     <ClInclude Include="..\src\IntegerLiteralExpressionNode.h" />
     <ClInclude Include="..\src\Interpreter.h" />
     <ClInclude Include="..\src\ISourceStream.h" />
@@ -125,6 +126,7 @@
     <ClCompile Include="..\src\EndStatementNode.cpp" />
     <ClCompile Include="..\src\ExpressionNode.cpp" />
     <ClCompile Include="..\src\IdentifierExpressionNode.cpp" />
+    <ClCompile Include="..\src\IfStatementNode.cpp" />
     <ClCompile Include="..\src\IntegerLiteralExpressionNode.cpp" />
     <ClCompile Include="..\src\Interpreter.cpp" />
     <ClCompile Include="..\src\Lexer.cpp" />

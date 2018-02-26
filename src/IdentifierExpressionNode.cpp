@@ -65,11 +65,11 @@ void IdentifierExpressionNode::analyze(Analyzer& analyzer)
 {
     char lastChar = mName.getText()[mName.getLength() - 1];
     if (lastChar == '$')
-        mTypename = Typename::String;
+        mType = Typename::String;
     else
-        mTypename = Typename::Integer;
+        mType = Typename::Integer;
 
-    mSymbol = analyzer.getSymbolTable().getSymbol(mRange, mName, mTypename);
+    mSymbol = analyzer.getSymbolTable().getSymbol(mRange, mName, mType);
 }
 
 void IdentifierExpressionNode::translate(Translator& translator)

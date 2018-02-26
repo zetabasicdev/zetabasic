@@ -153,6 +153,9 @@
     <ClInclude Include="..\src\StringManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\IfStatementNode.h">
+      <Filter>Header Files\Nodes</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\main.cpp">
@@ -235,6 +238,9 @@
     </ClCompile>
     <ClCompile Include="..\src\StringManager.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\IfStatementNode.cpp">
+      <Filter>Source Files\Nodes</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

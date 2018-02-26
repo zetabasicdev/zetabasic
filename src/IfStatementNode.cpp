@@ -28,51 +28,67 @@
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "BinaryExpressionNode.h"
+#pragma once
+
+#include "Analyzer.h"
 #include "ExpressionNode.h"
-#include "IdentifierExpressionNode.h"
-#include "IntegerLiteralExpressionNode.h"
+#include "IfStatementNode.h"
+#include "Opcodes.h"
 #include "Parser.h"
-#include "StringLiteralExpressionNode.h"
+#include "Translator.h"
 
-ExpressionNode::ExpressionNode()
+IfStatementNode::IfStatementNode()
     :
-    Node(),
-    mType(Typename::Unknown)
+    StatementNode(),
+    mExpression(nullptr),
+    mStatement(nullptr)
 {
     // intentionally left blank
 }
 
-ExpressionNode::~ExpressionNode()
+IfStatementNode::~IfStatementNode()
 {
     // intentionally left blank
 }
 
-int ExpressionNode::getPrecedence(TokenTag tag)
+void IfStatementNode::parse(Parser& parser)
 {
-    if (tag == TokenTag::Sym_Add) return 3;
-    if (tag == TokenTag::Sym_Equals) return 2;
-    return 0;
+    assert(parser.getToken().getTag() == TokenTag::Key_If);
+    parser.eatToken();
+
+    mExpression = ExpressionNode::parseExpression(parser);
+    if (!mExpression)
+        parser.raiseError(CompileErrorId::SyntaxError, "Expected Expression");
+
+    if (parser.getToken().getTag() != TokenTag::Key_Then)
+        parser.raiseError(CompileErrorId::SyntaxError, "Expected THEN");
+    parser.eatToken();
+
+    mStatement = StatementNode::parseStatement(parser);
+    if (!mStatement)
+        parser.raiseError(CompileErrorId::SyntaxError, "Expected Statement");
 }
 
-ExpressionNode* ExpressionNode::parseExpression(Parser& parser, int precedence)
+void IfStatementNode::analyze(Analyzer& analyzer)
 {
-    // first parse potential prefix expression
-    ExpressionNode* expr = nullptr;
-    if (parser.isToken(TokenId::String))
-        expr = parser.getNodePool().alloc<StringLiteralExpressionNode>();
-    else if (parser.isToken(TokenId::Integer))
-        expr = parser.getNodePool().alloc<IntegerLiteralExpressionNode>();
-    else if (parser.isToken(TokenId::Name) && parser.getToken().getTag() == TokenTag::None)
-        expr = parser.getNodePool().alloc<IdentifierExpressionNode>();
-    if (expr)
-        expr->parse(parser);
+    mExpression->analyze(analyzer);
+    mStatement->analyze(analyzer);
+}
 
-    // then search for infix expressions
-    while (precedence < getPrecedence(parser.getToken().getTag())) {
-        expr = parser.getNodePool().alloc<BinaryExpressionNode>(expr);
-        expr->parse(parser);
-    }
+void IfStatementNode::translate(Translator& translator)
+{
+    mExpression->translate(translator);
 
-    return expr;
+    int index = 0;
+    auto code = translator.getBytecode().alloc(2, index);
+    code[0] = Op_jmp_zero;
+    code[1] = 0;
+
+    mStatement->translate(translator);
+
+    int target = translator.getBytecode().getSize();
+    int offset = target - index;
+    assert(offset <= 255);
+
+    translator.getBytecode()[index + 1] = offset;
 }

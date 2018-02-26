@@ -83,7 +83,7 @@ void AssignmentStatementNode::analyze(Analyzer& analyzer)
     else
         type = Typename::Integer;
 
-    if (type != mValue->getTypename())
+    if (type != mValue->getType())
         throw CompileError(CompileErrorId::TypeError, mRange, "Incompatible Types For Assignment");
 
     mSymbol = analyzer.getSymbolTable().getSymbol(mRange, mName, type);

@@ -69,11 +69,11 @@ void PrintStatementNode::translate(Translator& translator)
     if (mExpression) {
         mExpression->translate(translator);
 
-        if (mExpression->getTypename() == Typename::String) {
+        if (mExpression->getType() == Typename::String) {
             auto ops = translator.getBytecode().alloc(2);
             ops[0] = Op_syscall;
             ops[1] = Syscall_printstr;
-        } else if (mExpression->getTypename() == Typename::Integer) {
+        } else if (mExpression->getType() == Typename::Integer) {
             auto ops = translator.getBytecode().alloc(2);
             ops[0] = Op_syscall;
             ops[1] = Syscall_printi;

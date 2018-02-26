@@ -62,7 +62,7 @@ void StringLiteralExpressionNode::parse(Parser& parser)
 
 void StringLiteralExpressionNode::analyze(Analyzer& analyzer)
 {
-    mTypename = Typename::String;
+    mType = Typename::String;
 }
 
 void StringLiteralExpressionNode::translate(Translator& translator)

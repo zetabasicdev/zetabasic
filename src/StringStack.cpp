@@ -29,6 +29,7 @@
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <cassert>
+#include <string>
 
 #include "StringStack.h"
 
@@ -89,6 +90,26 @@ void StringStack::add()
     // simply combine top two strings into a single string
     mLengths[mCount - 2] += mLengths[mCount - 1];
     --mCount;
+}
+
+int StringStack::compare()
+{
+    static std::string lhs;
+    static std::string rhs;
+
+    assert(mCount >= 2);
+
+    int len2 = mLengths[mCount - 1];
+    int len1 = mLengths[mCount - 2];
+
+    lhs.clear();
+    lhs.append(mData + mDataUsed - (len1 + len2), len1);
+    rhs.clear();
+    rhs.append(mData + mDataUsed - len2, len2);
+
+    mCount -= 2;
+
+    return strcmp(lhs.c_str(), rhs.c_str());
 }
 
 String StringStack::pop()

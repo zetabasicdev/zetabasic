@@ -45,11 +45,11 @@ public:
     static int getPrecedence(TokenTag tag);
     static ExpressionNode* parseExpression(Parser& parser, int precedence = 0);
 
-    Typename getTypename() const
+    Typename getType() const
     {
-        return mTypename;
+        return mType;
     }
 
 protected:
-    Typename mTypename;
+    Typename mType;
 };

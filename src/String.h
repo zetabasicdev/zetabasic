@@ -89,6 +89,14 @@ public:
         return false;
     }
 
+    int compareWithCase(const String& str) const
+    {
+        int len = mLength;
+        if (str.mLength < len)
+            len = str.mLength;
+        return strncmp(mText, str.mText, len);
+    }
+
 private:
     const char* mText;
     int mLength;

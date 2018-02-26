@@ -40,7 +40,8 @@ public:
     enum class Operator
     {
         Unknown,
-        Addition
+        Addition,
+        Equals
     };
 
     BinaryExpressionNode(ExpressionNode* lhs);

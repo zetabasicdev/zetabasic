@@ -44,5 +44,8 @@ enum Opcode : uint8_t
     Op_store_local,
     Op_syscall,
     Op_add_str,
-    Op_add_int
+    Op_add_int,
+    Op_eq_str,
+    Op_eq_int,
+    Op_jmp_zero
 };

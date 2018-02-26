@@ -40,6 +40,7 @@ public:
 
     void pushConstant(const String& value);
     void add();
+    int compare();
 
     String pop();
 

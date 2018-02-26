@@ -28,51 +28,25 @@
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "BinaryExpressionNode.h"
-#include "ExpressionNode.h"
-#include "IdentifierExpressionNode.h"
-#include "IntegerLiteralExpressionNode.h"
-#include "Parser.h"
-#include "StringLiteralExpressionNode.h"
+#pragma once
 
-ExpressionNode::ExpressionNode()
+#include "StatementNode.h"
+
+class ExpressionNode;
+
+class IfStatementNode
     :
-    Node(),
-    mType(Typename::Unknown)
+    public StatementNode
 {
-    // intentionally left blank
-}
+public:
+    IfStatementNode();
+    virtual ~IfStatementNode();
 
-ExpressionNode::~ExpressionNode()
-{
-    // intentionally left blank
-}
+    void parse(Parser& parser);
+    void analyze(Analyzer& analyzer);
+    void translate(Translator& translator);
 
-int ExpressionNode::getPrecedence(TokenTag tag)
-{
-    if (tag == TokenTag::Sym_Add) return 3;
-    if (tag == TokenTag::Sym_Equals) return 2;
-    return 0;
-}
-
-ExpressionNode* ExpressionNode::parseExpression(Parser& parser, int precedence)
-{
-    // first parse potential prefix expression
-    ExpressionNode* expr = nullptr;
-    if (parser.isToken(TokenId::String))
-        expr = parser.getNodePool().alloc<StringLiteralExpressionNode>();
-    else if (parser.isToken(TokenId::Integer))
-        expr = parser.getNodePool().alloc<IntegerLiteralExpressionNode>();
-    else if (parser.isToken(TokenId::Name) && parser.getToken().getTag() == TokenTag::None)
-        expr = parser.getNodePool().alloc<IdentifierExpressionNode>();
-    if (expr)
-        expr->parse(parser);
-
-    // then search for infix expressions
-    while (precedence < getPrecedence(parser.getToken().getTag())) {
-        expr = parser.getNodePool().alloc<BinaryExpressionNode>(expr);
-        expr->parse(parser);
-    }
-
-    return expr;
-}
+private:
+    ExpressionNode* mExpression;
+    StatementNode* mStatement;
+};
