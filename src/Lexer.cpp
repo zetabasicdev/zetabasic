@@ -101,6 +101,14 @@ void Lexer::run()
     if (mTokens.getSize() > 0)
         mTokens.push(mTokenPool.alloc(TokenId::EndOfLine, TokenTag::None, String(), Range()));
     mTokens.push(mTokenPool.alloc(TokenId::EndOfSource, TokenTag::None, String(), Range()));
+
+    for (int ix = 0; ix < mTokens.getSize(); ++ix) {
+        auto& token = mTokens[ix];
+        printf("%04d [%02d:%02d] %s (%s) \"%s\"\n",
+               ix, token.getRange().getStartRow(), token.getRange().getStartCol(),
+               ToString(token.getId()), ToString(token.getTag()),
+               (token.getId() != TokenId::EndOfLine) ? token.getText().getText() : "");
+    }
 }
 
 static bool isSymbolStart(char ch)
@@ -152,15 +160,16 @@ bool Lexer::runEndState()
             // try to match a potential keyword
             static struct
             {
-                const char* text;
+                String text;
                 TokenTag tag;
             } keywords[] = {
                 { "END", TokenTag::Key_End },
                 { "IF", TokenTag::Key_If },
                 { "LET", TokenTag::Key_Let },
+                { "OR", TokenTag::Key_Or },
                 { "PRINT", TokenTag::Key_Print },
                 { "THEN", TokenTag::Key_Then },
-                { nullptr, TokenTag::None }
+                { "", TokenTag::None }
             };
             for (int i = 0; keywords[i].tag != TokenTag::None; ++i) {
                 if (text == keywords[i].text) {

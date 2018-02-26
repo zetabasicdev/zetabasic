@@ -44,6 +44,15 @@ public:
         // intentionally left blank
     }
 
+    String(const char* text)
+        :
+        mText(text),
+        mLength(0)
+    {
+        assert(mText);
+        mLength = (int)strlen(mText);
+    }
+
     String(const char* text, int length)
         :
         mText(text),
