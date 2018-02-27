@@ -47,7 +47,7 @@ void fatalError(const std::string& title, const std::string& message)
 #ifdef _WIN32
     (void)MessageBoxA(nullptr, message.c_str(), title.c_str(), MB_OK|MB_ICONERROR);
 #else
-    fprintf(stderr, "%s\n", msg.str().c_str());
+    fprintf(stderr, "%s\n", message.c_str());
 #endif
     exit(-1);
 }

@@ -37,14 +37,28 @@ CP=cp -f
 BINARY=zb
 OBJECTS=\
 	obj/Analyzer.o \
+	obj/AssignmentStatementNode.o \
+	obj/BinaryExpressionNode.o \
 	obj/Compiler.o \
+	obj/ConstantTable.o \
 	obj/EndStatementNode.o \
+	obj/ExpressionNode.o \
+	obj/IdentifierExpressionNode.o \
+	obj/IfStatementNode.o \
+	obj/IntegerLiteralExpressionNode.o \
 	obj/Interpreter.o \
 	obj/Lexer.o \
 	obj/ModuleNode.o \
 	obj/Node.o \
 	obj/Parser.o \
+	obj/PrintStatementNode.o \
+	obj/Stack.o \
 	obj/StatementNode.o \
+	obj/StringLiteralExpressionNode.o \
+	obj/StringManager.o \
+	obj/StringStack.o \
+	obj/StringTable.o \
+	obj/SymbolTable.o \
 	obj/TextSourceStream.o \
 	obj/Token.o \
 	obj/Translator.o \
