@@ -31,6 +31,7 @@
 #pragma once
 
 #include <cstddef>
+#include <new>
 #include <utility>
 
 #include "MemoryPool.h"
