@@ -30,67 +30,43 @@
 
 #pragma once
 
-#include <cstdint>
+#include "String.h"
+#include "TObjectList.h"
+#include "TObjectPool.h"
 
-#include "Node.h"
-#include "TItemBuffer.h"
+enum class CodePositionType
+{
+    Label
+};
 
-class CodePositionTable;
-class ConstantTable;
-class FixUpTable;
-class StringTable;
-class SymbolTable;
-
-class Translator
+class CodePositionTable
 {
 public:
-    Translator(TItemBuffer<uint8_t>& bytecode,
-               StringTable& stringTable,
-               ConstantTable& constantTable,
-               SymbolTable& symbolTable,
-               CodePositionTable& codePositionTable,
-               FixUpTable& fixUpTable,
-               Node& root);
-    ~Translator();
+    CodePositionTable();
+    ~CodePositionTable();
 
-    void run();
+    void reset();
 
-    TItemBuffer<uint8_t>& getBytecode()
-    {
-        return mBytecode;
-    }
-
-    StringTable& getStringTable()
-    {
-        return mStringTable;
-    }
-
-    ConstantTable& getConstantTable()
-    {
-        return mConstantTable;
-    }
-
-    SymbolTable& getSymbolTable()
-    {
-        return mSymbolTable;
-    }
-
-    CodePositionTable& getCodePositionTable()
-    {
-        return mCodePositionTable;
-    }
-
-    FixUpTable& getFixUpTable()
-    {
-        return mFixUpTable;
-    }
+    bool addPosition(CodePositionType type, const String& name, int index);
+    int getPosition(CodePositionType type, const String& name);
 
 private:
-    TItemBuffer<uint8_t>& mBytecode;
-    StringTable& mStringTable;
-    ConstantTable& mConstantTable;
-    SymbolTable& mSymbolTable;
-    CodePositionTable& mCodePositionTable;
-    FixUpTable& mFixUpTable;
-    Node& mRoot;
+    struct Position
+    {
+        CodePositionType type;
+        String name;
+        int index;
+
+        Position(CodePositionType type, const String& name, int index)
+            :
+            type(type),
+            name(name),
+            index(index)
+        {
+            // intentionally left blank
+        }
+    };
+
+    TObjectPool<Position> mPositionPool;
+    TObjectList<Position> mPositions;
 };

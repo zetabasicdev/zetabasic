@@ -31,6 +31,8 @@
 #include "AssignmentStatementNode.h"
 #include "EndStatementNode.h"
 #include "IfStatementNode.h"
+#include "GotoStatementNode.h"
+#include "LabelStatementNode.h"
 #include "Parser.h"
 #include "PrintStatementNode.h"
 #include "StatementNode.h"
@@ -62,6 +64,9 @@ StatementNode* StatementNode::parseStatement(Parser& parser)
         case TokenTag::Key_If:
             node = parser.getNodePool().alloc<IfStatementNode>();
             break;
+        case TokenTag::Key_Goto:
+            node = parser.getNodePool().alloc<GotoStatementNode>();
+            break;
         case TokenTag::Key_Let:
             node = parser.getNodePool().alloc<AssignmentStatementNode>();
             break;
@@ -71,6 +76,8 @@ StatementNode* StatementNode::parseStatement(Parser& parser)
         default:
             break;
         }
+    } else if (token.getId() == TokenId::Label) {
+        node = parser.getNodePool().alloc<LabelStatementNode>();
     }
 
     if (node)

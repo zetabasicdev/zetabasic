@@ -40,6 +40,7 @@ const char* ToString(TokenId id)
     case TokenId::Integer: return "integer";
     case TokenId::String: return "string";
     case TokenId::Symbol: return "symbol";
+    case TokenId::Label: return "label";
     default:
         break;
     }
@@ -52,6 +53,7 @@ const char* ToString(TokenTag tag)
     case TokenTag::None: return "none";
     case TokenTag::Key_End: return "END";
     case TokenTag::Key_If: return "IF";
+    case TokenTag::Key_Goto: return "GOTO";
     case TokenTag::Key_Let: return "LET";
     case TokenTag::Key_Or: return "OR";
     case TokenTag::Key_Print: return "PRINT";

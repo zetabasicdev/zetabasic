@@ -59,7 +59,8 @@ static void dumpBytecode(const uint8_t* code, int length)
         Type_NoArgs,
         Type_OneInt,
         Type_OneIndex,
-        Type_Offset
+        Type_Offset,
+        Type_Location
     };
     static struct {
         uint8_t op;
@@ -81,6 +82,7 @@ static void dumpBytecode(const uint8_t* code, int length)
         { Op_eq_str, "equals.str", 1, Type_NoArgs },
         { Op_eq_int, "equals.int", 1, Type_NoArgs },
         { Op_or_int, "or.int", 1, Type_NoArgs },
+        { Op_jmp, "jump", 3, Type_Location },
         { Op_jmp_zero, "jump.if.zero", 2, Type_Offset },
         { 0, nullptr, 0, 0 }
     };
@@ -92,9 +94,11 @@ static void dumpBytecode(const uint8_t* code, int length)
         for (auto ix = 0; mapping[ix].name; ++ix) {
             if (mapping[ix].op == *code) {
                 if (mapping[ix].size == 1)
-                    printf("%04X: %02X     ", (int)(code - start), (int)code[0]);
+                    printf("%04X: %02X        ", (int)(code - start), (int)code[0]);
                 else if (mapping[ix].size == 2)
-                    printf("%04X: %02X %02X  ", (int)(code - start), (int)code[0], (int)code[1]);
+                    printf("%04X: %02X %02X     ", (int)(code - start), (int)code[0], (int)code[1]);
+                else if (mapping[ix].size == 3)
+                    printf("%04X: %02X %02X %02X  ", (int)(code - start), (int)code[0], (int)code[1], (int)code[2]);
                 switch (mapping[ix].type) {
                 case Type_NoArgs:
                     printf("%s\n", mapping[ix].name);
@@ -108,6 +112,9 @@ static void dumpBytecode(const uint8_t* code, int length)
                 case Type_Offset:
                     printf("%s %+d (%04X)\n", mapping[ix].name, (int)code[1], (int)(code - start) + (int)code[1]);
                     break;
+                case Type_Location:
+                    printf("%s (%02X%02X)\n", mapping[ix].name, (int)code[1], (int)code[2]);
+                    break;
                 default:
                     break;
                 }
@@ -117,7 +124,7 @@ static void dumpBytecode(const uint8_t* code, int length)
             }
         }
         if (!found) {
-            printf("unknown opcode : %02X\n", (int)*code);
+            printf("(%04X) unknown opcode : %02X\n", (int)(code - start), (int)*code);
             break;
         }
     }
@@ -177,6 +184,7 @@ InterpreterResult Interpreter::run()
             int64_t rhs = mStack.pop();
             int64_t lhs = mStack.pop();
             mStack.push(lhs + rhs);
+
             ++ip;
             break;
         }
@@ -200,6 +208,9 @@ InterpreterResult Interpreter::run()
             ++ip;
             break;
         }
+        case Op_jmp:
+            ip = (code[ip + 1] << 8) + code[ip + 2];
+            break;
         case Op_jmp_zero:
             if (mStack.pop() == 0)
                 ip += code[ip + 1];
@@ -221,12 +232,14 @@ void Interpreter::DoSysCall(uint8_t ix)
     {
         String text = mStringStack.pop();
         mWindow.printn(text.getText(), text.getLength());
+        mWindow.print("\n");
         break;
     }
     case Syscall_printi:
     {
         int64_t value = mStack.pop();
         mWindow.printf("%lld", value);
+        mWindow.print("\n");
         break;
     }
     default:

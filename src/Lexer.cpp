@@ -166,6 +166,7 @@ bool Lexer::runEndState()
             } keywords[] = {
                 { "END", TokenTag::Key_End },
                 { "IF", TokenTag::Key_If },
+                { "GOTO", TokenTag::Key_Goto },
                 { "LET", TokenTag::Key_Let },
                 { "OR", TokenTag::Key_Or },
                 { "PRINT", TokenTag::Key_Print },
@@ -216,6 +217,10 @@ bool Lexer::runNameState()
         return true;
     } else if (mChar == '$') {
         mId = TokenId::Name;
+        mState = State::End;
+        return true;
+    } else if (mChar == ':') {
+        mId = TokenId::Label;
         mState = State::End;
         return true;
     }

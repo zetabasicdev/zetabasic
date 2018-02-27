@@ -28,69 +28,42 @@
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#pragma once
+#include "CompileError.h"
+#include "FixUpTable.h"
 
-#include <cstdint>
-
-#include "Node.h"
-#include "TItemBuffer.h"
-
-class CodePositionTable;
-class ConstantTable;
-class FixUpTable;
-class StringTable;
-class SymbolTable;
-
-class Translator
+FixUpTable::FixUpTable(TItemBuffer<uint8_t>& bytecode, CodePositionTable& codePositionTable)
+    :
+    mBytecode(bytecode),
+    mCodePositionTable(codePositionTable),
+    mFixUpPool(32),
+    mFixUps()
 {
-public:
-    Translator(TItemBuffer<uint8_t>& bytecode,
-               StringTable& stringTable,
-               ConstantTable& constantTable,
-               SymbolTable& symbolTable,
-               CodePositionTable& codePositionTable,
-               FixUpTable& fixUpTable,
-               Node& root);
-    ~Translator();
+    // intentionally left blank
+}
 
-    void run();
+FixUpTable::~FixUpTable()
+{
+    // intentionally left blank
+}
 
-    TItemBuffer<uint8_t>& getBytecode()
-    {
-        return mBytecode;
+void FixUpTable::reset()
+{
+    mFixUpPool.reset();
+    mFixUps.reset();
+}
+
+void FixUpTable::addFixUp(int index, CodePositionType type, const String& name, const Range& range)
+{
+    mFixUps.push(mFixUpPool.alloc(index, type, name, range));
+}
+
+void FixUpTable::doFixups()
+{
+    for (auto& fixup : mFixUps) {
+        auto index = mCodePositionTable.getPosition(fixup.type, fixup.name);
+        if (index == -1)
+            throw CompileError(CompileErrorId::NameError, fixup.range, "Invalid Name");
+        mBytecode[fixup.index] = (index >> 8) & 0xff;
+        mBytecode[fixup.index + 1] = index & 0xff;
     }
-
-    StringTable& getStringTable()
-    {
-        return mStringTable;
-    }
-
-    ConstantTable& getConstantTable()
-    {
-        return mConstantTable;
-    }
-
-    SymbolTable& getSymbolTable()
-    {
-        return mSymbolTable;
-    }
-
-    CodePositionTable& getCodePositionTable()
-    {
-        return mCodePositionTable;
-    }
-
-    FixUpTable& getFixUpTable()
-    {
-        return mFixUpTable;
-    }
-
-private:
-    TItemBuffer<uint8_t>& mBytecode;
-    StringTable& mStringTable;
-    ConstantTable& mConstantTable;
-    SymbolTable& mSymbolTable;
-    CodePositionTable& mCodePositionTable;
-    FixUpTable& mFixUpTable;
-    Node& mRoot;
-};
+}

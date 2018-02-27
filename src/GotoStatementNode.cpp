@@ -28,69 +28,47 @@
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#pragma once
+#include "FixUpTable.h"
+#include "GotoStatementNode.h"
+#include "Opcodes.h"
+#include "Parser.h"
+#include "Translator.h"
 
-#include <cstdint>
-
-#include "Node.h"
-#include "TItemBuffer.h"
-
-class CodePositionTable;
-class ConstantTable;
-class FixUpTable;
-class StringTable;
-class SymbolTable;
-
-class Translator
+GotoStatementNode::GotoStatementNode()
+    :
+    StatementNode(),
+    mName()
 {
-public:
-    Translator(TItemBuffer<uint8_t>& bytecode,
-               StringTable& stringTable,
-               ConstantTable& constantTable,
-               SymbolTable& symbolTable,
-               CodePositionTable& codePositionTable,
-               FixUpTable& fixUpTable,
-               Node& root);
-    ~Translator();
+    // intentionally left blank
+}
 
-    void run();
+GotoStatementNode::~GotoStatementNode()
+{
+    // intentionally left blank
+}
 
-    TItemBuffer<uint8_t>& getBytecode()
-    {
-        return mBytecode;
-    }
+void GotoStatementNode::parse(Parser& parser)
+{
+    assert(parser.getToken().getTag() == TokenTag::Key_Goto);
+    parser.eatToken();
 
-    StringTable& getStringTable()
-    {
-        return mStringTable;
-    }
+    if (parser.getToken().getId() != TokenId::Name || parser.getToken().getTag() != TokenTag::None)
+        parser.raiseError(CompileErrorId::SyntaxError, "Expected Label Name");
 
-    ConstantTable& getConstantTable()
-    {
-        return mConstantTable;
-    }
+    mName = parser.getToken().getText();
+    parser.eatToken();
 
-    SymbolTable& getSymbolTable()
-    {
-        return mSymbolTable;
-    }
+    parser.eatEndOfLine();
+}
 
-    CodePositionTable& getCodePositionTable()
-    {
-        return mCodePositionTable;
-    }
+void GotoStatementNode::analyze(Analyzer& analyzer)
+{
+    // intentionally left blank
+}
 
-    FixUpTable& getFixUpTable()
-    {
-        return mFixUpTable;
-    }
-
-private:
-    TItemBuffer<uint8_t>& mBytecode;
-    StringTable& mStringTable;
-    ConstantTable& mConstantTable;
-    SymbolTable& mSymbolTable;
-    CodePositionTable& mCodePositionTable;
-    FixUpTable& mFixUpTable;
-    Node& mRoot;
-};
+void GotoStatementNode::translate(Translator& translator)
+{
+    int index = 0;
+    *translator.getBytecode().alloc(3, index) = Op_jmp;
+    translator.getFixUpTable().addFixUp(index + 1, CodePositionType::Label, mName, mRange);
+}

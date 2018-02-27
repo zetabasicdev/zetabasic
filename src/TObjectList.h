@@ -37,6 +37,57 @@ template<typename T>
 class TObjectList
 {
 public:
+    class Iterator
+    {
+    public:
+        Iterator(TObjectList& list, int index)
+            :
+            mList(list),
+            mIndex(index)
+        {
+            // intentionally left blank
+        }
+
+        ~Iterator()
+        {
+            // intentionally left blank
+        }
+
+        bool operator==(const Iterator& iter) const
+        {
+            return iter.mIndex == mIndex;
+        }
+
+        bool operator!=(const Iterator& iter) const
+        {
+            return iter.mIndex != mIndex;
+        }
+
+        T& operator*()
+        {
+            return mList[mIndex];
+        }
+
+        Iterator& operator++()
+        {
+            if (mIndex < mList.getSize())
+                ++mIndex;
+            return *this;
+        }
+
+        Iterator operator++(int)
+        {
+            Iterator clone(mItem);
+            if (mIndex < mList.getSize())
+                ++mIndex;
+            return clone;
+        }
+
+    private:
+        TObjectList& mList;
+        int mIndex;
+    };
+
     TObjectList()
         :
         mCapacity(32),
@@ -86,6 +137,16 @@ public:
         if (index < 0 || index >= mSize)
             throw std::runtime_error("out of bounds access");
         return *mItems[index];
+    }
+
+    Iterator begin()
+    {
+        return Iterator(*this, 0);
+    }
+
+    Iterator end()
+    {
+        return Iterator(*this, mSize);
     }
 
 private:

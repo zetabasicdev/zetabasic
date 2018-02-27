@@ -28,69 +28,42 @@
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#pragma once
+#include "CodePositionTable.h"
 
-#include <cstdint>
-
-#include "Node.h"
-#include "TItemBuffer.h"
-
-class CodePositionTable;
-class ConstantTable;
-class FixUpTable;
-class StringTable;
-class SymbolTable;
-
-class Translator
+CodePositionTable::CodePositionTable()
+    :
+    mPositionPool(32),
+    mPositions()
 {
-public:
-    Translator(TItemBuffer<uint8_t>& bytecode,
-               StringTable& stringTable,
-               ConstantTable& constantTable,
-               SymbolTable& symbolTable,
-               CodePositionTable& codePositionTable,
-               FixUpTable& fixUpTable,
-               Node& root);
-    ~Translator();
+    // intentionally left blank
+}
 
-    void run();
+CodePositionTable::~CodePositionTable()
+{
+    // intentionally left blank
+}
 
-    TItemBuffer<uint8_t>& getBytecode()
-    {
-        return mBytecode;
-    }
+void CodePositionTable::reset()
+{
+    mPositionPool.reset();
+    mPositions.reset();
+}
 
-    StringTable& getStringTable()
-    {
-        return mStringTable;
-    }
+bool CodePositionTable::addPosition(CodePositionType type, const String& name, int index)
+{
+    // make sure this name does not already exist
+    for (int ix = 0; ix < mPositions.getSize(); ++ix)
+        if (mPositions[ix].name == name)
+            return false;
 
-    ConstantTable& getConstantTable()
-    {
-        return mConstantTable;
-    }
+    mPositions.push(mPositionPool.alloc(type, name, index));
+    return true;
+}
 
-    SymbolTable& getSymbolTable()
-    {
-        return mSymbolTable;
-    }
-
-    CodePositionTable& getCodePositionTable()
-    {
-        return mCodePositionTable;
-    }
-
-    FixUpTable& getFixUpTable()
-    {
-        return mFixUpTable;
-    }
-
-private:
-    TItemBuffer<uint8_t>& mBytecode;
-    StringTable& mStringTable;
-    ConstantTable& mConstantTable;
-    SymbolTable& mSymbolTable;
-    CodePositionTable& mCodePositionTable;
-    FixUpTable& mFixUpTable;
-    Node& mRoot;
-};
+int CodePositionTable::getPosition(CodePositionType type, const String& name)
+{
+    for (int ix = 0; ix < mPositions.getSize(); ++ix)
+        if (mPositions[ix].name == name && mPositions[ix].type == type)
+            return mPositions[ix].index;
+    return -1;
+}

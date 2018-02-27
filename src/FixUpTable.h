@@ -31,66 +31,44 @@
 #pragma once
 
 #include <cstdint>
-
-#include "Node.h"
+#include "CodePositionTable.h"
+#include "Range.h"
 #include "TItemBuffer.h"
 
-class CodePositionTable;
-class ConstantTable;
-class FixUpTable;
-class StringTable;
-class SymbolTable;
-
-class Translator
+class FixUpTable
 {
 public:
-    Translator(TItemBuffer<uint8_t>& bytecode,
-               StringTable& stringTable,
-               ConstantTable& constantTable,
-               SymbolTable& symbolTable,
-               CodePositionTable& codePositionTable,
-               FixUpTable& fixUpTable,
-               Node& root);
-    ~Translator();
+    FixUpTable(TItemBuffer<uint8_t>& bytecode, CodePositionTable& codePositionTable);
+    ~FixUpTable();
 
-    void run();
+    void reset();
 
-    TItemBuffer<uint8_t>& getBytecode()
-    {
-        return mBytecode;
-    }
+    void addFixUp(int index, CodePositionType type, const String& name, const Range& range);
 
-    StringTable& getStringTable()
-    {
-        return mStringTable;
-    }
-
-    ConstantTable& getConstantTable()
-    {
-        return mConstantTable;
-    }
-
-    SymbolTable& getSymbolTable()
-    {
-        return mSymbolTable;
-    }
-
-    CodePositionTable& getCodePositionTable()
-    {
-        return mCodePositionTable;
-    }
-
-    FixUpTable& getFixUpTable()
-    {
-        return mFixUpTable;
-    }
+    void doFixups();
 
 private:
     TItemBuffer<uint8_t>& mBytecode;
-    StringTable& mStringTable;
-    ConstantTable& mConstantTable;
-    SymbolTable& mSymbolTable;
     CodePositionTable& mCodePositionTable;
-    FixUpTable& mFixUpTable;
-    Node& mRoot;
+
+    struct FixUpRecord
+    {
+        int index;
+        CodePositionType type;
+        String name;
+        Range range;
+
+        FixUpRecord(int index, CodePositionType type, const String& name, const Range& range)
+            :
+            index(index),
+            type(type),
+            name(name),
+            range(range)
+        {
+            // intentionally left blank
+        }
+    };
+
+    TObjectPool<FixUpRecord> mFixUpPool;
+    TObjectList<FixUpRecord> mFixUps;
 };

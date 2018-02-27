@@ -28,69 +28,39 @@
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#pragma once
+#include "CodePositionTable.h"
+#include "LabelStatementNode.h"
+#include "Parser.h"
+#include "Translator.h"
 
-#include <cstdint>
-
-#include "Node.h"
-#include "TItemBuffer.h"
-
-class CodePositionTable;
-class ConstantTable;
-class FixUpTable;
-class StringTable;
-class SymbolTable;
-
-class Translator
+LabelStatementNode::LabelStatementNode()
+    :
+    StatementNode(),
+    mName()
 {
-public:
-    Translator(TItemBuffer<uint8_t>& bytecode,
-               StringTable& stringTable,
-               ConstantTable& constantTable,
-               SymbolTable& symbolTable,
-               CodePositionTable& codePositionTable,
-               FixUpTable& fixUpTable,
-               Node& root);
-    ~Translator();
+    // intentionally left blank
+}
 
-    void run();
+LabelStatementNode::~LabelStatementNode()
+{
+    // intentionally left blank
+}
 
-    TItemBuffer<uint8_t>& getBytecode()
-    {
-        return mBytecode;
-    }
+void LabelStatementNode::parse(Parser& parser)
+{
+    assert(parser.getToken().getId() == TokenId::Label);
 
-    StringTable& getStringTable()
-    {
-        return mStringTable;
-    }
+    mName = String(parser.getToken().getText().getText(), parser.getToken().getText().getLength() - 1);
+    parser.eatToken();
+    parser.eatEndOfLine();
+}
 
-    ConstantTable& getConstantTable()
-    {
-        return mConstantTable;
-    }
+void LabelStatementNode::analyze(Analyzer& analyzer)
+{
+    // intentionally left blank
+}
 
-    SymbolTable& getSymbolTable()
-    {
-        return mSymbolTable;
-    }
-
-    CodePositionTable& getCodePositionTable()
-    {
-        return mCodePositionTable;
-    }
-
-    FixUpTable& getFixUpTable()
-    {
-        return mFixUpTable;
-    }
-
-private:
-    TItemBuffer<uint8_t>& mBytecode;
-    StringTable& mStringTable;
-    ConstantTable& mConstantTable;
-    SymbolTable& mSymbolTable;
-    CodePositionTable& mCodePositionTable;
-    FixUpTable& mFixUpTable;
-    Node& mRoot;
-};
+void LabelStatementNode::translate(Translator& translator)
+{
+    translator.getCodePositionTable().addPosition(CodePositionType::Label, mName, translator.getBytecode().getSize());
+}

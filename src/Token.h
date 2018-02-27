@@ -41,7 +41,8 @@ enum class TokenId
     Name,
     Integer,
     String,
-    Symbol
+    Symbol,
+    Label
 };
 const char* ToString(TokenId id);
 
@@ -49,6 +50,7 @@ enum class TokenTag
 {
     None,
     Key_End,
+    Key_Goto,
     Key_If,
     Key_Let,
     Key_Or,
