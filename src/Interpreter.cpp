@@ -70,6 +70,7 @@ static void dumpBytecode(const uint8_t* code, int length)
     } mapping[] = {
         { Op_end, "end", 1, Type_NoArgs },
         { Op_reserve, "reserve", 2, Type_OneInt },
+        { Op_dup, "dup", 1, Type_NoArgs },
         { Op_load_const_str, "load.const.str", 2, Type_OneIndex },
         { Op_load_const, "load.const", 2, Type_OneIndex },
         { Op_load_local_str, "load.local.str", 2, Type_OneIndex },
@@ -84,6 +85,7 @@ static void dumpBytecode(const uint8_t* code, int length)
         { Op_or_int, "or.int", 1, Type_NoArgs },
         { Op_jmp, "jump", 3, Type_Location },
         { Op_jmp_zero, "jump.if.zero", 2, Type_Offset },
+        { Op_jmp_neq, "jump.if.not.equal", 2, Type_Offset },
         { 0, nullptr, 0, 0 }
     };
 
@@ -110,7 +112,7 @@ static void dumpBytecode(const uint8_t* code, int length)
                     printf("%s #%d\n", mapping[ix].name, (int)code[1]);
                     break;
                 case Type_Offset:
-                    printf("%s %+d (%04X)\n", mapping[ix].name, (int)code[1], (int)(code - start) + (int)code[1]);
+                    printf("%s %+d (%04X)\n", mapping[ix].name, (int)((int8_t)code[1]), (int)(code - start) + (int)((int8_t)code[1]));
                     break;
                 case Type_Location:
                     printf("%s (%02X%02X)\n", mapping[ix].name, (int)code[1], (int)code[2]);
@@ -146,6 +148,10 @@ InterpreterResult Interpreter::run()
         case Op_reserve:
             mStack.reserve(code[ip + 1]);
             ip += 2;
+            break;
+        case Op_dup:
+            mStack.dup();
+            ++ip;
             break;
         case Op_load_const_str:
             mStringStack.pushConstant(mProgram.getString(code[ip + 1]));
@@ -213,10 +219,20 @@ InterpreterResult Interpreter::run()
             break;
         case Op_jmp_zero:
             if (mStack.pop() == 0)
-                ip += code[ip + 1];
+                ip += (int8_t)code[ip + 1];
             else
                 ip += 2;
             break;
+        case Op_jmp_neq:
+        {
+            int64_t rhs = mStack.pop();
+            int64_t lhs = mStack.pop();
+            if (lhs != rhs)
+                ip += (int8_t)code[ip + 1];
+            else
+                ip += 2;
+            break;
+        }
         default:
             return InterpreterResult::BadOpcode;
         }

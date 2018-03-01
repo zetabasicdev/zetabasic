@@ -98,6 +98,22 @@ public:
         return false;
     }
 
+    bool operator!=(const char* text) const
+    {
+        return !operator==(text);
+    }
+
+    bool operator!=(const String& str) const
+    {
+        return !operator==(str);
+    }
+
+    char operator[](int index) const
+    {
+        assert(index >= 0 && index < mLength);
+        return mText[index];
+    }
+
     int compareWithCase(const String& str) const
     {
         int len = mLength;

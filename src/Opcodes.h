@@ -36,6 +36,7 @@ enum Opcode : uint8_t
 {
     Op_end = 0x01,
     Op_reserve,
+    Op_dup,
     Op_load_const_str,
     Op_load_const,
     Op_load_local_str,
@@ -49,5 +50,6 @@ enum Opcode : uint8_t
     Op_eq_int,
     Op_or_int,
     Op_jmp,
-    Op_jmp_zero
+    Op_jmp_zero,
+    Op_jmp_neq
 };

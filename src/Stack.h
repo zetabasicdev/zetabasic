@@ -39,6 +39,7 @@ public:
     ~Stack();
 
     void reserve(int count);
+    void dup();
 
     void push(int64_t value);
     int64_t pop();
@@ -50,4 +51,6 @@ private:
     int mCapacity;
     int mPointer;
     int64_t* mData;
+
+    void ensureSpace(int count);
 };

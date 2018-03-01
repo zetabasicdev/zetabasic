@@ -28,65 +28,32 @@
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "Analyzer.h"
-#include "ExpressionNode.h"
-#include "IfStatementNode.h"
-#include "Opcodes.h"
-#include "Parser.h"
-#include "Translator.h"
+#pragma once
 
-IfStatementNode::IfStatementNode()
+#include "StatementNode.h"
+#include "String.h"
+#include "TNodeList.h"
+
+class ExpressionNode;
+class Symbol;
+
+class ForStatementNode
     :
-    StatementNode(),
-    mExpression(nullptr),
-    mStatement(nullptr)
+    public StatementNode
 {
-    // intentionally left blank
-}
+public:
+    ForStatementNode();
+    virtual ~ForStatementNode();
 
-IfStatementNode::~IfStatementNode()
-{
-    // intentionally left blank
-}
+    void parse(Parser& parser);
+    void analyze(Analyzer& analyzer);
+    void translate(Translator& translator);
 
-void IfStatementNode::parse(Parser& parser)
-{
-    assert(parser.getToken().getTag() == TokenTag::Key_If);
-    parser.eatToken();
-
-    mExpression = ExpressionNode::parseExpression(parser);
-    if (!mExpression)
-        parser.raiseError(CompileErrorId::SyntaxError, "Expected Expression");
-
-    if (parser.getToken().getTag() != TokenTag::Key_Then)
-        parser.raiseError(CompileErrorId::SyntaxError, "Expected THEN");
-    parser.eatToken();
-
-    mStatement = StatementNode::parseStatement(parser);
-    if (!mStatement)
-        parser.raiseError(CompileErrorId::SyntaxError, "Expected Statement");
-}
-
-void IfStatementNode::analyze(Analyzer& analyzer)
-{
-    mExpression->analyze(analyzer);
-    mStatement->analyze(analyzer);
-}
-
-void IfStatementNode::translate(Translator& translator)
-{
-    mExpression->translate(translator);
-
-    int index = 0;
-    auto code = translator.getBytecode().alloc(2, index);
-    code[0] = Op_jmp_zero;
-    code[1] = 0;
-
-    mStatement->translate(translator);
-
-    int target = translator.getBytecode().getSize();
-    int offset = target - index;
-    assert(offset >= -128 && offset < 127);
-
-    translator.getBytecode()[index + 1] = offset;
-}
+private:
+    String mName;
+    Symbol* mSymbol;
+    ExpressionNode* mStartExpression;
+    ExpressionNode* mStopExpression;
+    String mNextName;
+    TNodeList<StatementNode> mStatements;
+};

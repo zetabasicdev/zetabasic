@@ -42,6 +42,11 @@ public:
     Node();
     virtual ~Node();
 
+    const Range& getRange() const
+    {
+        return mRange;
+    }
+
     virtual void parse(Parser& parser) = 0;
     virtual void analyze(Analyzer& analyzer) = 0;
     virtual void translate(Translator& translator) = 0;

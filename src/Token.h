@@ -50,12 +50,15 @@ enum class TokenTag
 {
     None,
     Key_End,
+    Key_For,
     Key_Goto,
     Key_If,
     Key_Let,
+    Key_Next,
     Key_Or,
     Key_Print,
     Key_Then,
+    Key_To,
     Sym_Add,
     Sym_Equals
 };

@@ -56,14 +56,10 @@ int main(int argc, char* argv[])
 {
     try {
         const char* code =
-            " LET I = 0\n"
-            "Start:\n"
-            " PRINT \"Hello, world!\"\n"
-            " LET I = I + 1\n"
-            " IF I = 10 THEN GOTO Stop\n"
-            " GOTO Start\n"
-            "Stop:\n"
-            " END";
+            "FOR I = 1 TO 15\n"
+            "  PRINT I\n"
+            "NEXT I\n"
+            "END";
 
         Compiler compiler;
         TextSourceStream stream(code);

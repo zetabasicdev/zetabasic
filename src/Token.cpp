@@ -52,12 +52,15 @@ const char* ToString(TokenTag tag)
     switch (tag) {
     case TokenTag::None: return "none";
     case TokenTag::Key_End: return "END";
+    case TokenTag::Key_For: return "FOR";
     case TokenTag::Key_If: return "IF";
     case TokenTag::Key_Goto: return "GOTO";
     case TokenTag::Key_Let: return "LET";
+    case TokenTag::Key_Next: return "NEXT";
     case TokenTag::Key_Or: return "OR";
     case TokenTag::Key_Print: return "PRINT";
     case TokenTag::Key_Then: return "THEN";
+    case TokenTag::Key_To: return "TO";
     case TokenTag::Sym_Add: return "+";
     case TokenTag::Sym_Equals: return "=";
     default:
