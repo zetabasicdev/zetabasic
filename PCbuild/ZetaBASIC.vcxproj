@@ -83,6 +83,7 @@
     <ClInclude Include="..\src\FixUpTable.h" />
     <ClInclude Include="..\src\Font.h" />
     <ClInclude Include="..\src\ForStatementNode.h" />
+    <ClInclude Include="..\src\FunctionCallExpressionNode.h" />
     <ClInclude Include="..\src\GotoStatementNode.h" />
     <ClInclude Include="..\src\IdentifierExpressionNode.h" />
     <ClInclude Include="..\src\IfStatementNode.h" />
@@ -133,6 +134,7 @@
     <ClCompile Include="..\src\ExpressionNode.cpp" />
     <ClCompile Include="..\src\FixUpTable.cpp" />
     <ClCompile Include="..\src\ForStatementNode.cpp" />
+    <ClCompile Include="..\src\FunctionCallExpressionNode.cpp" />
     <ClCompile Include="..\src\GotoStatementNode.cpp" />
     <ClCompile Include="..\src\IdentifierExpressionNode.cpp" />
     <ClCompile Include="..\src\IfStatementNode.cpp" />

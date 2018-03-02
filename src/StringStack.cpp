@@ -112,6 +112,25 @@ int StringStack::compare()
     return strcmp(lhs.c_str(), rhs.c_str());
 }
 
+int StringStack::len()
+{
+    assert(mCount >= 1);
+    int len = mLengths[--mCount];
+    mDataUsed -= len;
+    return len;
+}
+
+void StringStack::left(int count)
+{
+    assert(mCount >= 1);
+
+    int len = mLengths[mCount - 1];
+    if (len > count) {
+        mLengths[mCount - 1] = count;
+        mDataUsed -= (len - count);
+    }
+}
+
 String StringStack::pop()
 {
     assert(mCount > 0);

@@ -90,7 +90,8 @@ public:
     TNodeList()
         :
         mFirst(nullptr),
-        mLast(nullptr)
+        mLast(nullptr),
+        mLength(0)
     {
         // intentionally left blank
     }
@@ -98,6 +99,11 @@ public:
     ~TNodeList()
     {
         // intentionally left blank
+    }
+
+    int getLength() const
+    {
+        return mLength;
     }
 
     void push(T* item)
@@ -108,6 +114,7 @@ public:
             mFirst = item;
         mLast = item;
         item->mNext = nullptr;
+        ++mLength;
     }
 
     Iterator begin()
@@ -123,4 +130,5 @@ public:
 private:
     T* mFirst;
     T* mLast;
+    int mLength;
 };

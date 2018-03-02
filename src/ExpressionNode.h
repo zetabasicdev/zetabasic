@@ -31,6 +31,7 @@
 #pragma once
 
 #include "Node.h"
+#include "TNodeList.h"
 #include "Token.h"
 #include "Typename.h"
 
@@ -50,6 +51,10 @@ public:
         return mType;
     }
 
+    friend class TNodeList<ExpressionNode>;
 protected:
     Typename mType;
+
+private:
+    ExpressionNode* mNext;
 };

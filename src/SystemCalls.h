@@ -35,5 +35,7 @@
 enum SystemCall : uint8_t
 {
     Syscall_printstr,
-    Syscall_printi
+    Syscall_printi,
+    Syscall_len,
+    Syscall_left_str
 };

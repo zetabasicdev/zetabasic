@@ -30,86 +30,24 @@
 
 #pragma once
 
-#include "Range.h"
+#include "ExpressionNode.h"
 #include "String.h"
 
-enum class TokenId
-{
-    Unknown,
-    EndOfSource,
-    EndOfLine,
-    Name,
-    Integer,
-    String,
-    Symbol,
-    Label
-};
-const char* ToString(TokenId id);
-
-enum class TokenTag
-{
-    None,
-    Key_End,
-    Key_For,
-    Key_Goto,
-    Key_If,
-    Key_Len,
-    Key_LeftS,
-    Key_Let,
-    Key_Next,
-    Key_Or,
-    Key_Print,
-    Key_Then,
-    Key_To,
-    Sym_Add,
-    Sym_Equals,
-    Sym_OpenParen,
-    Sym_CloseParen,
-    Sym_Comma
-};
-const char* ToString(TokenTag tag);
-
-class Token
+class FunctionCallExpressionNode
+    :
+    public ExpressionNode
 {
 public:
-    Token(TokenId id, TokenTag tag, const String& text, const Range& range)
-        :
-        mId(id),
-        mTag(tag),
-        mText(text),
-        mRange(range)
-    {
-        // intentionally left blank
-    }
+    FunctionCallExpressionNode();
+    virtual ~FunctionCallExpressionNode();
 
-    ~Token()
-    {
-        // intentionally left blank
-    }
+    static bool isBuiltin(TokenTag tag);
 
-    TokenId getId() const
-    {
-        return mId;
-    }
-
-    TokenTag getTag() const
-    {
-        return mTag;
-    }
-
-    const String& getText() const
-    {
-        return mText;
-    }
-
-    const Range& getRange() const
-    {
-        return mRange;
-    }
+    void parse(Parser& parser);
+    void analyze(Analyzer& analyzer);
+    void translate(Translator& translator);
 
 private:
-    TokenId mId;
-    TokenTag mTag;
-    String mText;
-    Range mRange;
+    String mName;
+    TNodeList<ExpressionNode> mArguments;
 };

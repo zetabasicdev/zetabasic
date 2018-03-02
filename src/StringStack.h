@@ -41,6 +41,8 @@ public:
     void pushConstant(const String& value);
     void add();
     int compare();
+    int len();
+    void left(int count);
 
     String pop();
 

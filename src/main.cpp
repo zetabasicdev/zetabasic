@@ -56,9 +56,8 @@ int main(int argc, char* argv[])
 {
     try {
         const char* code =
-            "FOR I = 1 TO 15\n"
-            "  PRINT I\n"
-            "NEXT I\n"
+            "PRINT LEN(\"Hello, world!\")\n"
+            "PRINT LEFT$(\"Hello!\", 1)\n"
             "END";
 
         Compiler compiler;

@@ -258,6 +258,12 @@ void Interpreter::DoSysCall(uint8_t ix)
         mWindow.print("\n");
         break;
     }
+    case Syscall_len:
+        mStack.push((int64_t)mStringStack.len());
+        break;
+    case Syscall_left_str:
+        mStringStack.left((int)mStack.pop());
+        break;
     default:
         break;
     }
