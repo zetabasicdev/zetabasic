@@ -28,44 +28,42 @@
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#pragma once
+#include "CodePositionTable.h"
 
-#include "StringPiece.h"
-#include "TItemPool.h"
-
-const int kStringPoolBlockSize = 4096;
-
-class StringPool
+CodePositionTable::CodePositionTable()
+    :
+    mPositionPool(32),
+    mPositions()
 {
-public:
-    StringPool()
-        :
-        mCharPool()
-    {
-        // intentionally left blank
-    }
+    // intentionally left blank
+}
 
-    ~StringPool()
-    {
-        // intentionally left blank
-    }
+CodePositionTable::~CodePositionTable()
+{
+    // intentionally left blank
+}
 
-    void reset()
-    {
-        mCharPool.reset();
-    }
+void CodePositionTable::reset()
+{
+    mPositionPool.reset();
+    mPositions.reset();
+}
 
-    StringPiece alloc(const char* text, int length)
-    {
-        assert(text);
-        assert(length >= 0);
-        assert(length < kStringPoolBlockSize);
-        char* buf = mCharPool.alloc(length + 1);
-        memcpy(buf, text, length);
-        buf[length] = 0;
-        return StringPiece(buf, length);
-    }
+bool CodePositionTable::addPosition(CodePositionType type, const StringPiece& name, int index)
+{
+    // make sure this name does not already exist
+    for (int ix = 0; ix < mPositions.getSize(); ++ix)
+        if (mPositions[ix].name == name)
+            return false;
 
-private:
-    TItemPool<char, kStringPoolBlockSize> mCharPool;
-};
+    mPositions.push(mPositionPool.alloc(type, name, index));
+    return true;
+}
+
+int CodePositionTable::getPosition(CodePositionType type, const StringPiece& name)
+{
+    for (int ix = 0; ix < mPositions.getSize(); ++ix)
+        if (mPositions[ix].name == name && mPositions[ix].type == type)
+            return mPositions[ix].index;
+    return -1;
+}

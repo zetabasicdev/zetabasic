@@ -13,39 +13,30 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="Header Files\Nodes">
+    <Filter Include="Header Files\Compiler">
+      <UniqueIdentifier>{01431a9d-673c-499c-b8ca-e2d44d3b33a5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Compiler">
+      <UniqueIdentifier>{39ce6441-a11f-4ebd-a775-ef0266470999}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Compiler\Nodes">
       <UniqueIdentifier>{49945022-ec27-443a-a326-32a07aef42c3}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Nodes">
+    <Filter Include="Source Files\Compiler\Nodes">
       <UniqueIdentifier>{08547bb1-f871-42e2-93dd-3a582de06e5d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Interpreter">
+      <UniqueIdentifier>{daaaf6e7-6d74-4612-b95a-13ebc5692023}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Interpreter">
+      <UniqueIdentifier>{029275ae-587e-495f-af5e-9167a5587d44}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\src\ISourceStream.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\TItemPool.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\Range.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\CompileError.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\String.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\StringPool.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Compiler.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Lexer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Token.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\src\TObjectPool.h">
@@ -54,49 +45,10 @@
     <ClInclude Include="..\src\TObjectList.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\TextSourceStream.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Parser.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Node.h">
-      <Filter>Header Files\Nodes</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\ModuleNode.h">
-      <Filter>Header Files\Nodes</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\StatementNode.h">
-      <Filter>Header Files\Nodes</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\EndStatementNode.h">
-      <Filter>Header Files\Nodes</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\NodePool.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\MemoryPool.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\Analyzer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\TNodeList.h">
-      <Filter>Header Files\Nodes</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Translator.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Program.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\TItemBuffer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Interpreter.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Opcodes.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Font.h">
@@ -105,184 +57,244 @@
     <ClInclude Include="..\src\Window.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\ExpressionNode.h">
-      <Filter>Header Files\Nodes</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Typename.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\PrintStatementNode.h">
-      <Filter>Header Files\Nodes</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\StringLiteralExpressionNode.h">
-      <Filter>Header Files\Nodes</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\StringTable.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\SystemCalls.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\StringStack.h">
+    <ClInclude Include="..\src\Compiler\Analyzer.h">
+      <Filter>Header Files\Compiler</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Compiler\CodePositionTable.h">
+      <Filter>Header Files\Compiler</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Compiler\CompileError.h">
+      <Filter>Header Files\Compiler</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Compiler\Compiler.h">
+      <Filter>Header Files\Compiler</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Compiler\ConstantTable.h">
+      <Filter>Header Files\Compiler</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Compiler\FixUpTable.h">
+      <Filter>Header Files\Compiler</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Compiler\ISourceStream.h">
+      <Filter>Header Files\Compiler</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Compiler\Lexer.h">
+      <Filter>Header Files\Compiler</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Compiler\Parser.h">
+      <Filter>Header Files\Compiler</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Compiler\Range.h">
+      <Filter>Header Files\Compiler</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Compiler\StringTable.h">
+      <Filter>Header Files\Compiler</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Compiler\Symbol.h">
+      <Filter>Header Files\Compiler</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Compiler\SymbolTable.h">
+      <Filter>Header Files\Compiler</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Compiler\TextSourceStream.h">
+      <Filter>Header Files\Compiler</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Compiler\Token.h">
+      <Filter>Header Files\Compiler</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Compiler\Translator.h">
+      <Filter>Header Files\Compiler</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Compiler\Typename.h">
+      <Filter>Header Files\Compiler</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Compiler\Nodes\AssignmentStatementNode.h">
+      <Filter>Header Files\Compiler\Nodes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Compiler\Nodes\BinaryExpressionNode.h">
+      <Filter>Header Files\Compiler\Nodes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Compiler\Nodes\EndStatementNode.h">
+      <Filter>Header Files\Compiler\Nodes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Compiler\Nodes\ExpressionNode.h">
+      <Filter>Header Files\Compiler\Nodes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Compiler\Nodes\ForStatementNode.h">
+      <Filter>Header Files\Compiler\Nodes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Compiler\Nodes\FunctionCallExpressionNode.h">
+      <Filter>Header Files\Compiler\Nodes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Compiler\Nodes\GotoStatementNode.h">
+      <Filter>Header Files\Compiler\Nodes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Compiler\Nodes\IdentifierExpressionNode.h">
+      <Filter>Header Files\Compiler\Nodes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Compiler\Nodes\IfStatementNode.h">
+      <Filter>Header Files\Compiler\Nodes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Compiler\Nodes\InputStatementNode.h">
+      <Filter>Header Files\Compiler\Nodes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Compiler\Nodes\IntegerLiteralExpressionNode.h">
+      <Filter>Header Files\Compiler\Nodes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Compiler\Nodes\LabelStatementNode.h">
+      <Filter>Header Files\Compiler\Nodes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Compiler\Nodes\ModuleNode.h">
+      <Filter>Header Files\Compiler\Nodes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Compiler\Nodes\Node.h">
+      <Filter>Header Files\Compiler\Nodes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Compiler\Nodes\NodePool.h">
+      <Filter>Header Files\Compiler\Nodes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Compiler\Nodes\PrintStatementNode.h">
+      <Filter>Header Files\Compiler\Nodes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Compiler\Nodes\StatementNode.h">
+      <Filter>Header Files\Compiler\Nodes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Compiler\Nodes\StringLiteralExpressionNode.h">
+      <Filter>Header Files\Compiler\Nodes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Compiler\Nodes\TNodeList.h">
+      <Filter>Header Files\Compiler\Nodes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Interpreter\Interpreter.h">
+      <Filter>Header Files\Interpreter</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Interpreter\Opcodes.h">
+      <Filter>Header Files\Interpreter</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Interpreter\Program.h">
+      <Filter>Header Files\Interpreter</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Interpreter\Stack.h">
+      <Filter>Header Files\Interpreter</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Interpreter\StringManager.h">
+      <Filter>Header Files\Interpreter</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Interpreter\StringStack.h">
+      <Filter>Header Files\Interpreter</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\StringPiece.h">
       <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\BinaryExpressionNode.h">
-      <Filter>Header Files\Nodes</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\IntegerLiteralExpressionNode.h">
-      <Filter>Header Files\Nodes</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\ConstantTable.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Stack.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\AssignmentStatementNode.h">
-      <Filter>Header Files\Nodes</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Symbol.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\SymbolTable.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\IdentifierExpressionNode.h">
-      <Filter>Header Files\Nodes</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\StringManager.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\IfStatementNode.h">
-      <Filter>Header Files\Nodes</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\CodePositionTable.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\FixUpTable.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\LabelStatementNode.h">
-      <Filter>Header Files\Nodes</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\GotoStatementNode.h">
-      <Filter>Header Files\Nodes</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\ForStatementNode.h">
-      <Filter>Header Files\Nodes</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\FunctionCallExpressionNode.h">
-      <Filter>Header Files\Nodes</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\InputStatementNode.h">
-      <Filter>Header Files\Nodes</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\Compiler.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\Token.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\Lexer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\TextSourceStream.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\Parser.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\Node.cpp">
-      <Filter>Source Files\Nodes</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\ModuleNode.cpp">
-      <Filter>Source Files\Nodes</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\StatementNode.cpp">
-      <Filter>Source Files\Nodes</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\EndStatementNode.cpp">
-      <Filter>Source Files\Nodes</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\Analyzer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\Translator.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\Interpreter.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\Window.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\ExpressionNode.cpp">
-      <Filter>Source Files\Nodes</Filter>
+    <ClCompile Include="..\src\Compiler\Analyzer.cpp">
+      <Filter>Source Files\Compiler</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\PrintStatementNode.cpp">
-      <Filter>Source Files\Nodes</Filter>
+    <ClCompile Include="..\src\Compiler\CodePositionTable.cpp">
+      <Filter>Source Files\Compiler</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\StringLiteralExpressionNode.cpp">
-      <Filter>Source Files\Nodes</Filter>
+    <ClCompile Include="..\src\Compiler\ConstantTable.cpp">
+      <Filter>Source Files\Compiler</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\StringTable.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="..\src\Compiler\FixUpTable.cpp">
+      <Filter>Source Files\Compiler</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\BinaryExpressionNode.cpp">
-      <Filter>Source Files\Nodes</Filter>
+    <ClCompile Include="..\src\Compiler\Lexer.cpp">
+      <Filter>Source Files\Compiler</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\StringStack.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="..\src\Compiler\Parser.cpp">
+      <Filter>Source Files\Compiler</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\IntegerLiteralExpressionNode.cpp">
-      <Filter>Source Files\Nodes</Filter>
+    <ClCompile Include="..\src\Compiler\StringTable.cpp">
+      <Filter>Source Files\Compiler</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\ConstantTable.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="..\src\Compiler\SymbolTable.cpp">
+      <Filter>Source Files\Compiler</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\Stack.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="..\src\Compiler\TextSourceStream.cpp">
+      <Filter>Source Files\Compiler</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\AssignmentStatementNode.cpp">
-      <Filter>Source Files\Nodes</Filter>
+    <ClCompile Include="..\src\Compiler\Token.cpp">
+      <Filter>Source Files\Compiler</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\SymbolTable.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="..\src\Compiler\Translator.cpp">
+      <Filter>Source Files\Compiler</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\IdentifierExpressionNode.cpp">
-      <Filter>Source Files\Nodes</Filter>
+    <ClCompile Include="..\src\Compiler\Nodes\AssignmentStatementNode.cpp">
+      <Filter>Source Files\Compiler\Nodes</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\StringManager.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="..\src\Compiler\Nodes\BinaryExpressionNode.cpp">
+      <Filter>Source Files\Compiler\Nodes</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\IfStatementNode.cpp">
-      <Filter>Source Files\Nodes</Filter>
+    <ClCompile Include="..\src\Compiler\Nodes\EndStatementNode.cpp">
+      <Filter>Source Files\Compiler\Nodes</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\CodePositionTable.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="..\src\Compiler\Nodes\ExpressionNode.cpp">
+      <Filter>Source Files\Compiler\Nodes</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\FixUpTable.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="..\src\Compiler\Nodes\ForStatementNode.cpp">
+      <Filter>Source Files\Compiler\Nodes</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\LabelStatementNode.cpp">
-      <Filter>Source Files\Nodes</Filter>
+    <ClCompile Include="..\src\Compiler\Nodes\FunctionCallExpressionNode.cpp">
+      <Filter>Source Files\Compiler\Nodes</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\GotoStatementNode.cpp">
-      <Filter>Source Files\Nodes</Filter>
+    <ClCompile Include="..\src\Compiler\Nodes\GotoStatementNode.cpp">
+      <Filter>Source Files\Compiler\Nodes</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\ForStatementNode.cpp">
-      <Filter>Source Files\Nodes</Filter>
+    <ClCompile Include="..\src\Compiler\Nodes\IdentifierExpressionNode.cpp">
+      <Filter>Source Files\Compiler\Nodes</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\FunctionCallExpressionNode.cpp">
-      <Filter>Source Files\Nodes</Filter>
+    <ClCompile Include="..\src\Compiler\Nodes\IfStatementNode.cpp">
+      <Filter>Source Files\Compiler\Nodes</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\InputStatementNode.cpp">
-      <Filter>Source Files\Nodes</Filter>
+    <ClCompile Include="..\src\Compiler\Nodes\InputStatementNode.cpp">
+      <Filter>Source Files\Compiler\Nodes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Compiler\Nodes\IntegerLiteralExpressionNode.cpp">
+      <Filter>Source Files\Compiler\Nodes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Compiler\Nodes\LabelStatementNode.cpp">
+      <Filter>Source Files\Compiler\Nodes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Compiler\Nodes\ModuleNode.cpp">
+      <Filter>Source Files\Compiler\Nodes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Compiler\Nodes\Node.cpp">
+      <Filter>Source Files\Compiler\Nodes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Compiler\Nodes\PrintStatementNode.cpp">
+      <Filter>Source Files\Compiler\Nodes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Compiler\Nodes\StatementNode.cpp">
+      <Filter>Source Files\Compiler\Nodes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Compiler\Nodes\StringLiteralExpressionNode.cpp">
+      <Filter>Source Files\Compiler\Nodes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Interpreter\Interpreter.cpp">
+      <Filter>Source Files\Interpreter</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Interpreter\Stack.cpp">
+      <Filter>Source Files\Interpreter</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Interpreter\StringManager.cpp">
+      <Filter>Source Files\Interpreter</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Interpreter\StringStack.cpp">
+      <Filter>Source Files\Interpreter</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Compiler\Compiler.cpp">
+      <Filter>Source Files\Compiler</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

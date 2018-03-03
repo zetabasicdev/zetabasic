@@ -30,42 +30,53 @@
 
 #pragma once
 
-#include "StringPiece.h"
-#include "TItemPool.h"
+#include <string>
+#include "TObjectList.h"
+#include "TObjectPool.h"
+#include "Token.h"
 
-const int kStringPoolBlockSize = 4096;
+class ISourceStream;
+class StringPool;
 
-class StringPool
+class Lexer
 {
 public:
-    StringPool()
-        :
-        mCharPool()
-    {
-        // intentionally left blank
-    }
+    Lexer(TObjectPool<Token>& tokenPool, TObjectList<Token>& tokens, StringPool& stringPool, ISourceStream& source);
+    ~Lexer();
 
-    ~StringPool()
-    {
-        // intentionally left blank
-    }
-
-    void reset()
-    {
-        mCharPool.reset();
-    }
-
-    StringPiece alloc(const char* text, int length)
-    {
-        assert(text);
-        assert(length >= 0);
-        assert(length < kStringPoolBlockSize);
-        char* buf = mCharPool.alloc(length + 1);
-        memcpy(buf, text, length);
-        buf[length] = 0;
-        return StringPiece(buf, length);
-    }
+    void run();
 
 private:
-    TItemPool<char, kStringPoolBlockSize> mCharPool;
+    StringPool& mStringPool;
+    TObjectPool<Token>& mTokenPool;
+    TObjectList<Token>& mTokens;
+    ISourceStream& mSource;
+
+    enum class State {
+        Start,
+        End,
+        Name,
+        StringPiece,
+        Whitespace,
+        Symbol,
+        Integer
+    };
+    State mState;
+
+    char mChar;
+    TokenId mId;
+    int mRow;
+    int mCol;
+    int mStartRow;
+    int mStartCol;
+    std::string mText;
+    bool mSkip;
+
+    bool runStartState();
+    bool runEndState();
+    bool runNameState();
+    bool runStringState();
+    bool runWhitespaceState();
+    bool runSymbolState();
+    bool runIntegerState();
 };

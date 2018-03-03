@@ -30,42 +30,45 @@
 
 #pragma once
 
-#include "StringPiece.h"
-#include "TItemPool.h"
+#include <cstdint>
+#include "CodePositionTable.h"
+#include "Range.h"
+#include "TItemBuffer.h"
 
-const int kStringPoolBlockSize = 4096;
-
-class StringPool
+class FixUpTable
 {
 public:
-    StringPool()
-        :
-        mCharPool()
-    {
-        // intentionally left blank
-    }
+    FixUpTable(TItemBuffer<uint8_t>& bytecode, CodePositionTable& codePositionTable);
+    ~FixUpTable();
 
-    ~StringPool()
-    {
-        // intentionally left blank
-    }
+    void reset();
 
-    void reset()
-    {
-        mCharPool.reset();
-    }
+    void addFixUp(int index, CodePositionType type, const StringPiece& name, const Range& range);
 
-    StringPiece alloc(const char* text, int length)
-    {
-        assert(text);
-        assert(length >= 0);
-        assert(length < kStringPoolBlockSize);
-        char* buf = mCharPool.alloc(length + 1);
-        memcpy(buf, text, length);
-        buf[length] = 0;
-        return StringPiece(buf, length);
-    }
+    void doFixups();
 
 private:
-    TItemPool<char, kStringPoolBlockSize> mCharPool;
+    TItemBuffer<uint8_t>& mBytecode;
+    CodePositionTable& mCodePositionTable;
+
+    struct FixUpRecord
+    {
+        int index;
+        CodePositionType type;
+        StringPiece name;
+        Range range;
+
+        FixUpRecord(int index, CodePositionType type, const StringPiece& name, const Range& range)
+            :
+            index(index),
+            type(type),
+            name(name),
+            range(range)
+        {
+            // intentionally left blank
+        }
+    };
+
+    TObjectPool<FixUpRecord> mFixUpPool;
+    TObjectList<FixUpRecord> mFixUps;
 };

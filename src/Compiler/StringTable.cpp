@@ -28,44 +28,47 @@
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#pragma once
+#include "StringTable.h"
 
-#include "StringPiece.h"
-#include "TItemPool.h"
-
-const int kStringPoolBlockSize = 4096;
-
-class StringPool
+StringTable::StringTable()
+    :
+    mStrings()
 {
-public:
-    StringPool()
-        :
-        mCharPool()
-    {
-        // intentionally left blank
-    }
+    // intentionally left blank
+}
 
-    ~StringPool()
-    {
-        // intentionally left blank
-    }
+StringTable::~StringTable()
+{
+    // intentionally left blank
+}
 
-    void reset()
-    {
-        mCharPool.reset();
-    }
+void StringTable::reset()
+{
+    mStrings.clear();
+}
 
-    StringPiece alloc(const char* text, int length)
-    {
-        assert(text);
-        assert(length >= 0);
-        assert(length < kStringPoolBlockSize);
-        char* buf = mCharPool.alloc(length + 1);
-        memcpy(buf, text, length);
-        buf[length] = 0;
-        return StringPiece(buf, length);
-    }
+int StringTable::addString(const StringPiece& string)
+{
+    auto len = (int)mStrings.size();
+    for (auto ix = 0; ix < len; ++ix)
+        if (mStrings[ix].exactCompareWithCase(string))
+            return ix;
+    mStrings.push_back(string);
+    return len;
+}
 
-private:
-    TItemPool<char, kStringPoolBlockSize> mCharPool;
-};
+const StringPiece& StringTable::getString(int index) const
+{
+    return mStrings[index];
+}
+
+void StringTable::dump() const
+{
+    printf("== string table ==\n");
+    for (size_t i = 0; i < mStrings.size(); ++i) {
+        printf("#%03zd: [", i);
+        for (int ix = 0; ix < mStrings[i].getLength(); ++ix)
+            putc(mStrings[i][ix], stdout);
+        printf("]\n");
+    }
+}

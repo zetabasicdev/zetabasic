@@ -30,42 +30,23 @@
 
 #pragma once
 
+#include <vector>
 #include "StringPiece.h"
-#include "TItemPool.h"
 
-const int kStringPoolBlockSize = 4096;
-
-class StringPool
+class StringTable
 {
 public:
-    StringPool()
-        :
-        mCharPool()
-    {
-        // intentionally left blank
-    }
+    StringTable();
+    ~StringTable();
 
-    ~StringPool()
-    {
-        // intentionally left blank
-    }
+    void reset();
 
-    void reset()
-    {
-        mCharPool.reset();
-    }
+    int addString(const StringPiece& string);
 
-    StringPiece alloc(const char* text, int length)
-    {
-        assert(text);
-        assert(length >= 0);
-        assert(length < kStringPoolBlockSize);
-        char* buf = mCharPool.alloc(length + 1);
-        memcpy(buf, text, length);
-        buf[length] = 0;
-        return StringPiece(buf, length);
-    }
+    const StringPiece& getString(int index) const;
+
+    void dump() const;
 
 private:
-    TItemPool<char, kStringPoolBlockSize> mCharPool;
+    std::vector<StringPiece> mStrings;
 };

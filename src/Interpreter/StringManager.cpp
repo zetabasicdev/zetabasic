@@ -28,44 +28,70 @@
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#pragma once
+#include "StringManager.h"
+#include "StringStack.h"
 
-#include "StringPiece.h"
-#include "TItemPool.h"
-
-const int kStringPoolBlockSize = 4096;
-
-class StringPool
+StringManager::StringManager(StringStack& stringStack)
+    :
+    mStringStack(stringStack)
 {
-public:
-    StringPool()
-        :
-        mCharPool()
-    {
-        // intentionally left blank
+    // intentionally left blank
+}
+
+StringManager::~StringManager()
+{
+    for (auto instance : mStrings) {
+        delete instance->data;
+        delete instance;
+    }
+}
+
+int64_t StringManager::storeString(int64_t desc)
+{
+    StringPiece value = mStringStack.pop();
+    
+    if (desc != 0) {
+        removeInstance(desc);
     }
 
-    ~StringPool()
-    {
-        // intentionally left blank
+    return newInstance(value.getText(), value.getLength());
+}
+
+void StringManager::loadString(int64_t desc)
+{
+    if (desc == 0) {
+        // load empty string
+        mStringStack.push(StringPiece());
+    } else {
+        StringObject* instance = (StringObject*)desc;
+        mStringStack.push(StringPiece(instance->data ? instance->data : "", instance->length));
+    }
+}
+
+void StringManager::removeInstance(int64_t desc)
+{
+    StringObject* instance = (StringObject*)desc;
+    for (auto iter = mStrings.begin(); iter != mStrings.end(); ++iter) {
+        if (*iter == instance) {
+            delete[] instance->data;
+            delete instance;
+            mStrings.erase(iter);
+            break;
+        }
+    }
+}
+
+int64_t StringManager::newInstance(const char* text, int length)
+{
+    StringObject* instance = new StringObject;
+    instance->length = length;
+    if (length > 0) {
+        instance->data = new char[length];
+        memcpy(instance->data, text, length);
+    } else {
+        instance->data = nullptr;
     }
 
-    void reset()
-    {
-        mCharPool.reset();
-    }
-
-    StringPiece alloc(const char* text, int length)
-    {
-        assert(text);
-        assert(length >= 0);
-        assert(length < kStringPoolBlockSize);
-        char* buf = mCharPool.alloc(length + 1);
-        memcpy(buf, text, length);
-        buf[length] = 0;
-        return StringPiece(buf, length);
-    }
-
-private:
-    TItemPool<char, kStringPoolBlockSize> mCharPool;
-};
+    mStrings.push_back(instance);
+    return (int64_t)instance;
+}

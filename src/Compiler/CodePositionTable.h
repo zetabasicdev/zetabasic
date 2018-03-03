@@ -31,41 +31,42 @@
 #pragma once
 
 #include "StringPiece.h"
-#include "TItemPool.h"
+#include "TObjectList.h"
+#include "TObjectPool.h"
 
-const int kStringPoolBlockSize = 4096;
+enum class CodePositionType
+{
+    Label
+};
 
-class StringPool
+class CodePositionTable
 {
 public:
-    StringPool()
-        :
-        mCharPool()
-    {
-        // intentionally left blank
-    }
+    CodePositionTable();
+    ~CodePositionTable();
 
-    ~StringPool()
-    {
-        // intentionally left blank
-    }
+    void reset();
 
-    void reset()
-    {
-        mCharPool.reset();
-    }
-
-    StringPiece alloc(const char* text, int length)
-    {
-        assert(text);
-        assert(length >= 0);
-        assert(length < kStringPoolBlockSize);
-        char* buf = mCharPool.alloc(length + 1);
-        memcpy(buf, text, length);
-        buf[length] = 0;
-        return StringPiece(buf, length);
-    }
+    bool addPosition(CodePositionType type, const StringPiece& name, int index);
+    int getPosition(CodePositionType type, const StringPiece& name);
 
 private:
-    TItemPool<char, kStringPoolBlockSize> mCharPool;
+    struct Position
+    {
+        CodePositionType type;
+        StringPiece name;
+        int index;
+
+        Position(CodePositionType type, const StringPiece& name, int index)
+            :
+            type(type),
+            name(name),
+            index(index)
+        {
+            // intentionally left blank
+        }
+    };
+
+    TObjectPool<Position> mPositionPool;
+    TObjectList<Position> mPositions;
 };

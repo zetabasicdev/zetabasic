@@ -30,42 +30,50 @@
 
 #pragma once
 
+#include "Range.h"
 #include "StringPiece.h"
-#include "TItemPool.h"
+#include "Typename.h"
 
-const int kStringPoolBlockSize = 4096;
-
-class StringPool
+class Symbol
 {
 public:
-    StringPool()
+    Symbol(int location, const Range& range, const StringPiece& name, Typename type)
         :
-        mCharPool()
+        mLocation(location),
+        mName(name),
+        mType(type)
     {
         // intentionally left blank
     }
 
-    ~StringPool()
+    ~Symbol()
     {
         // intentionally left blank
     }
 
-    void reset()
+    int getLocation() const
     {
-        mCharPool.reset();
+        return mLocation;
     }
 
-    StringPiece alloc(const char* text, int length)
+    const Range& getRange() const
     {
-        assert(text);
-        assert(length >= 0);
-        assert(length < kStringPoolBlockSize);
-        char* buf = mCharPool.alloc(length + 1);
-        memcpy(buf, text, length);
-        buf[length] = 0;
-        return StringPiece(buf, length);
+        return mRange;
+    }
+
+    const StringPiece& getName() const
+    {
+        return mName;
+    }
+
+    Typename getType() const
+    {
+        return mType;
     }
 
 private:
-    TItemPool<char, kStringPoolBlockSize> mCharPool;
+    int mLocation;
+    Range mRange;
+    StringPiece mName;
+    Typename mType;
 };

@@ -28,44 +28,45 @@
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#pragma once
+#include "Symbol.h"
+#include "SymbolTable.h"
 
-#include "StringPiece.h"
-#include "TItemPool.h"
-
-const int kStringPoolBlockSize = 4096;
-
-class StringPool
+SymbolTable::SymbolTable()
+    :
+    mSymbolPool(64),
+    mSymbols()
 {
-public:
-    StringPool()
-        :
-        mCharPool()
-    {
-        // intentionally left blank
-    }
+    // intentionally left blank
+}
 
-    ~StringPool()
-    {
-        // intentionally left blank
-    }
+SymbolTable::~SymbolTable()
+{
+    // intentionally left blank
+}
 
-    void reset()
-    {
-        mCharPool.reset();
-    }
+void SymbolTable::reset()
+{
+    mSymbolPool.reset();
+    mSymbols.reset();
+}
 
-    StringPiece alloc(const char* text, int length)
-    {
-        assert(text);
-        assert(length >= 0);
-        assert(length < kStringPoolBlockSize);
-        char* buf = mCharPool.alloc(length + 1);
-        memcpy(buf, text, length);
-        buf[length] = 0;
-        return StringPiece(buf, length);
-    }
+Symbol* SymbolTable::getSymbol(const Range& range, const StringPiece& name, Typename type)
+{
+    // first determine if symbol by this name already exists
+    for (auto ix = 0; ix < mSymbols.getSize(); ++ix)
+        if (mSymbols[ix].getName() == name)
+            // simply use this symbol
+            return &mSymbols[ix];
 
-private:
-    TItemPool<char, kStringPoolBlockSize> mCharPool;
-};
+    // need to instance a new symbol
+    if (type == Typename::Unknown) {
+        // deduce type with any suffix
+        type = Typename::Integer;
+        if (name[name.getLength() - 1] == '$')
+            type = Typename::StringPiece;
+    }
+    auto symbol = mSymbolPool.alloc(mSymbols.getSize(), range, name, type);
+    mSymbols.push(symbol);
+
+    return symbol;
+}

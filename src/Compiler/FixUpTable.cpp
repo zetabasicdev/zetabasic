@@ -28,44 +28,42 @@
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#pragma once
+#include "CompileError.h"
+#include "FixUpTable.h"
 
-#include "StringPiece.h"
-#include "TItemPool.h"
-
-const int kStringPoolBlockSize = 4096;
-
-class StringPool
+FixUpTable::FixUpTable(TItemBuffer<uint8_t>& bytecode, CodePositionTable& codePositionTable)
+    :
+    mBytecode(bytecode),
+    mCodePositionTable(codePositionTable),
+    mFixUpPool(32),
+    mFixUps()
 {
-public:
-    StringPool()
-        :
-        mCharPool()
-    {
-        // intentionally left blank
-    }
+    // intentionally left blank
+}
 
-    ~StringPool()
-    {
-        // intentionally left blank
-    }
+FixUpTable::~FixUpTable()
+{
+    // intentionally left blank
+}
 
-    void reset()
-    {
-        mCharPool.reset();
-    }
+void FixUpTable::reset()
+{
+    mFixUpPool.reset();
+    mFixUps.reset();
+}
 
-    StringPiece alloc(const char* text, int length)
-    {
-        assert(text);
-        assert(length >= 0);
-        assert(length < kStringPoolBlockSize);
-        char* buf = mCharPool.alloc(length + 1);
-        memcpy(buf, text, length);
-        buf[length] = 0;
-        return StringPiece(buf, length);
-    }
+void FixUpTable::addFixUp(int index, CodePositionType type, const StringPiece& name, const Range& range)
+{
+    mFixUps.push(mFixUpPool.alloc(index, type, name, range));
+}
 
-private:
-    TItemPool<char, kStringPoolBlockSize> mCharPool;
-};
+void FixUpTable::doFixups()
+{
+    for (auto& fixup : mFixUps) {
+        auto index = mCodePositionTable.getPosition(fixup.type, fixup.name);
+        if (index == -1)
+            throw CompileError(CompileErrorId::NameError, fixup.range, "Invalid Name");
+        mBytecode[fixup.index] = (index >> 8) & 0xff;
+        mBytecode[fixup.index + 1] = index & 0xff;
+    }
+}

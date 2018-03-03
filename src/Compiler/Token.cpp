@@ -28,44 +28,50 @@
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#pragma once
+#include "Token.h"
 
-#include "StringPiece.h"
-#include "TItemPool.h"
-
-const int kStringPoolBlockSize = 4096;
-
-class StringPool
+const char* ToString(TokenId id)
 {
-public:
-    StringPool()
-        :
-        mCharPool()
-    {
-        // intentionally left blank
+    switch (id) {
+    case TokenId::Unknown: return "unknown";
+    case TokenId::EndOfSource: return "end-of-source";
+    case TokenId::EndOfLine: return "end-of-line";
+    case TokenId::Name: return "name";
+    case TokenId::Integer: return "integer";
+    case TokenId::StringPiece: return "string";
+    case TokenId::Symbol: return "symbol";
+    case TokenId::Label: return "label";
+    default:
+        break;
     }
+    return "???";
+}
 
-    ~StringPool()
-    {
-        // intentionally left blank
+const char* ToString(TokenTag tag)
+{
+    switch (tag) {
+    case TokenTag::None: return "none";
+    case TokenTag::Key_End: return "END";
+    case TokenTag::Key_For: return "FOR";
+    case TokenTag::Key_If: return "IF";
+    case TokenTag::Key_Input: return "INPUT";
+    case TokenTag::Key_Goto: return "GOTO";
+    case TokenTag::Key_Let: return "LET";
+    case TokenTag::Key_LeftS: return "LEFT$";
+    case TokenTag::Key_Len: return "LEN";
+    case TokenTag::Key_Next: return "NEXT";
+    case TokenTag::Key_Or: return "OR";
+    case TokenTag::Key_Print: return "PRINT";
+    case TokenTag::Key_Then: return "THEN";
+    case TokenTag::Key_To: return "TO";
+    case TokenTag::Sym_Add: return "+";
+    case TokenTag::Sym_Equals: return "=";
+    case TokenTag::Sym_OpenParen: return "(";
+    case TokenTag::Sym_CloseParen: return ")";
+    case TokenTag::Sym_Comma: return ",";
+    case TokenTag::Sym_Semicolon: return ";";
+    default:
+        break;
     }
-
-    void reset()
-    {
-        mCharPool.reset();
-    }
-
-    StringPiece alloc(const char* text, int length)
-    {
-        assert(text);
-        assert(length >= 0);
-        assert(length < kStringPoolBlockSize);
-        char* buf = mCharPool.alloc(length + 1);
-        memcpy(buf, text, length);
-        buf[length] = 0;
-        return StringPiece(buf, length);
-    }
-
-private:
-    TItemPool<char, kStringPoolBlockSize> mCharPool;
-};
+    return "???";
+}

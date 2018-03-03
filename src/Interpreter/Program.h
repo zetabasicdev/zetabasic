@@ -30,42 +30,60 @@
 
 #pragma once
 
-#include "StringPiece.h"
-#include "TItemPool.h"
+#include <cassert>
+#include <cstdint>
+#include <vector>
+#include "ConstantTable.h"
+#include "StringTable.h"
 
-const int kStringPoolBlockSize = 4096;
-
-class StringPool
+class Program
 {
 public:
-    StringPool()
+    Program(const uint8_t* bytecode, int length, const StringTable& stringTable, const ConstantTable& constantTable)
         :
-        mCharPool()
+        mBytecode(bytecode),
+        mLength(length),
+        mStringTable(stringTable),
+        mConstantTable(constantTable)
+    {
+        assert(mBytecode);
+        assert(length > 0);
+    }
+
+    ~Program()
     {
         // intentionally left blank
     }
 
-    ~StringPool()
+    const uint8_t* getBytecode() const
     {
-        // intentionally left blank
+        return mBytecode;
     }
 
-    void reset()
+    int getLength() const
     {
-        mCharPool.reset();
+        return mLength;
     }
 
-    StringPiece alloc(const char* text, int length)
+    const StringPiece& getString(int index) const
     {
-        assert(text);
-        assert(length >= 0);
-        assert(length < kStringPoolBlockSize);
-        char* buf = mCharPool.alloc(length + 1);
-        memcpy(buf, text, length);
-        buf[length] = 0;
-        return StringPiece(buf, length);
+        return mStringTable.getString(index);
+    }
+
+    int64_t getIntegerConstant(int index) const
+    {
+        return mConstantTable.getIntegerConstant(index);
+    }
+
+    void dumpStrings() const
+    {
+        mStringTable.dump();
     }
 
 private:
-    TItemPool<char, kStringPoolBlockSize> mCharPool;
+    const uint8_t* mBytecode;
+    int mLength;
+
+    const StringTable& mStringTable;
+    const ConstantTable& mConstantTable;
 };

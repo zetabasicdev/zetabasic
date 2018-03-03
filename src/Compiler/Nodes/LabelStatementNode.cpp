@@ -28,44 +28,39 @@
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#pragma once
+#include "CodePositionTable.h"
+#include "LabelStatementNode.h"
+#include "Parser.h"
+#include "Translator.h"
 
-#include "StringPiece.h"
-#include "TItemPool.h"
-
-const int kStringPoolBlockSize = 4096;
-
-class StringPool
+LabelStatementNode::LabelStatementNode()
+    :
+    StatementNode(),
+    mName()
 {
-public:
-    StringPool()
-        :
-        mCharPool()
-    {
-        // intentionally left blank
-    }
+    // intentionally left blank
+}
 
-    ~StringPool()
-    {
-        // intentionally left blank
-    }
+LabelStatementNode::~LabelStatementNode()
+{
+    // intentionally left blank
+}
 
-    void reset()
-    {
-        mCharPool.reset();
-    }
+void LabelStatementNode::parse(Parser& parser)
+{
+    assert(parser.getToken().getId() == TokenId::Label);
 
-    StringPiece alloc(const char* text, int length)
-    {
-        assert(text);
-        assert(length >= 0);
-        assert(length < kStringPoolBlockSize);
-        char* buf = mCharPool.alloc(length + 1);
-        memcpy(buf, text, length);
-        buf[length] = 0;
-        return StringPiece(buf, length);
-    }
+    mName = StringPiece(parser.getToken().getText().getText(), parser.getToken().getText().getLength() - 1);
+    parser.eatToken();
+    parser.eatEndOfLine();
+}
 
-private:
-    TItemPool<char, kStringPoolBlockSize> mCharPool;
-};
+void LabelStatementNode::analyze(Analyzer& analyzer)
+{
+    // intentionally left blank
+}
+
+void LabelStatementNode::translate(Translator& translator)
+{
+    translator.getCodePositionTable().addPosition(CodePositionType::Label, mName, translator.getBytecode().getSize());
+}

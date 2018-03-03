@@ -30,42 +30,30 @@
 
 #pragma once
 
+#include "StatementNode.h"
 #include "StringPiece.h"
-#include "TItemPool.h"
+#include "TNodeList.h"
 
-const int kStringPoolBlockSize = 4096;
+class ExpressionNode;
+class Symbol;
 
-class StringPool
+class ForStatementNode
+    :
+    public StatementNode
 {
 public:
-    StringPool()
-        :
-        mCharPool()
-    {
-        // intentionally left blank
-    }
+    ForStatementNode();
+    virtual ~ForStatementNode();
 
-    ~StringPool()
-    {
-        // intentionally left blank
-    }
-
-    void reset()
-    {
-        mCharPool.reset();
-    }
-
-    StringPiece alloc(const char* text, int length)
-    {
-        assert(text);
-        assert(length >= 0);
-        assert(length < kStringPoolBlockSize);
-        char* buf = mCharPool.alloc(length + 1);
-        memcpy(buf, text, length);
-        buf[length] = 0;
-        return StringPiece(buf, length);
-    }
+    void parse(Parser& parser);
+    void analyze(Analyzer& analyzer);
+    void translate(Translator& translator);
 
 private:
-    TItemPool<char, kStringPoolBlockSize> mCharPool;
+    StringPiece mName;
+    Symbol* mSymbol;
+    ExpressionNode* mStartExpression;
+    ExpressionNode* mStopExpression;
+    StringPiece mNextName;
+    TNodeList<StatementNode> mStatements;
 };

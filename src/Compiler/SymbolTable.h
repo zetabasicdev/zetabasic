@@ -30,42 +30,31 @@
 
 #pragma once
 
-#include "StringPiece.h"
-#include "TItemPool.h"
+#include "TObjectList.h"
+#include "TObjectPool.h"
+#include "Typename.h"
 
-const int kStringPoolBlockSize = 4096;
+class Range;
+class StringPiece;
 
-class StringPool
+class Symbol;
+
+class SymbolTable
 {
 public:
-    StringPool()
-        :
-        mCharPool()
+    SymbolTable();
+    ~SymbolTable();
+
+    void reset();
+
+    int getSize() const
     {
-        // intentionally left blank
+        return mSymbols.getSize();
     }
 
-    ~StringPool()
-    {
-        // intentionally left blank
-    }
-
-    void reset()
-    {
-        mCharPool.reset();
-    }
-
-    StringPiece alloc(const char* text, int length)
-    {
-        assert(text);
-        assert(length >= 0);
-        assert(length < kStringPoolBlockSize);
-        char* buf = mCharPool.alloc(length + 1);
-        memcpy(buf, text, length);
-        buf[length] = 0;
-        return StringPiece(buf, length);
-    }
+    Symbol* getSymbol(const Range& range, const StringPiece& name, Typename type);
 
 private:
-    TItemPool<char, kStringPoolBlockSize> mCharPool;
+    TObjectPool<Symbol> mSymbolPool;
+    TObjectList<Symbol> mSymbols;
 };

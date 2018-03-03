@@ -30,42 +30,9 @@
 
 #pragma once
 
-#include "StringPiece.h"
-#include "TItemPool.h"
-
-const int kStringPoolBlockSize = 4096;
-
-class StringPool
+enum class Typename
 {
-public:
-    StringPool()
-        :
-        mCharPool()
-    {
-        // intentionally left blank
-    }
-
-    ~StringPool()
-    {
-        // intentionally left blank
-    }
-
-    void reset()
-    {
-        mCharPool.reset();
-    }
-
-    StringPiece alloc(const char* text, int length)
-    {
-        assert(text);
-        assert(length >= 0);
-        assert(length < kStringPoolBlockSize);
-        char* buf = mCharPool.alloc(length + 1);
-        memcpy(buf, text, length);
-        buf[length] = 0;
-        return StringPiece(buf, length);
-    }
-
-private:
-    TItemPool<char, kStringPoolBlockSize> mCharPool;
+    Unknown,
+    Integer,
+    StringPiece
 };

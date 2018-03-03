@@ -31,41 +31,26 @@
 #pragma once
 
 #include "StringPiece.h"
-#include "TItemPool.h"
 
-const int kStringPoolBlockSize = 4096;
-
-class StringPool
+class StringStack
 {
 public:
-    StringPool()
-        :
-        mCharPool()
-    {
-        // intentionally left blank
-    }
+    StringStack();
+    ~StringStack();
 
-    ~StringPool()
-    {
-        // intentionally left blank
-    }
+    void push(const StringPiece& value);
+    void add();
+    int compare();
+    int len();
+    void left(int count);
 
-    void reset()
-    {
-        mCharPool.reset();
-    }
-
-    StringPiece alloc(const char* text, int length)
-    {
-        assert(text);
-        assert(length >= 0);
-        assert(length < kStringPoolBlockSize);
-        char* buf = mCharPool.alloc(length + 1);
-        memcpy(buf, text, length);
-        buf[length] = 0;
-        return StringPiece(buf, length);
-    }
+    StringPiece pop();
 
 private:
-    TItemPool<char, kStringPoolBlockSize> mCharPool;
+    int mCount;
+    int mDataCapacity;
+    int mDataUsed;
+    char* mData;
+    int mLengthCapacity;
+    int* mLengths;
 };

@@ -28,44 +28,49 @@
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#pragma once
+#include <cassert>
 
-#include "StringPiece.h"
-#include "TItemPool.h"
+#include "Opcodes.h"
+#include "Parser.h"
+#include "StringLiteralExpressionNode.h"
+#include "StringTable.h"
+#include "Translator.h"
 
-const int kStringPoolBlockSize = 4096;
-
-class StringPool
+StringLiteralExpressionNode::StringLiteralExpressionNode()
+    :
+    ExpressionNode(),
+    mValue()
 {
-public:
-    StringPool()
-        :
-        mCharPool()
-    {
-        // intentionally left blank
-    }
+    // intentionally left blank
+}
 
-    ~StringPool()
-    {
-        // intentionally left blank
-    }
+StringLiteralExpressionNode::~StringLiteralExpressionNode()
+{
+    // intentionally left blank
+}
 
-    void reset()
-    {
-        mCharPool.reset();
-    }
+void StringLiteralExpressionNode::parse(Parser& parser)
+{
+    assert(parser.getToken().getId() == TokenId::StringPiece);
 
-    StringPiece alloc(const char* text, int length)
-    {
-        assert(text);
-        assert(length >= 0);
-        assert(length < kStringPoolBlockSize);
-        char* buf = mCharPool.alloc(length + 1);
-        memcpy(buf, text, length);
-        buf[length] = 0;
-        return StringPiece(buf, length);
-    }
+    // create string value without quotes
+    auto& text = parser.getToken().getText();
+    mValue = StringPiece(text.getText() + 1, text.getLength() - 2);
 
-private:
-    TItemPool<char, kStringPoolBlockSize> mCharPool;
-};
+    parser.eatToken();
+}
+
+void StringLiteralExpressionNode::analyze(Analyzer& analyzer)
+{
+    mType = Typename::StringPiece;
+}
+
+void StringLiteralExpressionNode::translate(Translator& translator)
+{
+    int ix = translator.getStringTable().addString(mValue);
+    assert(ix >= 0 && ix < 256);
+
+    auto ops = translator.getBytecode().alloc(2);
+    ops[0] = Op_load_const_str;
+    ops[1] = (uint8_t)ix;
+}

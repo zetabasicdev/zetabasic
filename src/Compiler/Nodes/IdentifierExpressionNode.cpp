@@ -28,44 +28,61 @@
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#pragma once
+#include <cassert>
 
-#include "StringPiece.h"
-#include "TItemPool.h"
+#include "Analyzer.h"
+#include "IdentifierExpressionNode.h"
+#include "Opcodes.h"
+#include "Parser.h"
+#include "Symbol.h"
+#include "SymbolTable.h"
+#include "Translator.h"
 
-const int kStringPoolBlockSize = 4096;
-
-class StringPool
+IdentifierExpressionNode::IdentifierExpressionNode()
+    :
+    mName(),
+    mSymbol(nullptr)
 {
-public:
-    StringPool()
-        :
-        mCharPool()
-    {
-        // intentionally left blank
-    }
+    // intentionally left blank
+}
 
-    ~StringPool()
-    {
-        // intentionally left blank
-    }
+IdentifierExpressionNode::~IdentifierExpressionNode()
+{
+    // intentionally left blank
+}
 
-    void reset()
-    {
-        mCharPool.reset();
-    }
+void IdentifierExpressionNode::parse(Parser& parser)
+{
+    assert(parser.getToken().getId() == TokenId::Name);
+    assert(parser.getToken().getTag() == TokenTag::None);
 
-    StringPiece alloc(const char* text, int length)
-    {
-        assert(text);
-        assert(length >= 0);
-        assert(length < kStringPoolBlockSize);
-        char* buf = mCharPool.alloc(length + 1);
-        memcpy(buf, text, length);
-        buf[length] = 0;
-        return StringPiece(buf, length);
-    }
+    mName = parser.getToken().getText();
+    
+    parser.eatToken();
+}
 
-private:
-    TItemPool<char, kStringPoolBlockSize> mCharPool;
-};
+void IdentifierExpressionNode::analyze(Analyzer& analyzer)
+{
+    char lastChar = mName.getText()[mName.getLength() - 1];
+    if (lastChar == '$')
+        mType = Typename::StringPiece;
+    else
+        mType = Typename::Integer;
+
+    mSymbol = analyzer.getSymbolTable().getSymbol(mRange, mName, mType);
+}
+
+void IdentifierExpressionNode::translate(Translator& translator)
+{
+    assert(mSymbol->getLocation() < 256);
+
+    if (mSymbol->getType() == Typename::StringPiece) {
+        auto code = translator.getBytecode().alloc(2);
+        code[0] = Op_load_local_str;
+        code[1] = (uint8_t)mSymbol->getLocation();
+    } else {
+        auto code = translator.getBytecode().alloc(2);
+        code[0] = Op_load_local;
+        code[1] = (uint8_t)mSymbol->getLocation();
+    }
+}

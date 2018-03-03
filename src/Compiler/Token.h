@@ -30,42 +30,88 @@
 
 #pragma once
 
+#include "Range.h"
 #include "StringPiece.h"
-#include "TItemPool.h"
 
-const int kStringPoolBlockSize = 4096;
+enum class TokenId
+{
+    Unknown,
+    EndOfSource,
+    EndOfLine,
+    Name,
+    Integer,
+    StringPiece,
+    Symbol,
+    Label
+};
+const char* ToString(TokenId id);
 
-class StringPool
+enum class TokenTag
+{
+    None,
+    Key_End,
+    Key_For,
+    Key_Goto,
+    Key_If,
+    Key_Input,
+    Key_Len,
+    Key_LeftS,
+    Key_Let,
+    Key_Next,
+    Key_Or,
+    Key_Print,
+    Key_Then,
+    Key_To,
+    Sym_Add,
+    Sym_Equals,
+    Sym_OpenParen,
+    Sym_CloseParen,
+    Sym_Comma,
+    Sym_Semicolon
+};
+const char* ToString(TokenTag tag);
+
+class Token
 {
 public:
-    StringPool()
+    Token(TokenId id, TokenTag tag, const StringPiece& text, const Range& range)
         :
-        mCharPool()
+        mId(id),
+        mTag(tag),
+        mText(text),
+        mRange(range)
     {
         // intentionally left blank
     }
 
-    ~StringPool()
+    ~Token()
     {
         // intentionally left blank
     }
 
-    void reset()
+    TokenId getId() const
     {
-        mCharPool.reset();
+        return mId;
     }
 
-    StringPiece alloc(const char* text, int length)
+    TokenTag getTag() const
     {
-        assert(text);
-        assert(length >= 0);
-        assert(length < kStringPoolBlockSize);
-        char* buf = mCharPool.alloc(length + 1);
-        memcpy(buf, text, length);
-        buf[length] = 0;
-        return StringPiece(buf, length);
+        return mTag;
+    }
+
+    const StringPiece& getText() const
+    {
+        return mText;
+    }
+
+    const Range& getRange() const
+    {
+        return mRange;
     }
 
 private:
-    TItemPool<char, kStringPoolBlockSize> mCharPool;
+    TokenId mId;
+    TokenTag mTag;
+    StringPiece mText;
+    Range mRange;
 };

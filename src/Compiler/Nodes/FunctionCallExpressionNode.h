@@ -30,42 +30,24 @@
 
 #pragma once
 
+#include "ExpressionNode.h"
 #include "StringPiece.h"
-#include "TItemPool.h"
 
-const int kStringPoolBlockSize = 4096;
-
-class StringPool
+class FunctionCallExpressionNode
+    :
+    public ExpressionNode
 {
 public:
-    StringPool()
-        :
-        mCharPool()
-    {
-        // intentionally left blank
-    }
+    FunctionCallExpressionNode();
+    virtual ~FunctionCallExpressionNode();
 
-    ~StringPool()
-    {
-        // intentionally left blank
-    }
+    static bool isBuiltin(TokenTag tag);
 
-    void reset()
-    {
-        mCharPool.reset();
-    }
-
-    StringPiece alloc(const char* text, int length)
-    {
-        assert(text);
-        assert(length >= 0);
-        assert(length < kStringPoolBlockSize);
-        char* buf = mCharPool.alloc(length + 1);
-        memcpy(buf, text, length);
-        buf[length] = 0;
-        return StringPiece(buf, length);
-    }
+    void parse(Parser& parser);
+    void analyze(Analyzer& analyzer);
+    void translate(Translator& translator);
 
 private:
-    TItemPool<char, kStringPoolBlockSize> mCharPool;
+    StringPiece mName;
+    TNodeList<ExpressionNode> mArguments;
 };
