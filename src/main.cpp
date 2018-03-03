@@ -56,10 +56,23 @@ int main(int argc, char* argv[])
 {
     try {
         const char* code =
-            "INPUT \"Enter your name: \"; U$\n"
+            "INPUT \"What is your name: \"; U$\n"
             "PRINT \"Hello \"; U$\n"
-            "INPUT \"Enter a number: \"; N\n"
-            "PRINT N\n"
+            "\n"
+            "Start:\n"
+            "INPUT \"How many stars do you want: \"; N\n"
+            "LET S$ = \"\"\n"
+            "FOR I = 1 TO N\n"
+            "  LET S$ = S$ + \"*\"\n"
+            "NEXT I\n"
+            "PRINT S$\n"
+            "\n"
+            "Again:\n"
+            "INPUT \"Do you want more stars? \"; A$\n"
+            "IF LEN(A$) = 0 THEN GOTO Again\n"
+            "LET A$ = LEFT$(A$, 1)\n"
+            "IF A$ = \"Y\" OR A$ = \"y\" THEN GOTO Start\n"
+            "PRINT \"Goodbye \"; U$\n"
             "END";
 
         Compiler compiler;

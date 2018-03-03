@@ -51,5 +51,6 @@ enum Opcode : uint8_t
     Op_or_int,
     Op_jmp,
     Op_jmp_zero,
-    Op_jmp_neq
+    Op_jmp_neq,
+    Op_jmp_lt
 };

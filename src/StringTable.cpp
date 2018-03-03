@@ -51,7 +51,7 @@ int StringTable::addString(const String& string)
 {
     auto len = (int)mStrings.size();
     for (auto ix = 0; ix < len; ++ix)
-        if (mStrings[ix] == string)
+        if (mStrings[ix].exactCompareWithCase(string))
             return ix;
     mStrings.push_back(string);
     return len;
@@ -60,4 +60,15 @@ int StringTable::addString(const String& string)
 const String& StringTable::getString(int index) const
 {
     return mStrings[index];
+}
+
+void StringTable::dump() const
+{
+    printf("== string table ==\n");
+    for (size_t i = 0; i < mStrings.size(); ++i) {
+        printf("#%03zd: [", i);
+        for (int ix = 0; ix < mStrings[i].getLength(); ++ix)
+            putc(mStrings[i][ix], stdout);
+        printf("]\n");
+    }
 }

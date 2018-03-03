@@ -108,6 +108,7 @@ int StringStack::compare()
     rhs.append(mData + mDataUsed - len2, len2);
 
     mCount -= 2;
+    mDataUsed -= (len1 + len2);
 
     return strcmp(lhs.c_str(), rhs.c_str());
 }

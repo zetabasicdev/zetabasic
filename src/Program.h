@@ -75,6 +75,11 @@ public:
         return mConstantTable.getIntegerConstant(index);
     }
 
+    void dumpStrings() const
+    {
+        mStringTable.dump();
+    }
+
 private:
     const uint8_t* mBytecode;
     int mLength;

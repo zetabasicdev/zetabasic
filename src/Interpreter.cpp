@@ -52,7 +52,7 @@ Interpreter::~Interpreter()
     // intentionally left blank
 }
 
-static void dumpBytecode(const uint8_t* code, int length)
+static void dumpBytecode(const Program& program)
 {
     enum
     {
@@ -86,9 +86,14 @@ static void dumpBytecode(const uint8_t* code, int length)
         { Op_jmp, "jump", 3, Type_Location },
         { Op_jmp_zero, "jump.if.zero", 2, Type_Offset },
         { Op_jmp_neq, "jump.if.not.equal", 2, Type_Offset },
+        { Op_jmp_lt, "jump.if.less", 2, Type_Offset },
         { 0, nullptr, 0, 0 }
     };
 
+    program.dumpStrings();
+    
+    const uint8_t* code = program.getBytecode();
+    int length = program.getLength();
     const uint8_t* start = code;
     const uint8_t* end = code + length;
     while (code < end) {
@@ -135,7 +140,7 @@ static void dumpBytecode(const uint8_t* code, int length)
 InterpreterResult Interpreter::run()
 {
     auto code = mProgram.getBytecode();
-    dumpBytecode(code, mProgram.getLength());
+    dumpBytecode(mProgram);
     int ip = 0;
     while (ip < mProgram.getLength()) {
         switch (code[ip]) {
@@ -228,6 +233,16 @@ InterpreterResult Interpreter::run()
             int64_t rhs = mStack.pop();
             int64_t lhs = mStack.pop();
             if (lhs != rhs)
+                ip += (int8_t)code[ip + 1];
+            else
+                ip += 2;
+            break;
+        }
+        case Op_jmp_lt:
+        {
+            int64_t rhs = mStack.pop();
+            int64_t lhs = mStack.pop();
+            if (lhs < rhs)
                 ip += (int8_t)code[ip + 1];
             else
                 ip += 2;

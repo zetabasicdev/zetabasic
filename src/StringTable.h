@@ -45,6 +45,8 @@ public:
 
     const String& getString(int index) const;
 
+    void dump() const;
+
 private:
     std::vector<String> mStrings;
 };

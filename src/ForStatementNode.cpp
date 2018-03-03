@@ -148,6 +148,8 @@ void ForStatementNode::translate(Translator& translator)
     // mark position for jump
     int target = translator.getBytecode().getSize();
 
+    // check if counter is past end
+
     // perform modification of counter
     code = translator.getBytecode().alloc(2);
     code[0] = Op_load_local;
@@ -182,6 +184,6 @@ void ForStatementNode::translate(Translator& translator)
     assert(offset >= -128 && offset < 127);
 
     code = translator.getBytecode().alloc(2);
-    code[0] = Op_jmp_neq;
+    code[0] = Op_jmp_lt;
     code[1] = (uint8_t)offset;
 }

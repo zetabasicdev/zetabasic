@@ -131,6 +131,13 @@ public:
         return strncmp(mText, str.mText, len);
     }
 
+    bool exactCompareWithCase(const String& str) const
+    {
+        if (str.mLength == mLength)
+            return strncmp(mText, str.mText, mLength) == 0;
+        return false;
+    }
+
 private:
     const char* mText;
     int mLength;
