@@ -38,7 +38,8 @@
 PrintStatementNode::PrintStatementNode()
     :
     StatementNode(),
-    mExpression(nullptr)
+    mExpressions(),
+    mTrailingSemicolon(false)
 {
     // intentionally left blank
 }
@@ -53,30 +54,52 @@ void PrintStatementNode::parse(Parser& parser)
     assert(parser.getToken().getTag() == TokenTag::Key_Print);
     parser.eatToken();
 
-    mExpression = ExpressionNode::parseExpression(parser);
+    auto expression = ExpressionNode::parseExpression(parser);
+    while (expression) {
+        mExpressions.push(expression);
+        mTrailingSemicolon = false;
+
+        if (parser.getToken().getTag() != TokenTag::Sym_Semicolon)
+            break;
+        parser.eatToken();
+        mTrailingSemicolon = true;
+        
+        expression = ExpressionNode::parseExpression(parser);
+    }
 
     parser.eatEndOfLine();
 }
 
 void PrintStatementNode::analyze(Analyzer& analyzer)
 {
-    if (mExpression)
-        mExpression->analyze(analyzer);
+    for (auto& expression : mExpressions)
+        expression.analyze(analyzer);
 }
 
 void PrintStatementNode::translate(Translator& translator)
 {
-    if (mExpression) {
-        mExpression->translate(translator);
+    for (auto& expression : mExpressions) {
+        expression.translate(translator);
 
-        if (mExpression->getType() == Typename::String) {
-            auto ops = translator.getBytecode().alloc(2);
-            ops[0] = Op_syscall;
-            ops[1] = Syscall_printstr;
-        } else if (mExpression->getType() == Typename::Integer) {
-            auto ops = translator.getBytecode().alloc(2);
-            ops[0] = Op_syscall;
+        auto ops = translator.getBytecode().alloc(2);
+        ops[0] = Op_syscall;
+
+        switch (expression.getType()) {
+        case Typename::Integer:
             ops[1] = Syscall_printi;
+            break;
+        case Typename::String:
+            ops[1] = Syscall_printstr;
+            break;
+        default:
+            assert(false);
+            break;
         }
+    }
+
+    if (!mTrailingSemicolon) {
+        auto ops = translator.getBytecode().alloc(2);
+        ops[0] = Op_syscall;
+        ops[1] = Syscall_printnl;
     }
 }

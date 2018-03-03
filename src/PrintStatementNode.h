@@ -31,6 +31,7 @@
 #pragma once
 
 #include "StatementNode.h"
+#include "TNodeList.h"
 
 class ExpressionNode;
 
@@ -47,5 +48,6 @@ public:
     void translate(Translator& translator);
 
 private:
-    ExpressionNode* mExpression;
+    TNodeList<ExpressionNode> mExpressions;
+    bool mTrailingSemicolon;
 };

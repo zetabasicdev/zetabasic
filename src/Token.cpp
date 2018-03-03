@@ -68,6 +68,7 @@ const char* ToString(TokenTag tag)
     case TokenTag::Sym_OpenParen: return "(";
     case TokenTag::Sym_CloseParen: return ")";
     case TokenTag::Sym_Comma: return ",";
+    case TokenTag::Sym_Semicolon: return ";";
     default:
         break;
     }

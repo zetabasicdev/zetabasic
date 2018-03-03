@@ -56,8 +56,8 @@ int main(int argc, char* argv[])
 {
     try {
         const char* code =
-            "PRINT LEN(\"Hello, world!\")\n"
-            "PRINT LEFT$(\"Hello!\", 1)\n"
+            "PRINT 1; \"Test\"\n"
+            "PRINT \"Hello\"\n"
             "END";
 
         Compiler compiler;

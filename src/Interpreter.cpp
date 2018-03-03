@@ -248,16 +248,17 @@ void Interpreter::DoSysCall(uint8_t ix)
     {
         String text = mStringStack.pop();
         mWindow.printn(text.getText(), text.getLength());
-        mWindow.print("\n");
         break;
     }
     case Syscall_printi:
     {
         int64_t value = mStack.pop();
         mWindow.printf("%lld", value);
-        mWindow.print("\n");
         break;
     }
+    case Syscall_printnl:
+        mWindow.print("\n");
+        break;
     case Syscall_len:
         mStack.push((int64_t)mStringStack.len());
         break;

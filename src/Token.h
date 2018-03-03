@@ -65,7 +65,8 @@ enum class TokenTag
     Sym_Equals,
     Sym_OpenParen,
     Sym_CloseParen,
-    Sym_Comma
+    Sym_Comma,
+    Sym_Semicolon
 };
 const char* ToString(TokenTag tag);
 
