@@ -32,6 +32,7 @@
 
 #include <cassert>
 #include <cstring>
+#include <string>
 
 class String
 {
@@ -60,6 +61,14 @@ public:
     {
         assert(mText);
         assert(mLength >= 0);
+    }
+
+    String(const std::string& str)
+        :
+        mText(str.data()),
+        mLength((int)str.length())
+    {
+        // intentionally left blank
     }
 
     ~String()

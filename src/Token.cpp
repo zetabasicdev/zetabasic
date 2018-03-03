@@ -54,6 +54,7 @@ const char* ToString(TokenTag tag)
     case TokenTag::Key_End: return "END";
     case TokenTag::Key_For: return "FOR";
     case TokenTag::Key_If: return "IF";
+    case TokenTag::Key_Input: return "INPUT";
     case TokenTag::Key_Goto: return "GOTO";
     case TokenTag::Key_Let: return "LET";
     case TokenTag::Key_LeftS: return "LEFT$";

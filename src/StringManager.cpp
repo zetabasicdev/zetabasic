@@ -61,10 +61,10 @@ void StringManager::loadString(int64_t desc)
 {
     if (desc == 0) {
         // load empty string
-        mStringStack.pushConstant(String());
+        mStringStack.push(String());
     } else {
         StringObject* instance = (StringObject*)desc;
-        mStringStack.pushConstant(String(instance->data ? instance->data : "", instance->length));
+        mStringStack.push(String(instance->data ? instance->data : "", instance->length));
     }
 }
 

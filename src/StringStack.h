@@ -38,7 +38,7 @@ public:
     StringStack();
     ~StringStack();
 
-    void pushConstant(const String& value);
+    void push(const String& value);
     void add();
     int compare();
     int len();

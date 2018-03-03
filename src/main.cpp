@@ -56,8 +56,10 @@ int main(int argc, char* argv[])
 {
     try {
         const char* code =
-            "PRINT 1; \"Test\"\n"
-            "PRINT \"Hello\"\n"
+            "INPUT \"Enter your name: \"; U$\n"
+            "PRINT \"Hello \"; U$\n"
+            "INPUT \"Enter a number: \"; N\n"
+            "PRINT N\n"
             "END";
 
         Compiler compiler;

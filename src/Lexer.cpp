@@ -167,6 +167,7 @@ bool Lexer::runEndState()
                 { "END", TokenTag::Key_End },
                 { "FOR", TokenTag::Key_For },
                 { "IF", TokenTag::Key_If },
+                { "INPUT", TokenTag::Key_Input },
                 { "GOTO", TokenTag::Key_Goto },
                 { "LEN", TokenTag::Key_Len },
                 { "LEFT$", TokenTag::Key_LeftS },

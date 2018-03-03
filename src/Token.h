@@ -53,6 +53,7 @@ enum class TokenTag
     Key_For,
     Key_Goto,
     Key_If,
+    Key_Input,
     Key_Len,
     Key_LeftS,
     Key_Let,

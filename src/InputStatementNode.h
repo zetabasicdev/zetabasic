@@ -30,79 +30,26 @@
 
 #pragma once
 
-#include <cstdint>
+#include "StatementNode.h"
+#include "String.h"
 
-enum
-{
-    UP = 256,
-    DOWN,
-    LEFT,
-    RIGHT,
-    PAGE_UP,
-    PAGE_DOWN,
-    HOME,
-    END,
-    INS,
-    DEL,
-    BACKSPACE,
-    ENTER,
-    ESCAPE,
-    TAB,
-    F1,
-    F2,
-    F3,
-    F4,
-    F5,
-    F6,
-    F7,
-    F8,
-    F9,
-    F10,
-    F11,
-    F12,
-    QUIT = 1024
-};
+class ExpressionNode;
+class Symbol;
 
-class Window
+class InputStatementNode
+    :
+    public StatementNode
 {
 public:
-    Window();
-    ~Window();
+    InputStatementNode();
+    virtual ~InputStatementNode();
 
-    int runOnce();
-
-    void print(const char* text);
-    void printf(const char* format, ...);
-    void printn(const char* text, int len);
-
-    const std::string& input();
-
-    void locate(int row, int col);
-    void color(int fg, int bg);
-
-    void showCursor();
-    void hideCursor();
+    void parse(Parser& parser);
+    void analyze(Analyzer& analyzer);
+    void translate(Translator& translator);
 
 private:
-    void* mWindow;
-    void* mScreen;
-
-    struct Cell
-    {
-        char ch;
-        uint8_t color;
-    };
-    Cell* mCells;
-
-    int mCursorRow;
-    int mCursorCol;
-    bool mCursorVisible;
-    int mFg;
-    int mBg;
-    bool mDirty;
-
-    void renderCell(char ch, int row, int col, int fg, int bg);
-    void scroll();
-    void drawCursor();
-    void eraseCursor();
+    ExpressionNode* mPromptExpression;
+    String mName;
+    Symbol* mSymbol;
 };

@@ -59,6 +59,12 @@ Symbol* SymbolTable::getSymbol(const Range& range, const String& name, Typename 
             return &mSymbols[ix];
 
     // need to instance a new symbol
+    if (type == Typename::Unknown) {
+        // deduce type with any suffix
+        type = Typename::Integer;
+        if (name[name.getLength() - 1] == '$')
+            type = Typename::String;
+    }
     auto symbol = mSymbolPool.alloc(mSymbols.getSize(), range, name, type);
     mSymbols.push(symbol);
 

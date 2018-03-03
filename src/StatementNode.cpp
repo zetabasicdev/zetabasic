@@ -32,6 +32,7 @@
 #include "EndStatementNode.h"
 #include "ForStatementNode.h"
 #include "IfStatementNode.h"
+#include "InputStatementNode.h"
 #include "GotoStatementNode.h"
 #include "LabelStatementNode.h"
 #include "Parser.h"
@@ -67,6 +68,9 @@ StatementNode* StatementNode::parseStatement(Parser& parser)
             break;
         case TokenTag::Key_If:
             node = parser.getNodePool().alloc<IfStatementNode>();
+            break;
+        case TokenTag::Key_Input:
+            node = parser.getNodePool().alloc<InputStatementNode>();
             break;
         case TokenTag::Key_Goto:
             node = parser.getNodePool().alloc<GotoStatementNode>();

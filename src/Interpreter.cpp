@@ -154,7 +154,7 @@ InterpreterResult Interpreter::run()
             ++ip;
             break;
         case Op_load_const_str:
-            mStringStack.pushConstant(mProgram.getString(code[ip + 1]));
+            mStringStack.push(mProgram.getString(code[ip + 1]));
             ip += 2;
             break;
         case Op_load_const:
@@ -258,6 +258,12 @@ void Interpreter::DoSysCall(uint8_t ix)
     }
     case Syscall_printnl:
         mWindow.print("\n");
+        break;
+    case Syscall_inputi:
+        mStack.push((int64_t)atoi(mWindow.input().c_str()));
+        break;
+    case Syscall_inputstr:
+        mStringStack.push(String(mWindow.input()));
         break;
     case Syscall_len:
         mStack.push((int64_t)mStringStack.len());

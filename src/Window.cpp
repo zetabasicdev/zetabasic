@@ -286,6 +286,90 @@ void Window::printn(const char* text, int len)
     mDirty = true;
 }
 
+const std::string& Window::input()
+{
+    static std::string text;
+    text.clear();
+
+    int startRow = mCursorRow;
+    int startCol = mCursorCol;
+    bool rehideCursor = false;
+
+    if (!mCursorVisible) {
+        showCursor();
+        rehideCursor = true;
+    }
+
+    bool done = false;
+    while (!done) {
+        int evt = runOnce();
+        switch (evt) {
+        case ENTER:
+            done = true;
+            break;
+        case BACKSPACE:
+            if (!text.empty()) {
+                text.erase(text.length() - 1, 1);
+
+                eraseCursor();
+                --mCursorCol;
+                if (mCursorCol < 1) {
+                    mCursorCol = 80;
+                    --mCursorRow;
+                }
+                Cell* cell = mCells + ((mCursorRow - 1) * 80) + (mCursorCol - 1);
+                cell->ch = ' ';
+                cell->color = (mBg << 4) | mFg;
+                renderCell(' ', mCursorRow, mCursorCol, mFg, mBg);
+                drawCursor();
+
+                mDirty = true;
+            }
+            break;
+        default:
+            if (evt >= 32 && evt <= 126) {
+                if (text.length() < 255) {
+                    text.push_back((char)evt);
+                    Cell* cell = mCells + ((mCursorRow - 1) * 80) + (mCursorCol - 1);
+                    cell->ch = (char)evt;
+                    cell->color = (mBg << 4) | mFg;
+                    renderCell((char)evt, mCursorRow, mCursorCol, mFg, mBg);
+
+                    ++mCursorCol;
+                    if (mCursorCol > 80) {
+                        mCursorCol = 1;
+                        ++mCursorRow;
+                        if (mCursorRow > 25) {
+                            eraseCursor();
+                            scroll();
+                            drawCursor();
+                        }
+                    }
+                    drawCursor();
+
+                    mDirty = true;
+                }
+            }
+            break;
+        }
+    }
+
+    hideCursor();
+
+    // move to next line
+    ++mCursorRow;
+    mCursorCol = 1;
+    if (mCursorRow > 25) {
+        --mCursorRow;
+        scroll();
+    }
+
+    if (!rehideCursor)
+        showCursor();
+
+    return text;
+}
+
 void Window::locate(int row, int col)
 {
     if (row == -1)

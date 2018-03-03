@@ -55,7 +55,7 @@ StringStack::~StringStack()
     delete[] mData;
 }
 
-void StringStack::pushConstant(const String& value)
+void StringStack::push(const String& value)
 {
     int len = value.getLength();
     assert(len <= kMaximumStringLength);
