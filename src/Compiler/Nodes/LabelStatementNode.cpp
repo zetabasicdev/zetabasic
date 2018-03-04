@@ -62,5 +62,5 @@ void LabelStatementNode::analyze(Analyzer& analyzer)
 
 void LabelStatementNode::translate(Translator& translator)
 {
-    translator.getCodePositionTable().addPosition(CodePositionType::Label, mName, translator.getBytecode().getSize());
+    translator.getCodePositionTable().addPosition(CodePositionType::Label, mName, translator.getCodeBuffer().getSize());
 }

@@ -32,9 +32,10 @@
 
 #include <cstdint>
 
-enum Opcode : uint8_t
+enum Opcode : uint64_t
 {
-    Op_end = 0x01,
+    Op_nop = 0,
+    Op_end,
     Op_reserve,
     Op_dup,
     Op_load_const_str,

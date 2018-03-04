@@ -96,11 +96,11 @@ void AssignmentStatementNode::translate(Translator& translator)
     assert(mSymbol->getLocation() < 256);
 
     if (mSymbol->getType() == Typename::StringPiece) {
-        auto code = translator.getBytecode().alloc(2);
+        auto code = translator.getCodeBuffer().alloc(2);
         code[0] = Op_store_local_str;
         code[1] = (uint8_t)mSymbol->getLocation();
     } else {
-        auto code = translator.getBytecode().alloc(2);
+        auto code = translator.getCodeBuffer().alloc(2);
         code[0] = Op_store_local;
         code[1] = (uint8_t)mSymbol->getLocation();
     }

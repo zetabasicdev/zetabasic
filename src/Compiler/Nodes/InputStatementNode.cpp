@@ -84,7 +84,7 @@ void InputStatementNode::translate(Translator& translator)
 {
     mPromptExpression->translate(translator);
 
-    auto ops = translator.getBytecode().alloc(2);
+    auto ops = translator.getCodeBuffer().alloc(2);
     ops[0] = Op_syscall;
     switch (mPromptExpression->getType()) {
     case Typename::Integer:
@@ -98,7 +98,7 @@ void InputStatementNode::translate(Translator& translator)
         break;
     }
 
-    ops = translator.getBytecode().alloc(2);
+    ops = translator.getCodeBuffer().alloc(2);
     ops[0] = Op_syscall;
     switch (mSymbol->getType()) {
     case Typename::Integer:
@@ -113,11 +113,11 @@ void InputStatementNode::translate(Translator& translator)
     }
 
     if (mSymbol->getType() == Typename::StringPiece) {
-        auto code = translator.getBytecode().alloc(2);
+        auto code = translator.getCodeBuffer().alloc(2);
         code[0] = Op_store_local_str;
         code[1] = (uint8_t)mSymbol->getLocation();
     } else {
-        auto code = translator.getBytecode().alloc(2);
+        auto code = translator.getCodeBuffer().alloc(2);
         code[0] = Op_store_local;
         code[1] = (uint8_t)mSymbol->getLocation();
     }

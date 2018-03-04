@@ -31,6 +31,7 @@
 #include <cstdio>
 
 #include "Interpreter.h"
+#include "Instructions.h"
 #include "Opcodes.h"
 #include "Program.h"
 #include "SystemCalls.h"
@@ -42,251 +43,136 @@ Interpreter::Interpreter(Window& window, const Program& program)
     mProgram(program),
     mStack(),
     mStringStack(),
-    mStringManager(mStringStack)
+    mStringManager(mStringStack),
+    mCodeSize(mProgram.getCodeSize()),
+    mCode(new VmWord[mCodeSize])
 {
-    // intentionally left blank
+    memcpy(mCode, mProgram.getCode(), sizeof(VmWord) * mCodeSize);
+
+    static struct {
+        VmWord opcode;
+        InstructionExecutor func;
+        int arguments;
+    } translationTable[] = {
+        { Op_nop, ExecuteNop, 0 },
+        { Op_end, ExecuteEnd, 0 },
+        { Op_reserve, ExecuteReserve, 1 },
+        { Op_dup, ExecuteDup, 0 },
+        { Op_load_const_str, ExecuteLoadConstStr, 1 },
+        { Op_load_const, ExecuteLoadConst, 1 },
+        { Op_load_local_str, ExecuteLoadLocalStr, 1 },
+        { Op_load_local, ExecuteLoadLocal, 1 },
+        { Op_store_local_str, ExecuteStoreLocalStr, 1 },
+        { Op_store_local, ExecuteStoreLocal, 1 },
+        { Op_syscall, ExecuteSyscall, 1 },
+        { Op_add_str, ExecuteAddStr, 0 },
+        { Op_add_int, ExecuteAddInt, 0 },
+        { Op_eq_str, ExecuteEqStr, 0 },
+        { Op_eq_int, ExecuteEqInt, 0 },
+        { Op_or_int, ExecuteOrInt, 0 },
+        { Op_jmp, ExecuteJmp, 1 },
+        { Op_jmp_zero, ExecuteJmpZero, 1 },
+        { Op_jmp_neq, ExecuteJmpNeq, 1 },
+        { Op_jmp_lt, ExecuteJmpLt, 1 },
+        { 0, nullptr, 0 }
+    };
+    // translate code into applicable function calls
+    for (int ix = 0; ix < mCodeSize; ++ix) {
+        printf("[%04X] ", ix);
+        switch (mCode[ix]) {
+        case Op_nop:
+            printf("nop\n");
+        case Op_end:
+            printf("end\n");
+            break;
+        case Op_reserve:
+            printf("reserve %d\n", (int)mCode[ix + 1]);
+            break;
+        case Op_dup:
+            printf("dup\n");
+            break;
+        case Op_load_const_str:
+            printf("load.const.str #%d\n", (int)mCode[ix + 1]);
+            break;
+        case Op_load_const:
+            printf("load.const #%d\n", (int)mCode[ix + 1]);
+            break;
+        case Op_load_local_str:
+            printf("load.local.str #%d\n", (int)mCode[ix + 1]);
+            break;
+        case Op_load_local:
+            printf("load.local #%d\n", (int)mCode[ix + 1]);
+            break;
+        case Op_store_local_str:
+            printf("store.local.str #%d\n", (int)mCode[ix + 1]);
+            break;
+        case Op_store_local:
+            printf("store.local #%d\n", (int)mCode[ix + 1]);
+            break;
+        case Op_syscall:
+            printf("syscall #%d\n", (int)mCode[ix + 1]);
+            break;
+        case Op_add_str:
+            printf("add.str\n");
+            break;
+        case Op_add_int:
+            printf("add.int\n");
+            break;
+        case Op_eq_str:
+            printf("equals.str\n");
+            break;
+        case Op_eq_int:
+            printf("equals.int\n");
+            break;
+        case Op_or_int:
+            printf("or.int\n");
+            break;
+        case Op_jmp:
+            printf("jump [%04X]\n", (int)mCode[ix + 1]);
+            break;
+        case Op_jmp_zero:
+            printf("jump.if.zero [%04X]\n", (int)mCode[ix + 1]);
+            break;
+        case Op_jmp_neq:
+            printf("jump.if.neq [%04X]\n", (int)mCode[ix + 1]);
+            break;
+        case Op_jmp_lt:
+            printf("jump.if.lt [%04X]\n", (int)mCode[ix + 1]);
+            break;
+        default:
+            assert(false);
+        }
+        int count = translationTable[mCode[ix]].arguments;
+        mCode[ix] = (VmWord)translationTable[mCode[ix]].func;
+        ix += count;
+        assert(ix <= mCodeSize);
+    }
 }
 
 Interpreter::~Interpreter()
 {
-    // intentionally left blank
-}
-
-static void dumpBytecode(const Program& program)
-{
-    enum
-    {
-        Type_NoArgs,
-        Type_OneInt,
-        Type_OneIndex,
-        Type_Offset,
-        Type_Location
-    };
-    static struct {
-        uint8_t op;
-        const char* name;
-        int size;
-        int type;
-    } mapping[] = {
-        { Op_end, "end", 1, Type_NoArgs },
-        { Op_reserve, "reserve", 2, Type_OneInt },
-        { Op_dup, "dup", 1, Type_NoArgs },
-        { Op_load_const_str, "load.const.str", 2, Type_OneIndex },
-        { Op_load_const, "load.const", 2, Type_OneIndex },
-        { Op_load_local_str, "load.local.str", 2, Type_OneIndex },
-        { Op_load_local, "load.local", 2, Type_OneIndex },
-        { Op_store_local_str, "store.local.str", 2, Type_OneIndex },
-        { Op_store_local, "store.local", 2, Type_OneIndex },
-        { Op_syscall, "syscall", 2, Type_OneIndex },
-        { Op_add_str, "add.str", 1, Type_NoArgs },
-        { Op_add_int, "add.int", 1, Type_NoArgs },
-        { Op_eq_str, "equals.str", 1, Type_NoArgs },
-        { Op_eq_int, "equals.int", 1, Type_NoArgs },
-        { Op_or_int, "or.int", 1, Type_NoArgs },
-        { Op_jmp, "jump", 3, Type_Location },
-        { Op_jmp_zero, "jump.if.zero", 2, Type_Offset },
-        { Op_jmp_neq, "jump.if.not.equal", 2, Type_Offset },
-        { Op_jmp_lt, "jump.if.less", 2, Type_Offset },
-        { 0, nullptr, 0, 0 }
-    };
-
-    program.dumpStrings();
-    
-    auto code = program.getBytecode();
-    auto length = program.getLength();
-    auto start = code;
-    auto end = code + length;
-    while (code < end) {
-        bool found = false;
-        for (auto ix = 0; mapping[ix].name; ++ix) {
-            if (mapping[ix].op == *code) {
-                if (mapping[ix].size == 1)
-                    printf("%04X: %02X        ", (int)(code - start), (int)code[0]);
-                else if (mapping[ix].size == 2)
-                    printf("%04X: %02X %02X     ", (int)(code - start), (int)code[0], (int)code[1]);
-                else if (mapping[ix].size == 3)
-                    printf("%04X: %02X %02X %02X  ", (int)(code - start), (int)code[0], (int)code[1], (int)code[2]);
-                switch (mapping[ix].type) {
-                case Type_NoArgs:
-                    printf("%s\n", mapping[ix].name);
-                    break;
-                case Type_OneInt:
-                    printf("%s %d\n", mapping[ix].name, (int)code[1]);
-                    break;
-                case Type_OneIndex:
-                    printf("%s #%d\n", mapping[ix].name, (int)code[1]);
-                    break;
-                case Type_Offset:
-                    printf("%s %+d (%04X)\n", mapping[ix].name, (int)((int8_t)code[1]), (int)(code - start) + (int)((int8_t)code[1]));
-                    break;
-                case Type_Location:
-                    printf("%s (%02X%02X)\n", mapping[ix].name, (int)code[1], (int)code[2]);
-                    break;
-                default:
-                    break;
-                }
-                code += mapping[ix].size;
-                found = true;
-                break;
-            }
-        }
-        if (!found) {
-            printf("(%04X) unknown opcode : %02X\n", (int)(code - start), (int)*code);
-            break;
-        }
-    }
+    delete[] mCode;
 }
 
 InterpreterResult Interpreter::run()
 {
-    auto code = mProgram.getBytecode();
-    dumpBytecode(mProgram);
-    int ip = 0;
-    while (ip < mProgram.getLength()) {
-        switch (code[ip]) {
-        case Op_end:
-            mWindow.locate(25, 1);
-            mWindow.print("Press any key to continue");
-            (void)mWindow.runOnce();
-            ip = mProgram.getLength();
-            break;
-        case Op_reserve:
-            mStack.reserve((int)code[ip + 1]);
-            ip += 2;
-            break;
-        case Op_dup:
-            mStack.dup();
-            ++ip;
-            break;
-        case Op_load_const_str:
-            mStringStack.push(mProgram.getString((int)code[ip + 1]));
-            ip += 2;
-            break;
-        case Op_load_const:
-            mStack.push(mProgram.getIntegerConstant((int)code[ip + 1]));
-            ip += 2;
-            break;
-        case Op_load_local_str:
-            mStringManager.loadString(mStack.getLocal((int)code[ip + 1]));
-            ip += 2;
-            break;
-        case Op_load_local:
-            mStack.push(mStack.getLocal((int)code[ip + 1]));
-            ip += 2;
-            break;
-        case Op_store_local_str:
-            mStack.setLocal((int)code[ip + 1], mStringManager.storeString(mStack.getLocal((int)code[ip + 1])));
-            ip += 2;
-            break;
-        case Op_store_local:
-            mStack.setLocal((int)code[ip + 1], mStack.pop());
-            ip += 2;
-            break;
-        case Op_syscall:
-            DoSysCall((int)code[ip + 1]);
-            ip += 2;
-            break;
-        case Op_add_str:
-            mStringStack.add();
-            ++ip;
-            break;
-        case Op_add_int:
-        {
-            int64_t rhs = mStack.pop();
-            int64_t lhs = mStack.pop();
-            mStack.push(lhs + rhs);
+    ExecutionContext context;
+    context.code = mCode;
+    context.stack = &mStack;
+    context.stringManager = &mStringManager;
+    context.stringStack = &mStringStack;
+    context.program = &mProgram;
+    context.window = &mWindow;
 
-            ++ip;
-            break;
-        }
-        case Op_eq_str:
-            mStack.push((mStringStack.compare() == 0) ? 1 : 0);
-            ++ip;
-            break;
-        case Op_eq_int:
-        {
-            int64_t rhs = mStack.pop();
-            int64_t lhs = mStack.pop();
-            mStack.push(lhs == rhs);
-            ++ip;
-            break;
-        }
-        case Op_or_int:
-        {
-            int64_t rhs = mStack.pop();
-            int64_t lhs = mStack.pop();
-            mStack.push(lhs | rhs);
-            ++ip;
-            break;
-        }
-        case Op_jmp:
-            ip = ((int)code[ip + 1] << 8) + (int)code[ip + 2];
-            break;
-        case Op_jmp_zero:
-            if (mStack.pop() == 0)
-                ip += (int8_t)code[ip + 1];
-            else
-                ip += 2;
-            break;
-        case Op_jmp_neq:
-        {
-            int64_t rhs = mStack.pop();
-            int64_t lhs = mStack.pop();
-            if (lhs != rhs)
-                ip += (int8_t)code[ip + 1];
-            else
-                ip += 2;
-            break;
-        }
-        case Op_jmp_lt:
-        {
-            int64_t rhs = mStack.pop();
-            int64_t lhs = mStack.pop();
-            if (lhs < rhs)
-                ip += (int8_t)code[ip + 1];
-            else
-                ip += 2;
-            break;
-        }
-        default:
-            return InterpreterResult::BadOpcode;
-        }
-    }
-    
+    VmWord* ip = &mCode[0];
+
+    do {
+        ip = ((InstructionExecutor)*ip)(&context, ip);
+    } while (ip != nullptr);
+
+    mWindow.locate(25, 1);
+    mWindow.print("Press any key to continue");
+    (void)mWindow.runOnce();
+
     return InterpreterResult::ExecutionComplete;
-}
-
-void Interpreter::DoSysCall(int ix)
-{
-    switch (ix) {
-    case Syscall_printstr:
-    {
-        StringPiece text = mStringStack.pop();
-        mWindow.printn(text.getText(), text.getLength());
-        break;
-    }
-    case Syscall_printi:
-    {
-        int64_t value = mStack.pop();
-        mWindow.printf("%lld", value);
-        break;
-    }
-    case Syscall_printnl:
-        mWindow.print("\n");
-        break;
-    case Syscall_inputi:
-        mStack.push((int64_t)atoi(mWindow.input().c_str()));
-        break;
-    case Syscall_inputstr:
-        mStringStack.push(StringPiece(mWindow.input()));
-        break;
-    case Syscall_len:
-        mStack.push((int64_t)mStringStack.len());
-        break;
-    case Syscall_left_str:
-        mStringStack.left((int)mStack.pop());
-        break;
-    default:
-        break;
-    }
 }

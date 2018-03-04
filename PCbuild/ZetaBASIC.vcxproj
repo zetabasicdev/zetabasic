@@ -71,7 +71,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="..\src\Bytecode.h" />
+    <ClInclude Include="..\src\VirtualMachine.h" />
     <ClInclude Include="..\src\Compiler\Analyzer.h" />
     <ClInclude Include="..\src\Compiler\CodePositionTable.h" />
     <ClInclude Include="..\src\Compiler\CompileError.h" />
@@ -109,6 +109,7 @@
     <ClInclude Include="..\src\Compiler\Translator.h" />
     <ClInclude Include="..\src\Compiler\Typename.h" />
     <ClInclude Include="..\src\Font.h" />
+    <ClInclude Include="..\src\Instructions.h" />
     <ClInclude Include="..\src\Interpreter\Interpreter.h" />
     <ClInclude Include="..\src\Interpreter\Opcodes.h" />
     <ClInclude Include="..\src\Interpreter\Program.h" />
@@ -155,6 +156,7 @@
     <ClCompile Include="..\src\Compiler\TextSourceStream.cpp" />
     <ClCompile Include="..\src\Compiler\Token.cpp" />
     <ClCompile Include="..\src\Compiler\Translator.cpp" />
+    <ClCompile Include="..\src\Instructions.cpp" />
     <ClCompile Include="..\src\Interpreter\Interpreter.cpp" />
     <ClCompile Include="..\src\Interpreter\Stack.cpp" />
     <ClCompile Include="..\src\Interpreter\StringManager.cpp" />

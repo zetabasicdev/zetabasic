@@ -189,7 +189,10 @@
     <ClInclude Include="..\src\StringPiece.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\Bytecode.h">
+    <ClInclude Include="..\src\Instructions.h">
+      <Filter>Header Files\Interpreter</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\VirtualMachine.h">
       <Filter>Header Files\Interpreter</Filter>
     </ClInclude>
   </ItemGroup>
@@ -298,6 +301,9 @@
     </ClCompile>
     <ClCompile Include="..\src\Compiler\Compiler.cpp">
       <Filter>Source Files\Compiler</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Instructions.cpp">
+      <Filter>Source Files\Interpreter</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

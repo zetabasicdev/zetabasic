@@ -142,7 +142,7 @@ void FunctionCallExpressionNode::translate(Translator& translator)
             syscall = builtinFunctions[ix].syscall;
     assert(syscall != 0);
 
-    auto code = translator.getBytecode().alloc(2);
+    auto code = translator.getCodeBuffer().alloc(2);
     code[0] = Op_syscall;
     code[1] = syscall;
 }

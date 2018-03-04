@@ -81,7 +81,7 @@ void PrintStatementNode::translate(Translator& translator)
     for (auto& expression : mExpressions) {
         expression.translate(translator);
 
-        auto ops = translator.getBytecode().alloc(2);
+        auto ops = translator.getCodeBuffer().alloc(2);
         ops[0] = Op_syscall;
 
         switch (expression.getType()) {
@@ -98,7 +98,7 @@ void PrintStatementNode::translate(Translator& translator)
     }
 
     if (!mTrailingSemicolon) {
-        auto ops = translator.getBytecode().alloc(2);
+        auto ops = translator.getCodeBuffer().alloc(2);
         ops[0] = Op_syscall;
         ops[1] = Syscall_printnl;
     }

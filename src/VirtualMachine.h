@@ -32,4 +32,4 @@
 
 #include <cstdint>
 
-typedef uint64_t BytecodeWord;
+typedef uint64_t VmWord;

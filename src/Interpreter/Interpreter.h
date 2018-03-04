@@ -31,6 +31,7 @@
 #pragma once
 
 #include <cstdint>
+#include "Instructions.h"
 #include "Stack.h"
 #include "StringManager.h"
 #include "StringStack.h"
@@ -60,5 +61,6 @@ private:
     StringStack mStringStack;
     StringManager mStringManager;
 
-    void DoSysCall(int ix);
+    int mCodeSize;
+    VmWord* mCode;
 };

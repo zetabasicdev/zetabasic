@@ -32,9 +32,9 @@
 
 #include <cstdint>
 
-#include "Bytecode.h"
 #include "Node.h"
 #include "TItemBuffer.h"
+#include "VirtualMachine.h"
 
 class CodePositionTable;
 class ConstantTable;
@@ -45,7 +45,7 @@ class SymbolTable;
 class Translator
 {
 public:
-    Translator(TItemBuffer<BytecodeWord>& bytecode,
+    Translator(TItemBuffer<VmWord>& bytecode,
                StringTable& stringTable,
                ConstantTable& constantTable,
                SymbolTable& symbolTable,
@@ -56,9 +56,9 @@ public:
 
     void run();
 
-    TItemBuffer<BytecodeWord>& getBytecode()
+    TItemBuffer<VmWord>& getCodeBuffer()
     {
-        return mBytecode;
+        return mCodeBuffer;
     }
 
     StringTable& getStringTable()
@@ -87,7 +87,7 @@ public:
     }
 
 private:
-    TItemBuffer<BytecodeWord>& mBytecode;
+    TItemBuffer<VmWord>& mCodeBuffer;
     StringTable& mStringTable;
     ConstantTable& mConstantTable;
     SymbolTable& mSymbolTable;

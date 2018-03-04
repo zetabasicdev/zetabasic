@@ -109,18 +109,18 @@ void BinaryExpressionNode::translate(Translator& translator)
     switch (mOp) {
     case Operator::Addition:
         if (opType == Typename::Integer)
-            *translator.getBytecode().alloc(1) = Op_add_int;
+            *translator.getCodeBuffer().alloc(1) = Op_add_int;
         else
-            *translator.getBytecode().alloc(1) = Op_add_str;
+            *translator.getCodeBuffer().alloc(1) = Op_add_str;
         break;
     case Operator::Equals:
         if (opType == Typename::Integer)
-            *translator.getBytecode().alloc(1) = Op_eq_int;
+            *translator.getCodeBuffer().alloc(1) = Op_eq_int;
         else
-            *translator.getBytecode().alloc(1) = Op_eq_str;
+            *translator.getCodeBuffer().alloc(1) = Op_eq_str;
         break;
     case Operator::BitwiseOr:
-        *translator.getBytecode().alloc(1) = Op_or_int;
+        *translator.getCodeBuffer().alloc(1) = Op_or_int;
         break;
     default:
         break;

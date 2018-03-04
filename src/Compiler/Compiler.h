@@ -32,7 +32,6 @@
 
 #include <cstdint>
 
-#include "Bytecode.h"
 #include "CodePositionTable.h"
 #include "ConstantTable.h"
 #include "FixUpTable.h"
@@ -45,6 +44,7 @@
 #include "Token.h"
 #include "TObjectPool.h"
 #include "TObjectList.h"
+#include "VirtualMachine.h"
 
 class ISourceStream;
 
@@ -61,7 +61,7 @@ private:
     TObjectList<Token> mTokens;
     StringPool mStringPool;
     NodePool mNodePool;
-    TItemBuffer<BytecodeWord> mBytecode;
+    TItemBuffer<VmWord> mBytecode;
     StringTable mStringTable;
     ConstantTable mConstantTable;
     SymbolTable mSymbolTable;

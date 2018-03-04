@@ -69,7 +69,7 @@ void ModuleNode::translate(Translator& translator)
 {
     assert(translator.getSymbolTable().getSize() < 256);
 
-    auto code = translator.getBytecode().alloc(2);
+    auto code = translator.getCodeBuffer().alloc(2);
     code[0] = Op_reserve;
     code[1] = (uint8_t)translator.getSymbolTable().getSize();
 

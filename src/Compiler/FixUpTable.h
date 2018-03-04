@@ -32,15 +32,15 @@
 
 #include <cstdint>
 
-#include "Bytecode.h"
 #include "CodePositionTable.h"
 #include "Range.h"
 #include "TItemBuffer.h"
+#include "VirtualMachine.h"
 
 class FixUpTable
 {
 public:
-    FixUpTable(TItemBuffer<BytecodeWord>& bytecode, CodePositionTable& codePositionTable);
+    FixUpTable(TItemBuffer<VmWord>& codeBuffer, CodePositionTable& codePositionTable);
     ~FixUpTable();
 
     void reset();
@@ -50,7 +50,7 @@ public:
     void doFixups();
 
 private:
-    TItemBuffer<BytecodeWord>& mBytecode;
+    TItemBuffer<VmWord>& mCodeBuffer;
     CodePositionTable& mCodePositionTable;
 
     struct FixUpRecord

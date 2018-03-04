@@ -31,9 +31,9 @@
 #include "CompileError.h"
 #include "FixUpTable.h"
 
-FixUpTable::FixUpTable(TItemBuffer<BytecodeWord>& bytecode, CodePositionTable& codePositionTable)
+FixUpTable::FixUpTable(TItemBuffer<VmWord>& codeBuffer, CodePositionTable& codePositionTable)
     :
-    mBytecode(bytecode),
+    mCodeBuffer(codeBuffer),
     mCodePositionTable(codePositionTable),
     mFixUpPool(32),
     mFixUps()
@@ -63,7 +63,6 @@ void FixUpTable::doFixups()
         auto index = mCodePositionTable.getPosition(fixup.type, fixup.name);
         if (index == -1)
             throw CompileError(CompileErrorId::NameError, fixup.range, "Invalid Name");
-        mBytecode[fixup.index] = (index >> 8) & 0xff;
-        mBytecode[fixup.index + 1] = index & 0xff;
+        mCodeBuffer[fixup.index] = index;
     }
 }

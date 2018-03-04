@@ -78,15 +78,10 @@ void IfStatementNode::translate(Translator& translator)
     mExpression->translate(translator);
 
     int index = 0;
-    auto code = translator.getBytecode().alloc(2, index);
+    auto code = translator.getCodeBuffer().alloc(2, index);
     code[0] = Op_jmp_zero;
-    code[1] = 0;
 
     mStatement->translate(translator);
 
-    int target = translator.getBytecode().getSize();
-    int offset = target - index;
-    assert(offset >= -128 && offset < 127);
-
-    translator.getBytecode()[index + 1] = offset;
+    translator.getCodeBuffer()[index + 1] = translator.getCodeBuffer().getSize();
 }

@@ -69,6 +69,6 @@ void GotoStatementNode::analyze(Analyzer& analyzer)
 void GotoStatementNode::translate(Translator& translator)
 {
     int index = 0;
-    *translator.getBytecode().alloc(3, index) = Op_jmp;
+    *translator.getCodeBuffer().alloc(2, index) = Op_jmp;
     translator.getFixUpTable().addFixUp(index + 1, CodePositionType::Label, mName, mRange);
 }

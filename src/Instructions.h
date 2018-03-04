@@ -30,61 +30,44 @@
 
 #pragma once
 
-#include <cassert>
-#include <cstdint>
-#include <vector>
 #include "VirtualMachine.h"
-#include "ConstantTable.h"
-#include "StringTable.h"
 
-class Program
+class Program;
+class Stack;
+class StringManager;
+class StringStack;
+class Window;
+struct ExecutionContext;
+
+typedef VmWord*(*InstructionExecutor)(ExecutionContext* context, VmWord* ip);
+
+struct ExecutionContext
 {
-public:
-    Program(const VmWord* code, int codeSize, const StringTable& stringTable, const ConstantTable& constantTable)
-        :
-        mCode(code),
-        mCodeSize(codeSize),
-        mStringTable(stringTable),
-        mConstantTable(constantTable)
-    {
-        assert(code);
-        assert(codeSize > 0);
-    }
-
-    ~Program()
-    {
-        // intentionally left blank
-    }
-
-    const VmWord* getCode() const
-    {
-        return mCode;
-    }
-
-    int getCodeSize() const
-    {
-        return mCodeSize;
-    }
-
-    const StringPiece& getString(int index) const
-    {
-        return mStringTable.getString(index);
-    }
-
-    int64_t getIntegerConstant(int index) const
-    {
-        return mConstantTable.getIntegerConstant(index);
-    }
-
-    void dumpStrings() const
-    {
-        mStringTable.dump();
-    }
-
-private:
-    const VmWord* mCode;
-    int mCodeSize;
-
-    const StringTable& mStringTable;
-    const ConstantTable& mConstantTable;
+    VmWord* code;
+    Stack* stack;
+    StringManager* stringManager;
+    StringStack* stringStack;
+    const Program* program;
+    Window* window;
 };
+
+VmWord* ExecuteNop(ExecutionContext* context, VmWord* ip);
+VmWord* ExecuteEnd(ExecutionContext* context, VmWord* ip);
+VmWord* ExecuteReserve(ExecutionContext* context, VmWord* ip);
+VmWord* ExecuteDup(ExecutionContext* context, VmWord* ip);
+VmWord* ExecuteLoadConstStr(ExecutionContext* context, VmWord* ip);
+VmWord* ExecuteLoadConst(ExecutionContext* context, VmWord* ip);
+VmWord* ExecuteLoadLocalStr(ExecutionContext* context, VmWord* ip);
+VmWord* ExecuteLoadLocal(ExecutionContext* context, VmWord* ip);
+VmWord* ExecuteStoreLocalStr(ExecutionContext* context, VmWord* ip);
+VmWord* ExecuteStoreLocal(ExecutionContext* context, VmWord* ip);
+VmWord* ExecuteSyscall(ExecutionContext* context, VmWord* ip);
+VmWord* ExecuteAddStr(ExecutionContext* context, VmWord* ip);
+VmWord* ExecuteAddInt(ExecutionContext* context, VmWord* ip);
+VmWord* ExecuteEqStr(ExecutionContext* context, VmWord* ip);
+VmWord* ExecuteEqInt(ExecutionContext* context, VmWord* ip);
+VmWord* ExecuteOrInt(ExecutionContext* context, VmWord* ip);
+VmWord* ExecuteJmp(ExecutionContext* context, VmWord* ip);
+VmWord* ExecuteJmpZero(ExecutionContext* context, VmWord* ip);
+VmWord* ExecuteJmpNeq(ExecutionContext* context, VmWord* ip);
+VmWord* ExecuteJmpLt(ExecutionContext* context, VmWord* ip);

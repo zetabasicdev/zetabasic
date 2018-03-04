@@ -30,7 +30,7 @@
 
 #include "Translator.h"
 
-Translator::Translator(TItemBuffer<BytecodeWord>& bytecode,
+Translator::Translator(TItemBuffer<VmWord>& codeBuffer,
                        StringTable& stringTable,
                        ConstantTable& constantTable,
                        SymbolTable& symbolTable,
@@ -38,7 +38,7 @@ Translator::Translator(TItemBuffer<BytecodeWord>& bytecode,
                        FixUpTable& fixUpTable,
                        Node& root)
     :
-    mBytecode(bytecode),
+    mCodeBuffer(codeBuffer),
     mStringTable(stringTable),
     mConstantTable(constantTable),
     mSymbolTable(symbolTable),

@@ -136,54 +136,49 @@ void ForStatementNode::translate(Translator& translator)
     mStartExpression->translate(translator);
     assert(mSymbol->getLocation() < 256);
 
-    auto code = translator.getBytecode().alloc(2);
+    auto code = translator.getCodeBuffer().alloc(2);
     code[0] = Op_store_local;
     code[1] = (uint8_t)mSymbol->getLocation();
 
     // need to jump past loop increment
     int jump1;
-    code = translator.getBytecode().alloc(3, jump1);
+    code = translator.getCodeBuffer().alloc(2, jump1);
     code[0] = Op_jmp;
     
     // mark position for jump
-    int target = translator.getBytecode().getSize();
+    int target = translator.getCodeBuffer().getSize();
 
     // check if counter is past end
 
     // perform modification of counter
-    code = translator.getBytecode().alloc(2);
+    code = translator.getCodeBuffer().alloc(2);
     code[0] = Op_load_local;
     code[1] = (uint8_t)mSymbol->getLocation();
 
-    code = translator.getBytecode().alloc(2);
+    code = translator.getCodeBuffer().alloc(2);
     code[0] = Op_load_const;
     code[1] = translator.getConstantTable().addInteger(1);
 
-    *translator.getBytecode().alloc(1) = Op_add_int;
+    *translator.getCodeBuffer().alloc(1) = Op_add_int;
 
-    code = translator.getBytecode().alloc(2);
+    code = translator.getCodeBuffer().alloc(2);
     code[0] = Op_store_local;
     code[1] = (uint8_t)mSymbol->getLocation();
 
-    int jump1Target = translator.getBytecode().getSize();
-    translator.getBytecode()[jump1 + 1] = (jump1Target >> 8) & 0xff;
-    translator.getBytecode()[jump1 + 2] = jump1Target & 0xff;
+    int jump1Target = translator.getCodeBuffer().getSize();
+    translator.getCodeBuffer()[jump1 + 1] = jump1Target;
 
     for (auto& stm : mStatements)
         stm.translate(translator);
 
     // and do comparison
-    code = translator.getBytecode().alloc(2);
+    code = translator.getCodeBuffer().alloc(2);
     code[0] = Op_load_local;
     code[1] = (uint8_t)mSymbol->getLocation();
 
     mStopExpression->translate(translator);
 
-    int index = translator.getBytecode().getSize();
-    int offset = target - index;
-    assert(offset >= -128 && offset < 127);
-
-    code = translator.getBytecode().alloc(2);
+    code = translator.getCodeBuffer().alloc(2);
     code[0] = Op_jmp_lt;
-    code[1] = (uint8_t)offset;
+    code[1] = target;
 }
