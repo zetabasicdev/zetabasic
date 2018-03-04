@@ -29,7 +29,7 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 CC=g++
-CFLAGS=-Wall -O0 -g -DDEBUG -std=c++14 -I$(SDL_INC_PATH)
+CFLAGS=-Wall -O0 -g -DDEBUG -std=c++14 -I./src -I./src/Compiler -I./src/Compiler/Nodes -I./src/Interpreter -I$(SDL_INC_PATH)
 LDFLAGS=-L$(SDL_LIB_PATH) $(SDL_LIBS)
 RM=rm -f
 CP=cp -f
@@ -39,14 +39,21 @@ OBJECTS=\
 	obj/Analyzer.o \
 	obj/AssignmentStatementNode.o \
 	obj/BinaryExpressionNode.o \
+	obj/CodePositionTable.o \
 	obj/Compiler.o \
 	obj/ConstantTable.o \
 	obj/EndStatementNode.o \
 	obj/ExpressionNode.o \
+	obj/FixUpTable.o \
+	obj/ForStatementNode.o \
+	obj/FunctionCallExpressionNode.o \
+	obj/GotoStatementNode.o \
 	obj/IdentifierExpressionNode.o \
 	obj/IfStatementNode.o \
+	obj/InputStatementNode.o \
 	obj/IntegerLiteralExpressionNode.o \
 	obj/Interpreter.o \
+	obj/LabelStatementNode.o \
 	obj/Lexer.o \
 	obj/ModuleNode.o \
 	obj/Node.o \
@@ -71,10 +78,24 @@ clean:
 	$(RM) $(BINARY) $(OBJECTS)
 
 $(BINARY): $(OBJECTS)
-	$(CC) -o $(BINARY) $(OBJECTS) $(LDFLAGS)
+	@$(CC) -o $(BINARY) $(OBJECTS) $(LDFLAGS)
+	@echo Linking $(BINARY)
 
 obj/%.o: src/%.cpp | obj
-	$(CC) $(CFLAGS) -o $@ -c $<
+	@$(CC) $(CFLAGS) -o $@ -c $<
+	@echo Compiling $(<F)
+
+obj/%.o: src/Compiler/%.cpp | obj
+	@$(CC) $(CFLAGS) -o $@ -c $<
+	@echo Compiling $(<F)
+
+obj/%.o: src/Compiler/Nodes/%.cpp | obj
+	@$(CC) $(CFLAGS) -o $@ -c $<
+	@echo Compiling $(<F)
+
+obj/%.o: src/Interpreter/%.cpp | obj
+	@$(CC) $(CFLAGS) -o $@ -c $<
+	@echo Compiling $(<F)
 
 obj:
 	mkdir -p $@

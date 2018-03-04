@@ -77,7 +77,7 @@ public:
 
         Iterator operator++(int)
         {
-            Iterator clone(mItem);
+            Iterator clone(mList, mIndex);
             if (mIndex < mList.getSize())
                 ++mIndex;
             return clone;

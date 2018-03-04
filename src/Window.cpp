@@ -291,8 +291,6 @@ const std::string& Window::input()
     static std::string text;
     text.clear();
 
-    int startRow = mCursorRow;
-    int startCol = mCursorCol;
     bool rehideCursor = false;
 
     if (!mCursorVisible) {
