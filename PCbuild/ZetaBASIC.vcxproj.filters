@@ -189,6 +189,9 @@
     <ClInclude Include="..\src\StringPiece.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\Bytecode.h">
+      <Filter>Header Files\Interpreter</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\main.cpp">

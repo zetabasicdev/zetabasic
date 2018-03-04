@@ -33,13 +33,14 @@
 #include <cassert>
 #include <cstdint>
 #include <vector>
+#include "Bytecode.h"
 #include "ConstantTable.h"
 #include "StringTable.h"
 
 class Program
 {
 public:
-    Program(const uint8_t* bytecode, int length, const StringTable& stringTable, const ConstantTable& constantTable)
+    Program(const BytecodeWord* bytecode, int length, const StringTable& stringTable, const ConstantTable& constantTable)
         :
         mBytecode(bytecode),
         mLength(length),
@@ -55,7 +56,7 @@ public:
         // intentionally left blank
     }
 
-    const uint8_t* getBytecode() const
+    const BytecodeWord* getBytecode() const
     {
         return mBytecode;
     }
@@ -81,7 +82,7 @@ public:
     }
 
 private:
-    const uint8_t* mBytecode;
+    const BytecodeWord* mBytecode;
     int mLength;
 
     const StringTable& mStringTable;

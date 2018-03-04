@@ -32,6 +32,7 @@
 
 #include <cstdint>
 
+#include "Bytecode.h"
 #include "CodePositionTable.h"
 #include "ConstantTable.h"
 #include "FixUpTable.h"
@@ -60,7 +61,7 @@ private:
     TObjectList<Token> mTokens;
     StringPool mStringPool;
     NodePool mNodePool;
-    TItemBuffer<uint8_t> mBytecode;
+    TItemBuffer<BytecodeWord> mBytecode;
     StringTable mStringTable;
     ConstantTable mConstantTable;
     SymbolTable mSymbolTable;

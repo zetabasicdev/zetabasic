@@ -30,7 +30,7 @@
 
 #include "Translator.h"
 
-Translator::Translator(TItemBuffer<uint8_t>& bytecode,
+Translator::Translator(TItemBuffer<BytecodeWord>& bytecode,
                        StringTable& stringTable,
                        ConstantTable& constantTable,
                        SymbolTable& symbolTable,

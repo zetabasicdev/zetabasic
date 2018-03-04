@@ -31,6 +31,8 @@
 #pragma once
 
 #include <cstdint>
+
+#include "Bytecode.h"
 #include "CodePositionTable.h"
 #include "Range.h"
 #include "TItemBuffer.h"
@@ -38,7 +40,7 @@
 class FixUpTable
 {
 public:
-    FixUpTable(TItemBuffer<uint8_t>& bytecode, CodePositionTable& codePositionTable);
+    FixUpTable(TItemBuffer<BytecodeWord>& bytecode, CodePositionTable& codePositionTable);
     ~FixUpTable();
 
     void reset();
@@ -48,7 +50,7 @@ public:
     void doFixups();
 
 private:
-    TItemBuffer<uint8_t>& mBytecode;
+    TItemBuffer<BytecodeWord>& mBytecode;
     CodePositionTable& mCodePositionTable;
 
     struct FixUpRecord

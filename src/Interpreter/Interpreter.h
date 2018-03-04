@@ -60,5 +60,5 @@ private:
     StringStack mStringStack;
     StringManager mStringManager;
 
-    void DoSysCall(uint8_t ix);
+    void DoSysCall(int ix);
 };

@@ -92,10 +92,10 @@ static void dumpBytecode(const Program& program)
 
     program.dumpStrings();
     
-    const uint8_t* code = program.getBytecode();
-    int length = program.getLength();
-    const uint8_t* start = code;
-    const uint8_t* end = code + length;
+    auto code = program.getBytecode();
+    auto length = program.getLength();
+    auto start = code;
+    auto end = code + length;
     while (code < end) {
         bool found = false;
         for (auto ix = 0; mapping[ix].name; ++ix) {
@@ -151,7 +151,7 @@ InterpreterResult Interpreter::run()
             ip = mProgram.getLength();
             break;
         case Op_reserve:
-            mStack.reserve(code[ip + 1]);
+            mStack.reserve((int)code[ip + 1]);
             ip += 2;
             break;
         case Op_dup:
@@ -159,31 +159,31 @@ InterpreterResult Interpreter::run()
             ++ip;
             break;
         case Op_load_const_str:
-            mStringStack.push(mProgram.getString(code[ip + 1]));
+            mStringStack.push(mProgram.getString((int)code[ip + 1]));
             ip += 2;
             break;
         case Op_load_const:
-            mStack.push(mProgram.getIntegerConstant(code[ip + 1]));
+            mStack.push(mProgram.getIntegerConstant((int)code[ip + 1]));
             ip += 2;
             break;
         case Op_load_local_str:
-            mStringManager.loadString(mStack.getLocal(code[ip + 1]));
+            mStringManager.loadString(mStack.getLocal((int)code[ip + 1]));
             ip += 2;
             break;
         case Op_load_local:
-            mStack.push(mStack.getLocal(code[ip + 1]));
+            mStack.push(mStack.getLocal((int)code[ip + 1]));
             ip += 2;
             break;
         case Op_store_local_str:
-            mStack.setLocal(code[ip + 1], mStringManager.storeString(mStack.getLocal(code[ip + 1])));
+            mStack.setLocal((int)code[ip + 1], mStringManager.storeString(mStack.getLocal((int)code[ip + 1])));
             ip += 2;
             break;
         case Op_store_local:
-            mStack.setLocal(code[ip + 1], mStack.pop());
+            mStack.setLocal((int)code[ip + 1], mStack.pop());
             ip += 2;
             break;
         case Op_syscall:
-            DoSysCall(code[ip + 1]);
+            DoSysCall((int)code[ip + 1]);
             ip += 2;
             break;
         case Op_add_str:
@@ -220,7 +220,7 @@ InterpreterResult Interpreter::run()
             break;
         }
         case Op_jmp:
-            ip = (code[ip + 1] << 8) + code[ip + 2];
+            ip = ((int)code[ip + 1] << 8) + (int)code[ip + 2];
             break;
         case Op_jmp_zero:
             if (mStack.pop() == 0)
@@ -256,7 +256,7 @@ InterpreterResult Interpreter::run()
     return InterpreterResult::ExecutionComplete;
 }
 
-void Interpreter::DoSysCall(uint8_t ix)
+void Interpreter::DoSysCall(int ix)
 {
     switch (ix) {
     case Syscall_printstr:

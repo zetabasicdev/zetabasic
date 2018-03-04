@@ -32,6 +32,7 @@
 
 #include <cstdint>
 
+#include "Bytecode.h"
 #include "Node.h"
 #include "TItemBuffer.h"
 
@@ -44,7 +45,7 @@ class SymbolTable;
 class Translator
 {
 public:
-    Translator(TItemBuffer<uint8_t>& bytecode,
+    Translator(TItemBuffer<BytecodeWord>& bytecode,
                StringTable& stringTable,
                ConstantTable& constantTable,
                SymbolTable& symbolTable,
@@ -55,7 +56,7 @@ public:
 
     void run();
 
-    TItemBuffer<uint8_t>& getBytecode()
+    TItemBuffer<BytecodeWord>& getBytecode()
     {
         return mBytecode;
     }
@@ -86,7 +87,7 @@ public:
     }
 
 private:
-    TItemBuffer<uint8_t>& mBytecode;
+    TItemBuffer<BytecodeWord>& mBytecode;
     StringTable& mStringTable;
     ConstantTable& mConstantTable;
     SymbolTable& mSymbolTable;

@@ -71,6 +71,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="..\src\Bytecode.h" />
     <ClInclude Include="..\src\Compiler\Analyzer.h" />
     <ClInclude Include="..\src\Compiler\CodePositionTable.h" />
     <ClInclude Include="..\src\Compiler\CompileError.h" />

@@ -28,42 +28,8 @@
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "CompileError.h"
-#include "FixUpTable.h"
+#pragma once
 
-FixUpTable::FixUpTable(TItemBuffer<BytecodeWord>& bytecode, CodePositionTable& codePositionTable)
-    :
-    mBytecode(bytecode),
-    mCodePositionTable(codePositionTable),
-    mFixUpPool(32),
-    mFixUps()
-{
-    // intentionally left blank
-}
+#include <cstdint>
 
-FixUpTable::~FixUpTable()
-{
-    // intentionally left blank
-}
-
-void FixUpTable::reset()
-{
-    mFixUpPool.reset();
-    mFixUps.reset();
-}
-
-void FixUpTable::addFixUp(int index, CodePositionType type, const StringPiece& name, const Range& range)
-{
-    mFixUps.push(mFixUpPool.alloc(index, type, name, range));
-}
-
-void FixUpTable::doFixups()
-{
-    for (auto& fixup : mFixUps) {
-        auto index = mCodePositionTable.getPosition(fixup.type, fixup.name);
-        if (index == -1)
-            throw CompileError(CompileErrorId::NameError, fixup.range, "Invalid Name");
-        mBytecode[fixup.index] = (index >> 8) & 0xff;
-        mBytecode[fixup.index + 1] = index & 0xff;
-    }
-}
+typedef uint64_t BytecodeWord;
