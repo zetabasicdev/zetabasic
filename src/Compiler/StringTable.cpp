@@ -28,10 +28,12 @@
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+#include "StringPool.h"
 #include "StringTable.h"
 
-StringTable::StringTable()
+StringTable::StringTable(StringPool& stringPool)
     :
+    mStringPool(stringPool),
     mStrings()
 {
     // intentionally left blank
@@ -53,7 +55,7 @@ int StringTable::addString(const StringPiece& string)
     for (auto ix = 0; ix < len; ++ix)
         if (mStrings[ix].exactCompareWithCase(string))
             return ix;
-    mStrings.push_back(string);
+    mStrings.push_back(mStringPool.alloc(string.getText(), string.getLength()));        // ensure null-terminated string is pushed
     return len;
 }
 

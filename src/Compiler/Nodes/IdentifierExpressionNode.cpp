@@ -65,7 +65,7 @@ void IdentifierExpressionNode::analyze(Analyzer& analyzer)
 {
     char lastChar = mName.getText()[mName.getLength() - 1];
     if (lastChar == '$')
-        mType = Typename::StringPiece;
+        mType = Typename::String;
     else
         mType = Typename::Integer;
 
@@ -74,15 +74,5 @@ void IdentifierExpressionNode::analyze(Analyzer& analyzer)
 
 void IdentifierExpressionNode::translate(Translator& translator)
 {
-    assert(mSymbol->getLocation() < 256);
-
-    if (mSymbol->getType() == Typename::StringPiece) {
-        auto code = translator.getCodeBuffer().alloc(2);
-        code[0] = Op_load_local_str;
-        code[1] = (uint8_t)mSymbol->getLocation();
-    } else {
-        auto code = translator.getCodeBuffer().alloc(2);
-        code[0] = Op_load_local;
-        code[1] = (uint8_t)mSymbol->getLocation();
-    }
+    mResultIndex = translator.loadIdentifier(mSymbol);
 }

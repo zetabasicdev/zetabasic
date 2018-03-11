@@ -63,7 +63,7 @@ Symbol* SymbolTable::getSymbol(const Range& range, const StringPiece& name, Type
         // deduce type with any suffix
         type = Typename::Integer;
         if (name[name.getLength() - 1] == '$')
-            type = Typename::StringPiece;
+            type = Typename::String;
     }
     auto symbol = mSymbolPool.alloc(mSymbols.getSize(), range, name, type);
     mSymbols.push(symbol);

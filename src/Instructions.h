@@ -53,21 +53,52 @@ struct ExecutionContext
 
 VmWord* ExecuteNop(ExecutionContext* context, VmWord* ip);
 VmWord* ExecuteEnd(ExecutionContext* context, VmWord* ip);
+
 VmWord* ExecuteReserve(ExecutionContext* context, VmWord* ip);
-VmWord* ExecuteDup(ExecutionContext* context, VmWord* ip);
-VmWord* ExecuteLoadConstStr(ExecutionContext* context, VmWord* ip);
-VmWord* ExecuteLoadConst(ExecutionContext* context, VmWord* ip);
-VmWord* ExecuteLoadLocalStr(ExecutionContext* context, VmWord* ip);
-VmWord* ExecuteLoadLocal(ExecutionContext* context, VmWord* ip);
-VmWord* ExecuteStoreLocalStr(ExecutionContext* context, VmWord* ip);
-VmWord* ExecuteStoreLocal(ExecutionContext* context, VmWord* ip);
-VmWord* ExecuteSyscall(ExecutionContext* context, VmWord* ip);
-VmWord* ExecuteAddStr(ExecutionContext* context, VmWord* ip);
-VmWord* ExecuteAddInt(ExecutionContext* context, VmWord* ip);
-VmWord* ExecuteEqStr(ExecutionContext* context, VmWord* ip);
-VmWord* ExecuteEqInt(ExecutionContext* context, VmWord* ip);
-VmWord* ExecuteOrInt(ExecutionContext* context, VmWord* ip);
+
 VmWord* ExecuteJmp(ExecutionContext* context, VmWord* ip);
 VmWord* ExecuteJmpZero(ExecutionContext* context, VmWord* ip);
-VmWord* ExecuteJmpNeq(ExecutionContext* context, VmWord* ip);
-VmWord* ExecuteJmpLt(ExecutionContext* context, VmWord* ip);
+VmWord* ExecuteJmpNotZero(ExecutionContext* context, VmWord* ip);
+
+VmWord* ExecuteLoadConstant(ExecutionContext* context, VmWord* ip);
+VmWord* ExecuteLoadString(ExecutionContext* context, VmWord* ip);
+VmWord* ExecuteAddIntegers0(ExecutionContext* context, VmWord* ip);
+VmWord* ExecuteAddIntegers1(ExecutionContext* context, VmWord* ip);
+VmWord* ExecuteAddIntegers2(ExecutionContext* context, VmWord* ip);
+VmWord* ExecuteAddIntegers3(ExecutionContext* context, VmWord* ip);
+VmWord* ExecuteAddStrings0(ExecutionContext* context, VmWord* ip);
+VmWord* ExecuteAddStrings1(ExecutionContext* context, VmWord* ip);
+VmWord* ExecuteAddStrings2(ExecutionContext* context, VmWord* ip);
+VmWord* ExecuteAddStrings3(ExecutionContext* context, VmWord* ip);
+VmWord* ExecuteEqIntegers0(ExecutionContext* context, VmWord* ip);
+VmWord* ExecuteEqIntegers1(ExecutionContext* context, VmWord* ip);
+VmWord* ExecuteEqIntegers2(ExecutionContext* context, VmWord* ip);
+VmWord* ExecuteEqIntegers3(ExecutionContext* context, VmWord* ip);
+VmWord* ExecuteEqStrings0(ExecutionContext* context, VmWord* ip);
+VmWord* ExecuteEqStrings1(ExecutionContext* context, VmWord* ip);
+VmWord* ExecuteEqStrings2(ExecutionContext* context, VmWord* ip);
+VmWord* ExecuteEqStrings3(ExecutionContext* context, VmWord* ip);
+VmWord* ExecuteGrIntegers0(ExecutionContext* context, VmWord* ip);
+VmWord* ExecuteGrIntegers1(ExecutionContext* context, VmWord* ip);
+VmWord* ExecuteGrIntegers2(ExecutionContext* context, VmWord* ip);
+VmWord* ExecuteGrIntegers3(ExecutionContext* context, VmWord* ip);
+VmWord* ExecuteOrIntegers0(ExecutionContext* context, VmWord* ip);
+VmWord* ExecuteOrIntegers1(ExecutionContext* context, VmWord* ip);
+VmWord* ExecuteOrIntegers2(ExecutionContext* context, VmWord* ip);
+VmWord* ExecuteOrIntegers3(ExecutionContext* context, VmWord* ip);
+VmWord* ExecuteMove0(ExecutionContext* context, VmWord* ip);
+VmWord* ExecuteMove1(ExecutionContext* context, VmWord* ip);
+VmWord* ExecutePrintInteger0(ExecutionContext* context, VmWord* ip);
+VmWord* ExecutePrintInteger1(ExecutionContext* context, VmWord* ip);
+VmWord* ExecutePrintInteger0Newline(ExecutionContext* context, VmWord* ip);
+VmWord* ExecutePrintInteger1Newline(ExecutionContext* context, VmWord* ip);
+VmWord* ExecutePrintString0(ExecutionContext* context, VmWord* ip);
+VmWord* ExecutePrintString1(ExecutionContext* context, VmWord* ip);
+VmWord* ExecutePrintString0Newline(ExecutionContext* context, VmWord* ip);
+VmWord* ExecutePrintString1Newline(ExecutionContext* context, VmWord* ip);
+
+VmWord* ExecuteInputInteger(ExecutionContext* context, VmWord* ip);
+VmWord* ExecuteInputString(ExecutionContext* context, VmWord* ip);
+
+VmWord* ExecuteFnLen(ExecutionContext* context, VmWord* ip);
+VmWord* ExecuteFnLeft(ExecutionContext* context, VmWord* ip);

@@ -132,53 +132,60 @@ void ForStatementNode::analyze(Analyzer& analyzer)
 
 void ForStatementNode::translate(Translator& translator)
 {
-    // setup assignment first
+    /*
+       pseudo-code
+
+       $var = $start
+       if $var > $stop then jump [3]
+       jump [1]
+    [2]
+       $var = $var + 1
+    [1]
+       <inner-statements>
+       if $var != $stop then jump [2]
+    [3]
+    */
+
+    // assign start first
     mStartExpression->translate(translator);
-    assert(mSymbol->getLocation() < 256);
+    translator.assign(mSymbol, mStartExpression->getResultIndex());
+    translator.clearTemporaries();
 
-    auto code = translator.getCodeBuffer().alloc(2);
-    code[0] = Op_store_local;
-    code[1] = (uint8_t)mSymbol->getLocation();
+    Label jump1 = translator.generateLabel();
+    Label jump2 = translator.generateLabel();
+    Label jump3 = translator.generateLabel();
 
-    // need to jump past loop increment
-    int jump1;
-    code = translator.getCodeBuffer().alloc(2, jump1);
-    code[0] = Op_jmp;
-    
-    // mark position for jump
-    int target = translator.getCodeBuffer().getSize();
+    // do initial check if loop should be skipped
+    mStopExpression->translate(translator);
+    auto result = translator.binaryOperator(Op_gr_integers0,
+                                            ResultIndex(ResultIndexType::Local, mSymbol->getLocation()),
+                                            mStopExpression->getResultIndex());
+    translator.jump(Op_jmp_not_zero, jump3, result);
 
-    // check if counter is past end
+    translator.jump(jump1);
+    translator.placeLabel(jump2);
+    translator.clearTemporaries();
 
-    // perform modification of counter
-    code = translator.getCodeBuffer().alloc(2);
-    code[0] = Op_load_local;
-    code[1] = (uint8_t)mSymbol->getLocation();
+    // perform increment of counter
+    result = translator.binaryOperator(Op_add_integers0,
+                                       ResultIndex(ResultIndexType::Local, mSymbol->getLocation()),
+                                       ResultIndex(ResultIndexType::Literal, 1));
+    translator.assign(mSymbol, result);
 
-    code = translator.getCodeBuffer().alloc(2);
-    code[0] = Op_load_const;
-    code[1] = translator.getConstantTable().addInteger(1);
+    translator.placeLabel(jump1);
+    translator.clearTemporaries();
 
-    *translator.getCodeBuffer().alloc(1) = Op_add_int;
-
-    code = translator.getCodeBuffer().alloc(2);
-    code[0] = Op_store_local;
-    code[1] = (uint8_t)mSymbol->getLocation();
-
-    int jump1Target = translator.getCodeBuffer().getSize();
-    translator.getCodeBuffer()[jump1 + 1] = jump1Target;
-
+    // execute loop statements
     for (auto& stm : mStatements)
         stm.translate(translator);
 
-    // and do comparison
-    code = translator.getCodeBuffer().alloc(2);
-    code[0] = Op_load_local;
-    code[1] = (uint8_t)mSymbol->getLocation();
-
+    // perform exit check
     mStopExpression->translate(translator);
+    result = translator.binaryOperator(Op_eq_integers0,
+                                       ResultIndex(ResultIndexType::Local, mSymbol->getLocation()),
+                                       mStopExpression->getResultIndex());
+    translator.jump(Op_jmp_zero, jump2, result);
 
-    code = translator.getCodeBuffer().alloc(2);
-    code[0] = Op_jmp_lt;
-    code[1] = target;
+    translator.placeLabel(jump3);
+    translator.clearTemporaries();
 }

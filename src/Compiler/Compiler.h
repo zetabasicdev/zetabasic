@@ -32,9 +32,7 @@
 
 #include <cstdint>
 
-#include "CodePositionTable.h"
 #include "ConstantTable.h"
-#include "FixUpTable.h"
 #include "NodePool.h"
 #include "Program.h"
 #include "StringPool.h"
@@ -65,6 +63,4 @@ private:
     StringTable mStringTable;
     ConstantTable mConstantTable;
     SymbolTable mSymbolTable;
-    CodePositionTable mCodePositionTable;
-    FixUpTable mFixUpTable;
 };

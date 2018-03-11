@@ -38,7 +38,7 @@ public:
     Stack();
     ~Stack();
 
-    void reserve(int count);
+    void reserve(int64_t count);
     void dup();
 
     void push(int64_t value);
@@ -48,9 +48,9 @@ public:
     void setLocal(int index, int64_t value);
 
 private:
-    int mCapacity;
-    int mPointer;
+    int64_t mCapacity;
+    int64_t mPointer;
     int64_t* mData;
 
-    void ensureSpace(int count);
+    void ensureSpace(int64_t count);
 };

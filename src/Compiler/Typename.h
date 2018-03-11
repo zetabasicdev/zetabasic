@@ -34,5 +34,5 @@ enum class Typename
 {
     Unknown,
     Integer,
-    StringPiece
+    String
 };

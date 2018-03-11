@@ -33,3 +33,16 @@
 #include <cstdint>
 
 typedef uint64_t VmWord;
+
+int getInstructionSize(VmWord word);
+
+// various instructions can take up to 3 operands, which all fit into a 64-bit
+// word--this means maximum operand size is 20 bits
+const int64_t OperandSizeMask = 0xfffff;
+const int64_t MaxOperandValue = 0xfffff;
+
+const int64_t Operand2Shift = 20;
+const int64_t Operand3Shift = 40;
+
+const int64_t JumpSizeMask = 0xfffffffffff;
+const int64_t JumpShift = 20;

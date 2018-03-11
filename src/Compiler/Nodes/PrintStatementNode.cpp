@@ -78,28 +78,11 @@ void PrintStatementNode::analyze(Analyzer& analyzer)
 
 void PrintStatementNode::translate(Translator& translator)
 {
+    int count = mExpressions.getLength();
+    int ix = 0;
     for (auto& expression : mExpressions) {
         expression.translate(translator);
-
-        auto ops = translator.getCodeBuffer().alloc(2);
-        ops[0] = Op_syscall;
-
-        switch (expression.getType()) {
-        case Typename::Integer:
-            ops[1] = Syscall_printi;
-            break;
-        case Typename::StringPiece:
-            ops[1] = Syscall_printstr;
-            break;
-        default:
-            assert(false);
-            break;
-        }
-    }
-
-    if (!mTrailingSemicolon) {
-        auto ops = translator.getCodeBuffer().alloc(2);
-        ops[0] = Op_syscall;
-        ops[1] = Syscall_printnl;
+        translator.print(expression.getType(), expression.getResultIndex(), ix++ < count - 1);
+        translator.clearTemporaries();
     }
 }

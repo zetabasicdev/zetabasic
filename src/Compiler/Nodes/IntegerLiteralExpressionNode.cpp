@@ -30,9 +30,7 @@
 
 #include <stdlib.h>
 
-#include "ConstantTable.h"
 #include "IntegerLiteralExpressionNode.h"
-#include "Opcodes.h"
 #include "Parser.h"
 #include "Translator.h"
 
@@ -65,10 +63,5 @@ void IntegerLiteralExpressionNode::analyze(Analyzer& analyzer)
 
 void IntegerLiteralExpressionNode::translate(Translator& translator)
 {
-    int ix = translator.getConstantTable().addInteger(mValue);
-    assert(ix >= 0 && ix < 256);
-
-    auto ops = translator.getCodeBuffer().alloc(2);
-    ops[0] = Op_load_const;
-    ops[1] = (uint8_t)ix;
+    mResultIndex = translator.loadConstant(mValue);
 }

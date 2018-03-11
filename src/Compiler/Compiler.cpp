@@ -41,11 +41,9 @@ Compiler::Compiler()
     mStringPool(),
     mNodePool(),
     mBytecode(256),
-    mStringTable(),
+    mStringTable(mStringPool),
     mConstantTable(),
-    mSymbolTable(),
-    mCodePositionTable(),
-    mFixUpTable(mBytecode, mCodePositionTable)
+    mSymbolTable()
 {
     // intentionally left blank
 }
@@ -65,8 +63,6 @@ Program Compiler::run(ISourceStream& source)
     mStringTable.reset();
     mConstantTable.reset();
     mSymbolTable.reset();
-    mCodePositionTable.reset();
-    mFixUpTable.reset();
 
     Lexer lexer(mTokenPool, mTokens, mStringPool, source);
     lexer.run();
@@ -77,10 +73,8 @@ Program Compiler::run(ISourceStream& source)
     Analyzer analyzer(mNodePool, mSymbolTable, root);
     analyzer.run();
 
-    Translator translator(mBytecode, mStringTable, mConstantTable, mSymbolTable, mCodePositionTable, mFixUpTable, root);
+    Translator translator(mBytecode, mStringTable, mConstantTable, mSymbolTable, root);
     translator.run();
-
-    mFixUpTable.doFixups();
 
     return Program(&mBytecode[0], mBytecode.getSize(), mStringTable, mConstantTable);
 }

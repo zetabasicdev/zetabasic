@@ -31,6 +31,7 @@
 #pragma once
 
 #include "Node.h"
+#include "ResultIndex.h"
 #include "TNodeList.h"
 #include "Token.h"
 #include "Typename.h"
@@ -51,9 +52,15 @@ public:
         return mType;
     }
 
+    const ResultIndex& getResultIndex() const
+    {
+        return mResultIndex;
+    }
+
     friend class TNodeList<ExpressionNode>;
 protected:
     Typename mType;
+    ResultIndex mResultIndex;
 
 private:
     ExpressionNode* mNext;

@@ -28,45 +28,12 @@
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#pragma once
+#include "Opcodes.h"
+#include "VirtualMachine.h"
 
-#include "StringPiece.h"
-#include "TObjectList.h"
-#include "TObjectPool.h"
-
-enum class CodePositionType
+int getInstructionSize(VmWord word)
 {
-    Label
-};
-
-class CodePositionTable
-{
-public:
-    CodePositionTable();
-    ~CodePositionTable();
-
-    void reset();
-
-    bool addPosition(CodePositionType type, const StringPiece& name, int index);
-    int getPosition(CodePositionType type, const StringPiece& name);
-
-private:
-    struct Position
-    {
-        CodePositionType type;
-        StringPiece name;
-        int index;
-
-        Position(CodePositionType type, const StringPiece& name, int index)
-            :
-            type(type),
-            name(name),
-            index(index)
-        {
-            // intentionally left blank
-        }
-    };
-
-    TObjectPool<Position> mPositionPool;
-    TObjectList<Position> mPositions;
-};
+    if ((word & 0xff) == 0)
+        return 1;
+    return 2;
+}

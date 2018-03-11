@@ -63,9 +63,6 @@
     <ClInclude Include="..\src\Compiler\Analyzer.h">
       <Filter>Header Files\Compiler</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\Compiler\CodePositionTable.h">
-      <Filter>Header Files\Compiler</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\Compiler\CompileError.h">
       <Filter>Header Files\Compiler</Filter>
     </ClInclude>
@@ -73,9 +70,6 @@
       <Filter>Header Files\Compiler</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Compiler\ConstantTable.h">
-      <Filter>Header Files\Compiler</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Compiler\FixUpTable.h">
       <Filter>Header Files\Compiler</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Compiler\ISourceStream.h">
@@ -195,6 +189,9 @@
     <ClInclude Include="..\src\VirtualMachine.h">
       <Filter>Header Files\Interpreter</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\ResultIndex.h">
+      <Filter>Header Files\Compiler</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\main.cpp">
@@ -206,13 +203,7 @@
     <ClCompile Include="..\src\Compiler\Analyzer.cpp">
       <Filter>Source Files\Compiler</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\Compiler\CodePositionTable.cpp">
-      <Filter>Source Files\Compiler</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\Compiler\ConstantTable.cpp">
-      <Filter>Source Files\Compiler</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\Compiler\FixUpTable.cpp">
       <Filter>Source Files\Compiler</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Compiler\Lexer.cpp">
@@ -303,6 +294,9 @@
       <Filter>Source Files\Compiler</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Instructions.cpp">
+      <Filter>Source Files\Interpreter</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Interpreter\VirtualMachine.cpp">
       <Filter>Source Files\Interpreter</Filter>
     </ClCompile>
   </ItemGroup>

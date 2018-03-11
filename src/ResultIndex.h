@@ -28,42 +28,52 @@
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "CodePositionTable.h"
+#pragma once
 
-CodePositionTable::CodePositionTable()
-    :
-    mPositionPool(32),
-    mPositions()
+#include <cstdint>
+
+enum class ResultIndexType
 {
-    // intentionally left blank
-}
+    Unknown,
+    Literal,
+    Local
+};
 
-CodePositionTable::~CodePositionTable()
+class ResultIndex
 {
-    // intentionally left blank
-}
+public:
+    ResultIndex()
+        :
+        mType(ResultIndexType::Unknown),
+        mValue(0)
+    {
+        // intentionally left blank
+    }
 
-void CodePositionTable::reset()
-{
-    mPositionPool.reset();
-    mPositions.reset();
-}
+    ResultIndex(ResultIndexType type, int value)
+        :
+        mType(type),
+        mValue(value)
+    {
+        // intentionally left blank
+    }
 
-bool CodePositionTable::addPosition(CodePositionType type, const StringPiece& name, int index)
-{
-    // make sure this name does not already exist
-    for (int ix = 0; ix < mPositions.getSize(); ++ix)
-        if (mPositions[ix].name == name)
-            return false;
+    ~ResultIndex()
+    {
+        // intentionally left blank
+    }
 
-    mPositions.push(mPositionPool.alloc(type, name, index));
-    return true;
-}
+    ResultIndexType getType() const
+    {
+        return mType;
+    }
 
-int CodePositionTable::getPosition(CodePositionType type, const StringPiece& name)
-{
-    for (int ix = 0; ix < mPositions.getSize(); ++ix)
-        if (mPositions[ix].name == name && mPositions[ix].type == type)
-            return mPositions[ix].index;
-    return -1;
-}
+    int getValue() const
+    {
+        return mValue;
+    }
+
+private:
+    ResultIndexType mType;
+    int mValue;
+};

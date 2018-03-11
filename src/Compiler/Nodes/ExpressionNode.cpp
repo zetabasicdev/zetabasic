@@ -39,7 +39,8 @@
 ExpressionNode::ExpressionNode()
     :
     Node(),
-    mType(Typename::Unknown)
+    mType(Typename::Unknown),
+    mResultIndex()
 {
     // intentionally left blank
 }

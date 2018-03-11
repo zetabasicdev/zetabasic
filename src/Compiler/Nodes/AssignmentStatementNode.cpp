@@ -79,7 +79,7 @@ void AssignmentStatementNode::analyze(Analyzer& analyzer)
     Typename type = Typename::Unknown;
     char lastChar = mName.getText()[mName.getLength() - 1];
     if (lastChar == '$')
-        type = Typename::StringPiece;
+        type = Typename::String;
     else
         type = Typename::Integer;
 
@@ -92,16 +92,6 @@ void AssignmentStatementNode::analyze(Analyzer& analyzer)
 void AssignmentStatementNode::translate(Translator& translator)
 {
     mValue->translate(translator);
-
-    assert(mSymbol->getLocation() < 256);
-
-    if (mSymbol->getType() == Typename::StringPiece) {
-        auto code = translator.getCodeBuffer().alloc(2);
-        code[0] = Op_store_local_str;
-        code[1] = (uint8_t)mSymbol->getLocation();
-    } else {
-        auto code = translator.getCodeBuffer().alloc(2);
-        code[0] = Op_store_local;
-        code[1] = (uint8_t)mSymbol->getLocation();
-    }
+    translator.assign(mSymbol, mValue->getResultIndex());
+    translator.clearTemporaries();
 }

@@ -171,7 +171,7 @@ void Window::renderCell(char ch, int row, int col, int fg, int bg)
 
     Uint32 pitch = ((SDL_Surface*)mScreen)->pitch / sizeof(Uint32);
     Uint32* pixel = (Uint32*)((SDL_Surface*)mScreen)->pixels + (((row - 1) * 16) * pitch) + ((col - 1) * 8);
-    uint8_t* chr = (uint8_t*)font8x16 + (ch * 16);
+    uint8_t* chr = (uint8_t*)font8x16 + ((uint8_t)ch * 16);
     Uint32 colr[2] = { palette[bg], palette[fg] };
 
     for (int y = 0; y < 16; ++y) {

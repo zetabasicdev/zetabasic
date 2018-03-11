@@ -33,10 +33,12 @@
 #include <vector>
 #include "StringPiece.h"
 
+class StringPool;
+
 class StringTable
 {
 public:
-    StringTable();
+    StringTable(StringPool& stringPool);
     ~StringTable();
 
     void reset();
@@ -48,5 +50,6 @@ public:
     void dump() const;
 
 private:
+    StringPool& mStringPool;
     std::vector<StringPiece> mStrings;
 };

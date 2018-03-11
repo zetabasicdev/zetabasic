@@ -84,41 +84,6 @@ void InputStatementNode::translate(Translator& translator)
 {
     mPromptExpression->translate(translator);
 
-    auto ops = translator.getCodeBuffer().alloc(2);
-    ops[0] = Op_syscall;
-    switch (mPromptExpression->getType()) {
-    case Typename::Integer:
-        ops[1] = Syscall_printi;
-        break;
-    case Typename::StringPiece:
-        ops[1] = Syscall_printstr;
-        break;
-    default:
-        assert(false);
-        break;
-    }
-
-    ops = translator.getCodeBuffer().alloc(2);
-    ops[0] = Op_syscall;
-    switch (mSymbol->getType()) {
-    case Typename::Integer:
-        ops[1] = Syscall_inputi;
-        break;
-    case Typename::StringPiece:
-        ops[1] = Syscall_inputstr;
-        break;
-    default:
-        assert(false);
-        break;
-    }
-
-    if (mSymbol->getType() == Typename::StringPiece) {
-        auto code = translator.getCodeBuffer().alloc(2);
-        code[0] = Op_store_local_str;
-        code[1] = (uint8_t)mSymbol->getLocation();
-    } else {
-        auto code = translator.getCodeBuffer().alloc(2);
-        code[0] = Op_store_local;
-        code[1] = (uint8_t)mSymbol->getLocation();
-    }
+    translator.print(mPromptExpression->getType(), mPromptExpression->getResultIndex(), true);
+    translator.input(mSymbol);
 }

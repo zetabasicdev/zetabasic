@@ -49,101 +49,58 @@ Interpreter::Interpreter(Window& window, const Program& program)
 {
     memcpy(mCode, mProgram.getCode(), sizeof(VmWord) * mCodeSize);
 
-    static struct {
-        VmWord opcode;
-        InstructionExecutor func;
-        int arguments;
-    } translationTable[] = {
-        { Op_nop, ExecuteNop, 0 },
-        { Op_end, ExecuteEnd, 0 },
-        { Op_reserve, ExecuteReserve, 1 },
-        { Op_dup, ExecuteDup, 0 },
-        { Op_load_const_str, ExecuteLoadConstStr, 1 },
-        { Op_load_const, ExecuteLoadConst, 1 },
-        { Op_load_local_str, ExecuteLoadLocalStr, 1 },
-        { Op_load_local, ExecuteLoadLocal, 1 },
-        { Op_store_local_str, ExecuteStoreLocalStr, 1 },
-        { Op_store_local, ExecuteStoreLocal, 1 },
-        { Op_syscall, ExecuteSyscall, 1 },
-        { Op_add_str, ExecuteAddStr, 0 },
-        { Op_add_int, ExecuteAddInt, 0 },
-        { Op_eq_str, ExecuteEqStr, 0 },
-        { Op_eq_int, ExecuteEqInt, 0 },
-        { Op_or_int, ExecuteOrInt, 0 },
-        { Op_jmp, ExecuteJmp, 1 },
-        { Op_jmp_zero, ExecuteJmpZero, 1 },
-        { Op_jmp_neq, ExecuteJmpNeq, 1 },
-        { Op_jmp_lt, ExecuteJmpLt, 1 },
-        { 0, nullptr, 0 }
+    static InstructionExecutor translationTable[] = {
+        ExecuteNop,
+        ExecuteEnd,
+        ExecuteReserve,
+        ExecuteJmp,
+        ExecuteJmpZero,
+        ExecuteJmpNotZero,
+        ExecuteLoadConstant,
+        ExecuteLoadString,
+        ExecuteAddIntegers0,
+        ExecuteAddIntegers1,
+        ExecuteAddIntegers2,
+        ExecuteAddIntegers3,
+        ExecuteAddStrings0,
+        ExecuteAddStrings1,
+        ExecuteAddStrings2,
+        ExecuteAddStrings3,
+        ExecuteEqIntegers0,
+        ExecuteEqIntegers1,
+        ExecuteEqIntegers2,
+        ExecuteEqIntegers3,
+        ExecuteEqStrings0,
+        ExecuteEqStrings1,
+        ExecuteEqStrings2,
+        ExecuteEqStrings3,
+        ExecuteGrIntegers0,
+        ExecuteGrIntegers1,
+        ExecuteGrIntegers2,
+        ExecuteGrIntegers3,
+        ExecuteOrIntegers0,
+        ExecuteOrIntegers1,
+        ExecuteOrIntegers2,
+        ExecuteOrIntegers3,
+        ExecuteMove0,
+        ExecuteMove1,
+        ExecutePrintInteger0,
+        ExecutePrintInteger1,
+        ExecutePrintInteger0Newline,
+        ExecutePrintInteger1Newline,
+        ExecutePrintString0,
+        ExecutePrintString1,
+        ExecutePrintString0Newline,
+        ExecutePrintString1Newline,
+        ExecuteInputInteger,
+        ExecuteInputString,
+        ExecuteFnLen,
+        ExecuteFnLeft
     };
     // translate code into applicable function calls
-    for (int ix = 0; ix < mCodeSize; ++ix) {
-        printf("[%04X] ", ix);
-        switch (mCode[ix]) {
-        case Op_nop:
-            printf("nop\n");
-        case Op_end:
-            printf("end\n");
-            break;
-        case Op_reserve:
-            printf("reserve %d\n", (int)mCode[ix + 1]);
-            break;
-        case Op_dup:
-            printf("dup\n");
-            break;
-        case Op_load_const_str:
-            printf("load.const.str #%d\n", (int)mCode[ix + 1]);
-            break;
-        case Op_load_const:
-            printf("load.const #%d\n", (int)mCode[ix + 1]);
-            break;
-        case Op_load_local_str:
-            printf("load.local.str #%d\n", (int)mCode[ix + 1]);
-            break;
-        case Op_load_local:
-            printf("load.local #%d\n", (int)mCode[ix + 1]);
-            break;
-        case Op_store_local_str:
-            printf("store.local.str #%d\n", (int)mCode[ix + 1]);
-            break;
-        case Op_store_local:
-            printf("store.local #%d\n", (int)mCode[ix + 1]);
-            break;
-        case Op_syscall:
-            printf("syscall #%d\n", (int)mCode[ix + 1]);
-            break;
-        case Op_add_str:
-            printf("add.str\n");
-            break;
-        case Op_add_int:
-            printf("add.int\n");
-            break;
-        case Op_eq_str:
-            printf("equals.str\n");
-            break;
-        case Op_eq_int:
-            printf("equals.int\n");
-            break;
-        case Op_or_int:
-            printf("or.int\n");
-            break;
-        case Op_jmp:
-            printf("jump [%04X]\n", (int)mCode[ix + 1]);
-            break;
-        case Op_jmp_zero:
-            printf("jump.if.zero [%04X]\n", (int)mCode[ix + 1]);
-            break;
-        case Op_jmp_neq:
-            printf("jump.if.neq [%04X]\n", (int)mCode[ix + 1]);
-            break;
-        case Op_jmp_lt:
-            printf("jump.if.lt [%04X]\n", (int)mCode[ix + 1]);
-            break;
-        default:
-            assert(false);
-        }
-        int count = translationTable[mCode[ix]].arguments;
-        mCode[ix] = (VmWord)translationTable[mCode[ix]].func;
+    for (int ix = 0; ix < mCodeSize; ) {
+        int count = getInstructionSize(mCode[ix]);
+        mCode[ix] = (VmWord)translationTable[mCode[ix] >> 8];
         ix += count;
         assert(ix <= mCodeSize);
     }
@@ -167,6 +124,7 @@ InterpreterResult Interpreter::run()
     VmWord* ip = &mCode[0];
 
     do {
+        //printf("%06llX\n", (uint64_t)(ip - mCode));
         ip = ((InstructionExecutor)*ip)(&context, ip);
     } while (ip != nullptr);
 

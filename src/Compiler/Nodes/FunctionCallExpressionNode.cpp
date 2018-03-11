@@ -39,11 +39,11 @@ static struct {
     TokenTag tag;
     StringPiece name;
     StringPiece arguments;
-    int syscall;
+    uint64_t opcode;
     Typename returnType;
 } builtinFunctions[] = {
-    { TokenTag::Key_Len, "LEN", "S", Syscall_len, Typename::Integer },
-    { TokenTag::Key_LeftS, "LEFT$", "SI", Syscall_left_str, Typename::StringPiece },
+    { TokenTag::Key_Len, "LEN", "S", Op_fn_len, Typename::Integer },
+    { TokenTag::Key_LeftS, "LEFT$", "SI", Op_fn_left, Typename::String },
     { TokenTag::None, "", "", 0, Typename::Unknown }
 };
 
@@ -109,7 +109,7 @@ void FunctionCallExpressionNode::analyze(Analyzer& analyzer)
 
                 switch (builtinFunctions[ix].arguments[i]) {
                 case 'S':
-                    if (arg.getType() != Typename::StringPiece)
+                    if (arg.getType() != Typename::String)
                         throw CompileError(CompileErrorId::TypeError, arg.getRange(), "Expected StringPiece Expression");
                     break;
                 case 'I':
@@ -135,14 +135,12 @@ void FunctionCallExpressionNode::translate(Translator& translator)
 {
     for (auto& arg : mArguments)
         arg.translate(translator);
-
-    uint8_t syscall = 0;
-    for (int ix = 0; builtinFunctions[ix].tag != TokenTag::None && syscall == 0; ++ix)
+    
+    uint64_t op = 0;
+    for (int ix = 0; builtinFunctions[ix].tag != TokenTag::None && op == 0; ++ix)
         if (builtinFunctions[ix].name == mName)
-            syscall = builtinFunctions[ix].syscall;
-    assert(syscall != 0);
+            op = builtinFunctions[ix].opcode;
+    assert(op != 0);
 
-    auto code = translator.getCodeBuffer().alloc(2);
-    code[0] = Op_syscall;
-    code[1] = syscall;
+    mResultIndex = translator.builtInFunction(op, mArguments);
 }

@@ -59,5 +59,5 @@ void EndStatementNode::analyze(Analyzer& analyzer)
 
 void EndStatementNode::translate(Translator& translator)
 {
-    *translator.getCodeBuffer().alloc(1) = Op_end;
+    translator.end();
 }

@@ -49,7 +49,7 @@ Stack::~Stack()
     delete[] mData;
 }
 
-void Stack::reserve(int count)
+void Stack::reserve(int64_t count)
 {
     ensureSpace(count);
     memset(&mData[mPointer], 0, sizeof(int64_t) * count);
@@ -94,7 +94,7 @@ void Stack::setLocal(int index, int64_t value)
     mData[index] = value;
 }
 
-void Stack::ensureSpace(int count)
+void Stack::ensureSpace(int64_t count)
 {
     assert(count < kDefaultStackCapacity);
 

@@ -29,6 +29,7 @@
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "StringManager.h"
+#include "StringPiece.h"
 #include "StringStack.h"
 
 StringManager::StringManager(StringStack& stringStack)
@@ -44,6 +45,37 @@ StringManager::~StringManager()
         delete instance->data;
         delete instance;
     }
+}
+
+int64_t StringManager::newString(const StringPiece& string)
+{
+    return newInstance(string.getText(), string.getLength());
+}
+
+void StringManager::getString(int64_t desc, const char*& text, int& length)
+{
+    // check for uninitialized strings first
+    if (desc == 0) {
+        text = "";
+        length = 0;
+        return;
+    }
+
+    StringObject* instance = (StringObject*)desc;
+    text = instance->data;
+    length = instance->length;
+}
+
+int64_t StringManager::addStrings(const char* left, int leftLength, const char* right, int rightLength)
+{
+    int newLength = leftLength + rightLength;
+    static std::vector<char> buf;
+    buf.resize(newLength);
+    if (leftLength > 0)
+        memcpy(&buf[0], left, leftLength);
+    if (rightLength > 0)
+        memcpy(&buf[leftLength], right, rightLength);
+    return newInstance(&buf[0], newLength);
 }
 
 int64_t StringManager::storeString(int64_t desc)

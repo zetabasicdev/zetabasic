@@ -31,16 +31,22 @@
 #pragma once
 
 #include <cstdint>
-
+#include <unordered_map>
+#include "ResultIndex.h"
 #include "Node.h"
+#include "StringPiece.h"
+#include "SymbolTable.h"
 #include "TItemBuffer.h"
+#include "TNodeList.h"
+#include "Typename.h"
 #include "VirtualMachine.h"
 
-class CodePositionTable;
+typedef int Label;
+
 class ConstantTable;
-class FixUpTable;
+class ExpressionNode;
 class StringTable;
-class SymbolTable;
+
 
 class Translator
 {
@@ -49,49 +55,58 @@ public:
                StringTable& stringTable,
                ConstantTable& constantTable,
                SymbolTable& symbolTable,
-               CodePositionTable& codePositionTable,
-               FixUpTable& fixUpTable,
                Node& root);
     ~Translator();
 
     void run();
 
-    TItemBuffer<VmWord>& getCodeBuffer()
-    {
-        return mCodeBuffer;
-    }
+    void startCodeBody();
+    void endCodeBody();
 
-    StringTable& getStringTable()
-    {
-        return mStringTable;
-    }
+    ResultIndex loadConstant(int64_t value);
+    ResultIndex loadStringConstant(const StringPiece& value);
+    ResultIndex loadIdentifier(Symbol* symbol);
+    ResultIndex binaryOperator(uint64_t baseOpcode, const ResultIndex& lhs, const ResultIndex& rhs);
 
-    ConstantTable& getConstantTable()
-    {
-        return mConstantTable;
-    }
+    void jump(const StringPiece& name);
+    void jump(Label label);
+    void jump(uint64_t opcode, Label label, const ResultIndex& result);
 
-    SymbolTable& getSymbolTable()
-    {
-        return mSymbolTable;
-    }
+    void assign(Symbol* target, const ResultIndex& index);
+    ResultIndex ensureLocal(Typename type, const ResultIndex& index);
 
-    CodePositionTable& getCodePositionTable()
-    {
-        return mCodePositionTable;
-    }
+    void print(Typename type, const ResultIndex& index, bool trailingSemicolon);
+    void input(Symbol* target);
 
-    FixUpTable& getFixUpTable()
-    {
-        return mFixUpTable;
-    }
+    void end();
+
+    ResultIndex builtInFunction(uint64_t opcode, TNodeList<ExpressionNode>& arguments);
+
+    void placeLabel(const StringPiece& name);
+    void placeLabel(Label label);
+
+    Label generateLabel();
+
+    void fixupLabels();
+
+    void clearTemporaries();
 
 private:
     TItemBuffer<VmWord>& mCodeBuffer;
     StringTable& mStringTable;
     ConstantTable& mConstantTable;
     SymbolTable& mSymbolTable;
-    CodePositionTable& mCodePositionTable;
-    FixUpTable& mFixUpTable;
     Node& mRoot;
+
+    int mReserveIndex;
+
+    std::unordered_map<std::string, Label> mNamedLabels;
+    std::vector<int> mLabelTargets;
+
+    int mNextTemporary;
+    int mMaxTemporaries;
+
+    int getTemporary();
+    Label getLabelByName(const StringPiece& name);
+    void dumpCode();
 };

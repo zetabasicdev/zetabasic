@@ -28,7 +28,6 @@
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "FixUpTable.h"
 #include "GotoStatementNode.h"
 #include "Opcodes.h"
 #include "Parser.h"
@@ -68,7 +67,5 @@ void GotoStatementNode::analyze(Analyzer& analyzer)
 
 void GotoStatementNode::translate(Translator& translator)
 {
-    int index = 0;
-    *translator.getCodeBuffer().alloc(2, index) = Op_jmp;
-    translator.getFixUpTable().addFixUp(index + 1, CodePositionType::Label, mName, mRange);
+    translator.jump(mName);
 }

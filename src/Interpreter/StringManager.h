@@ -33,6 +33,7 @@
 #include <cstdint>
 #include <vector>
 
+class StringPiece;
 class StringStack;
 
 class StringManager
@@ -40,6 +41,10 @@ class StringManager
 public:
     StringManager(StringStack& stringStack);
     ~StringManager();
+
+    int64_t newString(const StringPiece& string);
+    void getString(int64_t desc, const char*& text, int& length);
+    int64_t addStrings(const char* left, int leftLength, const char* right, int rightLength);
 
     int64_t storeString(int64_t desc);
     void loadString(int64_t desc);

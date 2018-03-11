@@ -77,11 +77,10 @@ void IfStatementNode::translate(Translator& translator)
 {
     mExpression->translate(translator);
 
-    int index = 0;
-    auto code = translator.getCodeBuffer().alloc(2, index);
-    code[0] = Op_jmp_zero;
+    auto label = translator.generateLabel();
 
+    translator.jump(Op_jmp_zero, label, mExpression->getResultIndex());
     mStatement->translate(translator);
-
-    translator.getCodeBuffer()[index + 1] = translator.getCodeBuffer().getSize();
+    translator.placeLabel(label);
+    translator.clearTemporaries();
 }

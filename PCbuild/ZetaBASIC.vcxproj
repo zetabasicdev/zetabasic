@@ -71,13 +71,12 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="..\src\ResultIndex.h" />
     <ClInclude Include="..\src\VirtualMachine.h" />
     <ClInclude Include="..\src\Compiler\Analyzer.h" />
-    <ClInclude Include="..\src\Compiler\CodePositionTable.h" />
     <ClInclude Include="..\src\Compiler\CompileError.h" />
     <ClInclude Include="..\src\Compiler\Compiler.h" />
     <ClInclude Include="..\src\Compiler\ConstantTable.h" />
-    <ClInclude Include="..\src\Compiler\FixUpTable.h" />
     <ClInclude Include="..\src\Compiler\ISourceStream.h" />
     <ClInclude Include="..\src\Compiler\Lexer.h" />
     <ClInclude Include="..\src\Compiler\Nodes\AssignmentStatementNode.h" />
@@ -128,10 +127,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\Compiler\Analyzer.cpp" />
-    <ClCompile Include="..\src\Compiler\CodePositionTable.cpp" />
     <ClCompile Include="..\src\Compiler\Compiler.cpp" />
     <ClCompile Include="..\src\Compiler\ConstantTable.cpp" />
-    <ClCompile Include="..\src\Compiler\FixUpTable.cpp" />
     <ClCompile Include="..\src\Compiler\Lexer.cpp" />
     <ClCompile Include="..\src\Compiler\Nodes\AssignmentStatementNode.cpp" />
     <ClCompile Include="..\src\Compiler\Nodes\BinaryExpressionNode.cpp" />
@@ -161,6 +158,7 @@
     <ClCompile Include="..\src\Interpreter\Stack.cpp" />
     <ClCompile Include="..\src\Interpreter\StringManager.cpp" />
     <ClCompile Include="..\src\Interpreter\StringStack.cpp" />
+    <ClCompile Include="..\src\Interpreter\VirtualMachine.cpp" />
     <ClCompile Include="..\src\main.cpp" />
     <ClCompile Include="..\src\Window.cpp" />
   </ItemGroup>
