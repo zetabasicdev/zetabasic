@@ -31,6 +31,7 @@
 #pragma once
 
 #include "ExpressionNode.h"
+#include "IdentifierNode.h"
 
 class Symbol;
 
@@ -47,6 +48,5 @@ public:
     void translate(Translator& translator);
 
 private:
-    StringPiece mName;
-    Symbol* mSymbol;
+    IdentifierNode mIdentifier;
 };

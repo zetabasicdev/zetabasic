@@ -39,8 +39,7 @@
 
 AssignmentStatementNode::AssignmentStatementNode()
     :
-    mName(),
-    mValue(nullptr)
+    mIdentifier()
 {
     // intentionally left blank
 }
@@ -55,11 +54,7 @@ void AssignmentStatementNode::parse(Parser& parser)
     assert(parser.getToken().getTag() == TokenTag::Key_Let);
     parser.eatToken();
 
-    if (parser.getToken().getId() != TokenId::Name || parser.getToken().getTag() != TokenTag::None)
-        parser.raiseError(CompileErrorId::SyntaxError, "Expected Identifier");
-
-    mName = parser.getToken().getText();
-    parser.eatToken();
+    mIdentifier.parse(parser);
 
     if (parser.getToken().getTag() != TokenTag::Sym_Equals)
         parser.raiseError(CompileErrorId::SyntaxError, "Expected =");
@@ -74,24 +69,16 @@ void AssignmentStatementNode::parse(Parser& parser)
 
 void AssignmentStatementNode::analyze(Analyzer& analyzer)
 {
+    mIdentifier.analyze(analyzer);
     mValue->analyze(analyzer);
 
-    Typename type = Typename::Unknown;
-    char lastChar = mName.getText()[mName.getLength() - 1];
-    if (lastChar == '$')
-        type = Typename::String;
-    else
-        type = Typename::Integer;
-
-    if (type != mValue->getType())
+    if (mIdentifier.getSymbol()->getType() != mValue->getType())
         throw CompileError(CompileErrorId::TypeError, mRange, "Incompatible Types For Assignment");
-
-    mSymbol = analyzer.getSymbolTable().getSymbol(mRange, mName, type);
 }
 
 void AssignmentStatementNode::translate(Translator& translator)
 {
     mValue->translate(translator);
-    translator.assign(mSymbol, mValue->getResultIndex());
+    translator.assign(mIdentifier.getSymbol(), mValue->getResultIndex());
     translator.clearTemporaries();
 }

@@ -31,37 +31,45 @@
 #include <cassert>
 
 #include "Analyzer.h"
-#include "IdentifierExpressionNode.h"
-#include "Opcodes.h"
+#include "IdentifierNode.h"
 #include "Parser.h"
 #include "Symbol.h"
 #include "SymbolTable.h"
 #include "Translator.h"
 
-IdentifierExpressionNode::IdentifierExpressionNode()
+IdentifierNode::IdentifierNode()
     :
-    mIdentifier()
+    mName(),
+    mSymbol(nullptr)
 {
     // intentionally left blank
 }
 
-IdentifierExpressionNode::~IdentifierExpressionNode()
+IdentifierNode::~IdentifierNode()
 {
     // intentionally left blank
 }
 
-void IdentifierExpressionNode::parse(Parser& parser)
+void IdentifierNode::parse(Parser& parser)
 {
-    mIdentifier.parse(parser);
+    if (parser.getToken().getId() != TokenId::Name || parser.getToken().getTag() != TokenTag::None)
+        parser.raiseError(CompileErrorId::SyntaxError, "Expected Identifier");
+    mName = parser.getToken().getText();
+    parser.eatToken();
 }
 
-void IdentifierExpressionNode::analyze(Analyzer& analyzer)
+void IdentifierNode::analyze(Analyzer& analyzer)
 {
-    mIdentifier.analyze(analyzer);
-    mType = mIdentifier.getSymbol()->getType();
+    Typename type = Typename::Integer;
+
+    char lastChar = mName.getText()[mName.getLength() - 1];
+    if (lastChar == '$')
+        type = Typename::String;
+
+    mSymbol = analyzer.getSymbolTable().getSymbol(mRange, mName, type);
 }
 
-void IdentifierExpressionNode::translate(Translator& translator)
+void IdentifierNode::translate(Translator& translator)
 {
-    mResultIndex = translator.loadIdentifier(mIdentifier.getSymbol());
+    // intentionally left blank
 }

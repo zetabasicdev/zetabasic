@@ -28,40 +28,31 @@
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include <cassert>
+#pragma once
 
-#include "Analyzer.h"
-#include "IdentifierExpressionNode.h"
-#include "Opcodes.h"
-#include "Parser.h"
-#include "Symbol.h"
-#include "SymbolTable.h"
-#include "Translator.h"
+#include "Node.h"
+#include "StringPiece.h"
 
-IdentifierExpressionNode::IdentifierExpressionNode()
+class Symbol;
+
+class IdentifierNode
     :
-    mIdentifier()
+    public Node
 {
-    // intentionally left blank
-}
+public:
+    IdentifierNode();
+    virtual ~IdentifierNode();
 
-IdentifierExpressionNode::~IdentifierExpressionNode()
-{
-    // intentionally left blank
-}
+    void parse(Parser& parser);
+    void analyze(Analyzer& analyzer);
+    void translate(Translator& translator);
 
-void IdentifierExpressionNode::parse(Parser& parser)
-{
-    mIdentifier.parse(parser);
-}
+    Symbol* getSymbol()
+    {
+        return mSymbol;
+    }
 
-void IdentifierExpressionNode::analyze(Analyzer& analyzer)
-{
-    mIdentifier.analyze(analyzer);
-    mType = mIdentifier.getSymbol()->getType();
-}
-
-void IdentifierExpressionNode::translate(Translator& translator)
-{
-    mResultIndex = translator.loadIdentifier(mIdentifier.getSymbol());
-}
+private:
+    StringPiece mName;
+    Symbol* mSymbol;
+};

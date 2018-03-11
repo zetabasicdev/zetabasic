@@ -71,6 +71,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="..\src\Compiler\Nodes\IdentifierNode.h" />
     <ClInclude Include="..\src\ResultIndex.h" />
     <ClInclude Include="..\src\VirtualMachine.h" />
     <ClInclude Include="..\src\Compiler\Analyzer.h" />
@@ -138,6 +139,7 @@
     <ClCompile Include="..\src\Compiler\Nodes\FunctionCallExpressionNode.cpp" />
     <ClCompile Include="..\src\Compiler\Nodes\GotoStatementNode.cpp" />
     <ClCompile Include="..\src\Compiler\Nodes\IdentifierExpressionNode.cpp" />
+    <ClCompile Include="..\src\Compiler\Nodes\IdentifierNode.cpp" />
     <ClCompile Include="..\src\Compiler\Nodes\IfStatementNode.cpp" />
     <ClCompile Include="..\src\Compiler\Nodes\InputStatementNode.cpp" />
     <ClCompile Include="..\src\Compiler\Nodes\IntegerLiteralExpressionNode.cpp" />

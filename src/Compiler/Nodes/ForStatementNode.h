@@ -30,6 +30,7 @@
 
 #pragma once
 
+#include "IdentifierNode.h"
 #include "StatementNode.h"
 #include "StringPiece.h"
 #include "TNodeList.h"
@@ -50,8 +51,7 @@ public:
     void translate(Translator& translator);
 
 private:
-    StringPiece mName;
-    Symbol* mSymbol;
+    IdentifierNode mIdentifier;
     ExpressionNode* mStartExpression;
     ExpressionNode* mStopExpression;
     StringPiece mNextName;

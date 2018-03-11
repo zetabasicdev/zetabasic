@@ -30,11 +30,11 @@
 
 #pragma once
 
+#include "IdentifierNode.h"
 #include "StatementNode.h"
 #include "StringPiece.h"
 
 class ExpressionNode;
-class Symbol;
 
 class InputStatementNode
     :
@@ -50,6 +50,5 @@ public:
 
 private:
     ExpressionNode* mPromptExpression;
-    StringPiece mName;
-    Symbol* mSymbol;
+    IdentifierNode mIdentifier;
 };

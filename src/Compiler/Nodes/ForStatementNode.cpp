@@ -44,8 +44,7 @@
 ForStatementNode::ForStatementNode()
     :
     StatementNode(),
-    mName(),
-    mSymbol(nullptr),
+    mIdentifier(),
     mStartExpression(nullptr),
     mStopExpression(nullptr),
     mNextName(),
@@ -64,10 +63,7 @@ void ForStatementNode::parse(Parser& parser)
     assert(parser.getToken().getTag() == TokenTag::Key_For);
     parser.eatToken();
 
-    if (parser.getToken().getId() != TokenId::Name || parser.getToken().getTag() != TokenTag::None)
-        parser.raiseError(CompileErrorId::SyntaxError, "Expected Identifier");
-    mName = parser.getToken().getText();
-    parser.eatToken();
+    mIdentifier.parse(parser);
 
     if (parser.getToken().getTag() != TokenTag::Sym_Equals)
         parser.raiseError(CompileErrorId::SyntaxError, "Expected =");
@@ -106,8 +102,7 @@ void ForStatementNode::parse(Parser& parser)
 
 void ForStatementNode::analyze(Analyzer& analyzer)
 {
-    if (mName != mNextName)
-        throw CompileError(CompileErrorId::NameError, mRange, "Name Mismatch In NEXT");
+    mIdentifier.analyze(analyzer);
 
     mStartExpression->analyze(analyzer);
     mStopExpression->analyze(analyzer);
@@ -121,13 +116,15 @@ void ForStatementNode::analyze(Analyzer& analyzer)
         throw CompileError(CompileErrorId::TypeError, mRange, "Mismatched Start And Stop Types");
 
     // identifier expression must match
-    if (mName[mName.getLength() - 1] == '$')
+    auto identifierSymbol = mIdentifier.getSymbol();
+    if (identifierSymbol->getType() != Typename::Integer)
         throw CompileError(CompileErrorId::TypeError, mRange, "Expected Integer Identifier Type");
-
-    mSymbol = analyzer.getSymbolTable().getSymbol(mRange, mName, Typename::Integer);
 
     for (auto& stm : mStatements)
         stm.analyze(analyzer);
+
+    if (identifierSymbol->getName() != mNextName)
+        throw CompileError(CompileErrorId::NameError, mRange, "Name Mismatch In NEXT");
 }
 
 void ForStatementNode::translate(Translator& translator)
@@ -148,7 +145,7 @@ void ForStatementNode::translate(Translator& translator)
 
     // assign start first
     mStartExpression->translate(translator);
-    translator.assign(mSymbol, mStartExpression->getResultIndex());
+    translator.assign(mIdentifier.getSymbol(), mStartExpression->getResultIndex());
     translator.clearTemporaries();
 
     Label jump1 = translator.generateLabel();
@@ -158,7 +155,7 @@ void ForStatementNode::translate(Translator& translator)
     // do initial check if loop should be skipped
     mStopExpression->translate(translator);
     auto result = translator.binaryOperator(Op_gr_integers0,
-                                            ResultIndex(ResultIndexType::Local, mSymbol->getLocation()),
+                                            ResultIndex(ResultIndexType::Local, mIdentifier.getSymbol()->getLocation()),
                                             mStopExpression->getResultIndex());
     translator.jump(Op_jmp_not_zero, jump3, result);
 
@@ -168,9 +165,9 @@ void ForStatementNode::translate(Translator& translator)
 
     // perform increment of counter
     result = translator.binaryOperator(Op_add_integers0,
-                                       ResultIndex(ResultIndexType::Local, mSymbol->getLocation()),
+                                       ResultIndex(ResultIndexType::Local, mIdentifier.getSymbol()->getLocation()),
                                        ResultIndex(ResultIndexType::Literal, 1));
-    translator.assign(mSymbol, result);
+    translator.assign(mIdentifier.getSymbol(), result);
 
     translator.placeLabel(jump1);
     translator.clearTemporaries();
@@ -182,7 +179,7 @@ void ForStatementNode::translate(Translator& translator)
     // perform exit check
     mStopExpression->translate(translator);
     result = translator.binaryOperator(Op_eq_integers0,
-                                       ResultIndex(ResultIndexType::Local, mSymbol->getLocation()),
+                                       ResultIndex(ResultIndexType::Local, mIdentifier.getSymbol()->getLocation()),
                                        mStopExpression->getResultIndex());
     translator.jump(Op_jmp_zero, jump2, result);
 

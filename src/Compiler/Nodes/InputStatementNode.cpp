@@ -41,8 +41,7 @@
 InputStatementNode::InputStatementNode()
     :
     mPromptExpression(nullptr),
-    mName(),
-    mSymbol(nullptr)
+    mIdentifier()
 {
     // intentionally left blank
 }
@@ -65,10 +64,7 @@ void InputStatementNode::parse(Parser& parser)
         parser.raiseError(CompileErrorId::SyntaxError, "Expected Semicolon");
     parser.eatToken();
 
-    if (parser.getToken().getId() != TokenId::Name || parser.getToken().getTag() != TokenTag::None)
-        parser.raiseError(CompileErrorId::SyntaxError, "Expected Identifier");
-    mName = parser.getToken().getText();
-    parser.eatToken();
+    mIdentifier.parse(parser);
 
     parser.eatEndOfLine();
 }
@@ -76,8 +72,7 @@ void InputStatementNode::parse(Parser& parser)
 void InputStatementNode::analyze(Analyzer& analyzer)
 {
     mPromptExpression->analyze(analyzer);
-
-    mSymbol = analyzer.getSymbolTable().getSymbol(mRange, mName, Typename::Unknown);
+    mIdentifier.analyze(analyzer);
 }
 
 void InputStatementNode::translate(Translator& translator)
@@ -85,5 +80,5 @@ void InputStatementNode::translate(Translator& translator)
     mPromptExpression->translate(translator);
 
     translator.print(mPromptExpression->getType(), mPromptExpression->getResultIndex(), true);
-    translator.input(mSymbol);
+    translator.input(mIdentifier.getSymbol());
 }
