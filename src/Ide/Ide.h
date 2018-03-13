@@ -30,6 +30,7 @@
 
 #pragma once
 
+#include "Editor.h"
 #include "StatusBar.h"
 #include "Window.h"
 
@@ -44,4 +45,5 @@ public:
 private:
     Window mWindow;
     StatusBar mStatusBar;
+    Editor mEditor;
 };

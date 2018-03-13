@@ -28,30 +28,18 @@
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "StatusBar.h"
-#include "Window.h"
+#pragma once
 
-StatusBar::StatusBar(Window& window)
-    :
-    mWindow(window),
-    mRow(0),
-    mCol(0)
+class EditBuffer;
+class Window;
+
+class EditView
 {
-    // intentionally left blank
-}
+public:
+    EditView(Window& window, EditBuffer& buffer);
+    ~EditView();
 
-StatusBar::~StatusBar()
-{
-    // intentionally left blank
-}
-
-void StatusBar::draw()
-{
-    mWindow.color(1, 3);
-    mWindow.locate(25, 1);
-    //mWindow.printn("", 80);
-    mWindow.print("  F1=New  F2=Load  F3=Save  F4=Output  F5=Run  F10=Quit              ");
-
-    mWindow.locate(25, 70);
-    mWindow.printf("%06d:%03d ", mRow, mCol);
-}
+private:
+    Window& mWindow;
+    EditBuffer& mBuffer;
+};

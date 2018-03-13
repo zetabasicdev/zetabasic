@@ -29,3 +29,21 @@
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #pragma once
+
+class EditBuffer;
+class EditView;
+class Window;
+
+class Editor
+{
+public:
+    Editor(Window& window);
+    ~Editor();
+
+    void draw();
+
+private:
+    Window& mWindow;
+    EditBuffer* mBuffer;
+    EditView* mView;
+};

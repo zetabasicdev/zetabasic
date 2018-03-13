@@ -33,7 +33,8 @@
 Ide::Ide()
     :
     mWindow(),
-    mStatusBar(mWindow)
+    mStatusBar(mWindow),
+    mEditor(mWindow)
 {
     // intentionally left blank
 }
@@ -46,22 +47,15 @@ Ide::~Ide()
 void Ide::run()
 {
     Palette idePalette;
-    idePalette.setColor(3, Color(0x2a, 0xa1, 0x98));
     idePalette.setColor(1, Color(0x00, 0x2b, 0x36));
+    idePalette.setColor(3, Color(0x2a, 0xa1, 0x98));
     idePalette.setColor(7, Color(0x83, 0x94, 0x96));
     mWindow.setPalette(idePalette);
     mStatusBar.draw();
-
-    mWindow.color(7, 1);
-    for (int y = 1; y <= 24; ++y) {
-        mWindow.locate(y, 1);
-        mWindow.printn("", 80);
-    }
-    mWindow.locate(1, 1);
-    mWindow.showCursor();
+    mEditor.draw();
 
     int evt = 0;
     do {
         evt = mWindow.runOnce();
-    } while (evt != QUIT && evt != ESCAPE);
+    } while (evt != QUIT && evt != ESCAPE && evt != F10);
 }

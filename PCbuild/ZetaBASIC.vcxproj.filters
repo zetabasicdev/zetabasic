@@ -210,6 +210,12 @@
     <ClInclude Include="..\src\Palette.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\Ide\EditBuffer.h">
+      <Filter>Header Files\Ide</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Ide\EditView.h">
+      <Filter>Header Files\Ide</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\main.cpp">
@@ -324,6 +330,12 @@
       <Filter>Source Files\Ide</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Ide\StatusBar.cpp">
+      <Filter>Source Files\Ide</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Ide\EditBuffer.cpp">
+      <Filter>Source Files\Ide</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Ide\EditView.cpp">
       <Filter>Source Files\Ide</Filter>
     </ClCompile>
   </ItemGroup>

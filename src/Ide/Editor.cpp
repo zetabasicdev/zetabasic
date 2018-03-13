@@ -28,4 +28,33 @@
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+#include "EditBuffer.h"
 #include "Editor.h"
+#include "EditView.h"
+#include "Window.h"
+
+Editor::Editor(Window& window)
+    :
+    mWindow(window),
+    mBuffer(new EditBuffer),
+    mView(new EditView(window, *mBuffer))
+{
+    
+}
+
+Editor::~Editor()
+{
+    delete mView;
+    delete mBuffer;
+}
+
+void Editor::draw()
+{
+    mWindow.color(7, 1);
+    for (int y = 1; y <= 24; ++y) {
+        mWindow.locate(y, 1);
+        mWindow.printn("", 80);
+    }
+    mWindow.locate(1, 1);
+    mWindow.showCursor();
+}

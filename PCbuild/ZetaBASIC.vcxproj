@@ -109,7 +109,9 @@
     <ClInclude Include="..\src\Compiler\Translator.h" />
     <ClInclude Include="..\src\Compiler\Typename.h" />
     <ClInclude Include="..\src\Font.h" />
+    <ClInclude Include="..\src\Ide\EditBuffer.h" />
     <ClInclude Include="..\src\Ide\Editor.h" />
+    <ClInclude Include="..\src\Ide\EditView.h" />
     <ClInclude Include="..\src\Ide\Ide.h" />
     <ClInclude Include="..\src\Ide\StatusBar.h" />
     <ClInclude Include="..\src\Interpreter\Interpreter.h" />
@@ -159,7 +161,9 @@
     <ClCompile Include="..\src\Compiler\TextSourceStream.cpp" />
     <ClCompile Include="..\src\Compiler\Token.cpp" />
     <ClCompile Include="..\src\Compiler\Translator.cpp" />
+    <ClCompile Include="..\src\Ide\EditBuffer.cpp" />
     <ClCompile Include="..\src\Ide\Editor.cpp" />
+    <ClCompile Include="..\src\Ide\EditView.cpp" />
     <ClCompile Include="..\src\Ide\Ide.cpp" />
     <ClCompile Include="..\src\Ide\StatusBar.cpp" />
     <ClCompile Include="..\src\Interpreter\Interpreter.cpp" />

@@ -28,30 +28,42 @@
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "StatusBar.h"
-#include "Window.h"
+#pragma once
 
-StatusBar::StatusBar(Window& window)
-    :
-    mWindow(window),
-    mRow(0),
-    mCol(0)
+#include <string>
+
+struct EditLine
 {
-    // intentionally left blank
-}
+    char text[81];
+    int len;
+    EditLine* prev;
+    EditLine* next;
+};
 
-StatusBar::~StatusBar()
+class EditBuffer
 {
-    // intentionally left blank
-}
+public:
+    EditBuffer();
+    EditBuffer(const std::string& filename);
+    ~EditBuffer();
 
-void StatusBar::draw()
-{
-    mWindow.color(1, 3);
-    mWindow.locate(25, 1);
-    //mWindow.printn("", 80);
-    mWindow.print("  F1=New  F2=Load  F3=Save  F4=Output  F5=Run  F10=Quit              ");
+    EditLine* getFirstLine()
+    {
+        return mFirstLine;
+    }
 
-    mWindow.locate(25, 70);
-    mWindow.printf("%06d:%03d ", mRow, mCol);
-}
+    EditLine* getLastLine()
+    {
+        return mLastLine;
+    }
+
+    int getLineCount()
+    {
+        return mLineCount;
+    }
+
+private:
+    EditLine* mFirstLine;
+    EditLine* mLastLine;
+    int mLineCount;
+};
