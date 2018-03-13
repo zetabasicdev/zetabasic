@@ -55,6 +55,7 @@ void IdentifierNode::parse(Parser& parser)
     if (parser.getToken().getId() != TokenId::Name || parser.getToken().getTag() != TokenTag::None)
         parser.raiseError(CompileErrorId::SyntaxError, "Expected Identifier");
     mName = parser.getToken().getText();
+    mRange = parser.getToken().getRange();
     parser.eatToken();
 }
 

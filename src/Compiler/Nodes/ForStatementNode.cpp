@@ -48,6 +48,7 @@ ForStatementNode::ForStatementNode()
     mStartExpression(nullptr),
     mStopExpression(nullptr),
     mNextName(),
+    mNameRange(),
     mStatements()
 {
     // intentionally left blank
@@ -61,6 +62,7 @@ ForStatementNode::~ForStatementNode()
 void ForStatementNode::parse(Parser& parser)
 {
     assert(parser.getToken().getTag() == TokenTag::Key_For);
+    auto& start = parser.getToken().getRange();
     parser.eatToken();
 
     mIdentifier.parse(parser);
@@ -95,7 +97,10 @@ void ForStatementNode::parse(Parser& parser)
     if (parser.getToken().getId() != TokenId::Name || parser.getToken().getTag() != TokenTag::None)
         parser.raiseError(CompileErrorId::SyntaxError, "Expected Identifier");
     mNextName = parser.getToken().getText();
+    mNameRange = parser.getToken().getRange();
     parser.eatToken();
+
+    mRange = Range(start, mNameRange);
 
     parser.eatEndOfLine();
 }
@@ -118,13 +123,13 @@ void ForStatementNode::analyze(Analyzer& analyzer)
     // identifier expression must match
     auto identifierSymbol = mIdentifier.getSymbol();
     if (identifierSymbol->getType() != Typename::Integer)
-        throw CompileError(CompileErrorId::TypeError, mRange, "Expected Integer Identifier Type");
+        throw CompileError(CompileErrorId::TypeError, mIdentifier.getRange(), "Expected Integer Identifier Type");
 
     for (auto& stm : mStatements)
         stm.analyze(analyzer);
 
     if (identifierSymbol->getName() != mNextName)
-        throw CompileError(CompileErrorId::NameError, mRange, "Name Mismatch In NEXT");
+        throw CompileError(CompileErrorId::NameError, mNameRange, "Name Mismatch In NEXT");
 }
 
 void ForStatementNode::translate(Translator& translator)

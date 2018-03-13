@@ -56,6 +56,7 @@ void StringLiteralExpressionNode::parse(Parser& parser)
     // create string value without quotes
     auto& text = parser.getToken().getText();
     mValue = StringPiece(text.getText() + 1, text.getLength() - 2);
+    mRange = parser.getToken().getRange();
 
     parser.eatToken();
 }

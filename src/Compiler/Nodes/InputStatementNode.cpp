@@ -54,6 +54,7 @@ InputStatementNode::~InputStatementNode()
 void InputStatementNode::parse(Parser& parser)
 {
     assert(parser.getToken().getTag() == TokenTag::Key_Input);
+    mRange = parser.getToken().getRange();
     parser.eatToken();
 
     mPromptExpression = ExpressionNode::parseExpression(parser);

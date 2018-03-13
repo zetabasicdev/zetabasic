@@ -65,6 +65,7 @@ void BinaryExpressionNode::parse(Parser& parser)
         assert(false);
         break;
     }
+    mRange = parser.getToken().getRange();
     parser.eatToken();
 
     // parse sub-expressions on the right-hand side

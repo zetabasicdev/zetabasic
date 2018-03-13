@@ -52,6 +52,7 @@ PrintStatementNode::~PrintStatementNode()
 void PrintStatementNode::parse(Parser& parser)
 {
     assert(parser.getToken().getTag() == TokenTag::Key_Print);
+    mRange = parser.getToken().getRange();
     parser.eatToken();
 
     auto expression = ExpressionNode::parseExpression(parser);

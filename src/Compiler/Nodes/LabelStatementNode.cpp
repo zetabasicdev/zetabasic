@@ -50,6 +50,7 @@ void LabelStatementNode::parse(Parser& parser)
     assert(parser.getToken().getId() == TokenId::Label);
 
     mName = StringPiece(parser.getToken().getText().getText(), parser.getToken().getText().getLength() - 1);
+    mRange = parser.getToken().getRange();
     parser.eatToken();
     parser.eatEndOfLine();
 }

@@ -52,6 +52,7 @@ void IntegerLiteralExpressionNode::parse(Parser& parser)
 
     // todo : verify value of integer is not out-of-bounds
     mValue = strtoll(parser.getToken().getText().getText(), nullptr, 10);
+    mRange = parser.getToken().getRange();
 
     parser.eatToken();
 }

@@ -72,6 +72,7 @@ void FunctionCallExpressionNode::parse(Parser& parser)
 {
     assert(parser.getToken().getId() == TokenId::Name);
     mName = parser.getToken().getText();
+    mRange = parser.getToken().getRange();
     parser.eatToken();
 
     if (parser.getToken().getTag() == TokenTag::Sym_OpenParen) {
@@ -128,7 +129,7 @@ void FunctionCallExpressionNode::analyze(Analyzer& analyzer)
         }
     }
 
-    throw CompileError(CompileErrorId::NameError, mRange, "Unknown Identifier Specified");
+    assert(false);
 }
 
 void FunctionCallExpressionNode::translate(Translator& translator)

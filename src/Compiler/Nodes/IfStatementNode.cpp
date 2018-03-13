@@ -52,6 +52,7 @@ IfStatementNode::~IfStatementNode()
 void IfStatementNode::parse(Parser& parser)
 {
     assert(parser.getToken().getTag() == TokenTag::Key_If);
+    mRange = parser.getToken().getRange();
     parser.eatToken();
 
     mExpression = ExpressionNode::parseExpression(parser);

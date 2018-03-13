@@ -49,6 +49,7 @@ GotoStatementNode::~GotoStatementNode()
 void GotoStatementNode::parse(Parser& parser)
 {
     assert(parser.getToken().getTag() == TokenTag::Key_Goto);
+    mRange = parser.getToken().getRange();
     parser.eatToken();
 
     if (parser.getToken().getId() != TokenId::Name || parser.getToken().getTag() != TokenTag::None)

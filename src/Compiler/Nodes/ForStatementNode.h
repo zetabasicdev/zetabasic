@@ -55,5 +55,6 @@ private:
     ExpressionNode* mStartExpression;
     ExpressionNode* mStopExpression;
     StringPiece mNextName;
+    Range mNameRange;
     TNodeList<StatementNode> mStatements;
 };

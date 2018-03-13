@@ -58,6 +58,7 @@ void AssignmentStatementNode::parse(Parser& parser)
 
     if (parser.getToken().getTag() != TokenTag::Sym_Equals)
         parser.raiseError(CompileErrorId::SyntaxError, "Expected =");
+    mRange = parser.getToken().getRange();
     parser.eatToken();
 
     mValue = ExpressionNode::parseExpression(parser);
@@ -73,7 +74,7 @@ void AssignmentStatementNode::analyze(Analyzer& analyzer)
     mValue->analyze(analyzer);
 
     if (mIdentifier.getSymbol()->getType() != mValue->getType())
-        throw CompileError(CompileErrorId::TypeError, mRange, "Incompatible Types For Assignment");
+        throw CompileError(CompileErrorId::TypeError, mIdentifier.getRange(), "Incompatible Types For Assignment");
 }
 
 void AssignmentStatementNode::translate(Translator& translator)

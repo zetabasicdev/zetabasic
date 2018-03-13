@@ -53,6 +53,7 @@ IdentifierExpressionNode::~IdentifierExpressionNode()
 void IdentifierExpressionNode::parse(Parser& parser)
 {
     mIdentifier.parse(parser);
+    mRange = mIdentifier.getRange();
 }
 
 void IdentifierExpressionNode::analyze(Analyzer& analyzer)

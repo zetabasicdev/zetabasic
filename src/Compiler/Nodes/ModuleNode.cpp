@@ -49,11 +49,19 @@ ModuleNode::~ModuleNode()
 
 void ModuleNode::parse(Parser& parser)
 {
+    StatementNode* first = nullptr;
+    StatementNode* last = nullptr;
     auto stm = StatementNode::parseStatement(parser);
     while (stm) {
+        if (!first)
+            first = stm;
+        last = stm;
         mStatements.push(stm);
         stm = StatementNode::parseStatement(parser);
     }
+
+    if (first && last)
+        mRange = Range(first->getRange(), last->getRange());
 
     if (!parser.isToken(TokenId::EndOfSource))
         parser.raiseError(CompileErrorId::SyntaxError, "Expected Statement");
