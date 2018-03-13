@@ -28,42 +28,84 @@
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#ifdef _WIN32
-#include <Windows.h>
-#else
-#include <cstdio>
-#endif
+#pragma once
 
-#include <sstream>
+#include <cstdint>
 
-#include "CompileError.h"
-#include "Compiler.h"
-#include "Ide.h"
-#include "Interpreter.h"
-#include "TextSourceStream.h"
-#include "Window.h"
-
-void fatalError(const std::string& title, const std::string& message)
+class Color
 {
-#ifdef _WIN32
-    (void)MessageBoxA(nullptr, message.c_str(), title.c_str(), MB_OK|MB_ICONERROR);
-#else
-    fprintf(stderr, "%s\n", message.c_str());
-#endif
-    exit(-1);
-}
-
-int main(int argc, char* argv[])
-{
-    try {
-        Ide ide;
-        ide.run();
-    }
-    catch (const CompileError& err) {
-        std::stringstream msg;
-        msg << "[" << err.getRange().getStartRow() << ":" << err.getRange().getStartCol() << "] " << err.what();
-        fatalError("Compile Error", msg.str());
+public:
+    Color()
+        :
+        mRed(0),
+        mGreen(0),
+        mBlue(0),
+        mAlpha(0),
+        mValue(0)
+    {
+        // intentionally left blank
     }
 
-    return 0;
-}
+    Color(uint32_t value)
+        :
+        mRed((value >> 16) & 0xff),
+        mGreen((value >> 8) & 0xff),
+        mBlue(value & 0xff),
+        mAlpha((value >> 24) & 0xff),
+        mValue(value)
+    {
+        // intentionally left blank
+    }
+
+    Color(int red, int green, int blue, int alpha = 255)
+        :
+        mRed(red),
+        mGreen(green),
+        mBlue(blue),
+        mAlpha(alpha),
+        mValue(0)
+    {
+        assert(mRed >= 0 && mRed < 256);
+        assert(mGreen >= 0 && mGreen < 256);
+        assert(mBlue >= 0 && mBlue < 256);
+        assert(mAlpha >= 0 && mAlpha < 256);
+        mValue = (mAlpha << 24) | (mRed << 16) | (mGreen << 8) | mBlue;
+    }
+
+    ~Color()
+    {
+        // intentionally left blank
+    }
+
+    int getRed() const
+    {
+        return mRed;
+    }
+
+    int getGreen() const
+    {
+        return mGreen;
+    }
+
+    int getBlue() const
+    {
+        return mBlue;
+    }
+
+    int getAlpha() const
+    {
+        return mAlpha;
+    }
+
+    uint32_t getValue() const
+    {
+        return mValue;
+    }
+
+private:
+    int mRed;
+    int mGreen;
+    int mBlue;
+    int mAlpha;
+    uint32_t mValue;
+};

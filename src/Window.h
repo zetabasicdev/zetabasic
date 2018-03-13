@@ -31,6 +31,8 @@
 #pragma once
 
 #include <cstdint>
+#include <string>
+#include "Palette.h"
 
 enum
 {
@@ -83,6 +85,8 @@ public:
     void showCursor();
     void hideCursor();
 
+    void setPalette(const Palette& palette);
+
 private:
     void* mWindow;
     void* mScreen;
@@ -100,6 +104,8 @@ private:
     int mFg;
     int mBg;
     bool mDirty;
+
+    Palette mPalette;
 
     void renderCell(char ch, int row, int col, int fg, int bg);
     void scroll();

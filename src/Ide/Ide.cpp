@@ -28,42 +28,40 @@
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#ifdef _WIN32
-#include <Windows.h>
-#else
-#include <cstdio>
-#endif
-
-#include <sstream>
-
-#include "CompileError.h"
-#include "Compiler.h"
 #include "Ide.h"
-#include "Interpreter.h"
-#include "TextSourceStream.h"
-#include "Window.h"
 
-void fatalError(const std::string& title, const std::string& message)
+Ide::Ide()
+    :
+    mWindow(),
+    mStatusBar(mWindow)
 {
-#ifdef _WIN32
-    (void)MessageBoxA(nullptr, message.c_str(), title.c_str(), MB_OK|MB_ICONERROR);
-#else
-    fprintf(stderr, "%s\n", message.c_str());
-#endif
-    exit(-1);
+    // intentionally left blank
 }
 
-int main(int argc, char* argv[])
+Ide::~Ide()
 {
-    try {
-        Ide ide;
-        ide.run();
-    }
-    catch (const CompileError& err) {
-        std::stringstream msg;
-        msg << "[" << err.getRange().getStartRow() << ":" << err.getRange().getStartCol() << "] " << err.what();
-        fatalError("Compile Error", msg.str());
-    }
+    // intentionally left blank
+}
 
-    return 0;
+void Ide::run()
+{
+    Palette idePalette;
+    idePalette.setColor(3, Color(0x2a, 0xa1, 0x98));
+    idePalette.setColor(1, Color(0x00, 0x2b, 0x36));
+    idePalette.setColor(7, Color(0x83, 0x94, 0x96));
+    mWindow.setPalette(idePalette);
+    mStatusBar.draw();
+
+    mWindow.color(7, 1);
+    for (int y = 1; y <= 24; ++y) {
+        mWindow.locate(y, 1);
+        mWindow.printn("", 80);
+    }
+    mWindow.locate(1, 1);
+    mWindow.showCursor();
+
+    int evt = 0;
+    do {
+        evt = mWindow.runOnce();
+    } while (evt != QUIT && evt != ESCAPE);
 }

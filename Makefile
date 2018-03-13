@@ -29,7 +29,7 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 CC=g++
-CFLAGS=-Wall -O0 -g -DDEBUG -std=c++14 -I./src -I./src/Compiler -I./src/Compiler/Nodes -I./src/Interpreter -I$(SDL_INC_PATH)
+CFLAGS=-Wall -O0 -g -DDEBUG -std=c++14 -I./src -I./src/Compiler -I./src/Compiler/Nodes -I./src/Interpreter -I./src/Ide -I$(SDL_INC_PATH)
 LDFLAGS=-L$(SDL_LIB_PATH) $(SDL_LIBS)
 RM=rm -f
 CP=cp -f
@@ -48,6 +48,7 @@ OBJECTS=\
 	obj/ForStatementNode.o \
 	obj/FunctionCallExpressionNode.o \
 	obj/GotoStatementNode.o \
+	obj/Ide.o \
 	obj/IdentifierExpressionNode.o \
 	obj/IfStatementNode.o \
 	obj/InputStatementNode.o \
@@ -61,6 +62,7 @@ OBJECTS=\
 	obj/PrintStatementNode.o \
 	obj/Stack.o \
 	obj/StatementNode.o \
+	obj/StatusBar.o \
 	obj/StringLiteralExpressionNode.o \
 	obj/StringManager.o \
 	obj/StringStack.o \
@@ -94,6 +96,10 @@ obj/%.o: src/Compiler/Nodes/%.cpp | obj
 	@echo Compiling $(<F)
 
 obj/%.o: src/Interpreter/%.cpp | obj
+	@$(CC) $(CFLAGS) -o $@ -c $<
+	@echo Compiling $(<F)
+
+obj/%.o: src/Ide/%.cpp | obj
 	@$(CC) $(CFLAGS) -o $@ -c $<
 	@echo Compiling $(<F)
 

@@ -28,42 +28,4 @@
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#ifdef _WIN32
-#include <Windows.h>
-#else
-#include <cstdio>
-#endif
-
-#include <sstream>
-
-#include "CompileError.h"
-#include "Compiler.h"
-#include "Ide.h"
-#include "Interpreter.h"
-#include "TextSourceStream.h"
-#include "Window.h"
-
-void fatalError(const std::string& title, const std::string& message)
-{
-#ifdef _WIN32
-    (void)MessageBoxA(nullptr, message.c_str(), title.c_str(), MB_OK|MB_ICONERROR);
-#else
-    fprintf(stderr, "%s\n", message.c_str());
-#endif
-    exit(-1);
-}
-
-int main(int argc, char* argv[])
-{
-    try {
-        Ide ide;
-        ide.run();
-    }
-    catch (const CompileError& err) {
-        std::stringstream msg;
-        msg << "[" << err.getRange().getStartRow() << ":" << err.getRange().getStartCol() << "] " << err.what();
-        fatalError("Compile Error", msg.str());
-    }
-
-    return 0;
-}
+#include "Editor.h"
