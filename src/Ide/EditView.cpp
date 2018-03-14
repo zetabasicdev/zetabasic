@@ -137,6 +137,9 @@ void EditView::handleKey(int key)
     case ENTER:
         insertBreak();
         break;
+    case BACKSPACE:
+        backspace();
+        break;
     default:
         if (key >= 32 && key <= 126)
             insertChar((char)key);
@@ -213,4 +216,55 @@ void EditView::insertChar(char ch)
 
     drawLine(mCurLine, mCurRow);
     drawCursor();
+}
+
+void EditView::backspace()
+{
+    if (mCurCol > 1 || mCurRow > 1) {
+        auto prevLine = mCurLine->prev;
+        auto prevLen = 0;
+        if (prevLine)
+            prevLen = prevLine->len;
+        auto lineRemoved = mBuffer.backspace(mCurLine, mCurCol);
+
+        if (!lineRemoved) {
+            // just need to redraw line
+            --mCurCol;
+            drawLine(mCurLine, mCurRow);
+            drawCursor();
+        } else {
+            // adjust the view accordingly
+            if (mCurLine == mBottomLine) {
+                mBottomLine = prevLine;
+            } else if (mCurLine == mTopLine) {
+                mTopLine = prevLine;
+                --mTopRow;
+            }
+            mCurLine = prevLine;
+            if (mBottomLine->next)
+                mBottomLine = mBottomLine->next;
+            else
+                --mBottomRow;
+            --mCurRow;
+
+            // move cursor to where appending took place on previous line
+            mCurCol = prevLen + 1;
+            if (mCurCol > 80)
+                mCurCol = 80;
+
+            // ensure view is full when possible
+            if (mBottomRow - mTopRow + 1 < 24 && mTopRow > 1) {
+                --mTopRow;
+                mTopLine = mTopLine->prev;
+            }
+
+            drawAllLines();
+            if (mBottomRow - mTopRow + 1 < 24) {
+                // need to erase the last line due to upward movement
+                mWindow.locate(mBottomRow - mTopRow + 2, 1);
+                mWindow.printn("", 80);
+            }
+            drawCursor();
+        }
+    }
 }

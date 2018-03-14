@@ -197,3 +197,39 @@ void EditBuffer::insertChar(EditLine* line, int col, char ch)
         line->text[line->len] = 0;
     }
 }
+
+bool EditBuffer::backspace(EditLine* line, int col)
+{
+    if (col > 1) {
+        if (col - 1 <= line->len) {
+            // move text first
+            for (int i = col - 1; i < line->len; ++i)
+                line->text[i - 1] = line->text[i];
+            --line->len;
+            line->text[line->len] = 0;
+        }
+    } else if (line->prev) {
+        // at beginning of line, so pull onto end of previous line
+        int count = line->len;
+        if (count > 80 - line->prev->len)
+            count = 80 - line->prev->len;
+        if (count > 0)
+            memcpy(line->prev->text + line->prev->len, line->text, count);
+        line->prev->len += count;
+        line->prev->text[line->prev->len] = 0;
+
+        // now remove the current line
+        line->prev->next = line->next;
+        if (line->next)
+            line->next->prev = line->prev;
+        else
+            mLastLine = line->prev;
+        delete line;
+
+        // line was removed
+        return true;
+    }
+
+    // no line actually removed
+    return false;
+}
