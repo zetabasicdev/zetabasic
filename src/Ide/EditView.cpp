@@ -117,6 +117,23 @@ void EditView::handleKey(int key)
             drawCursor();
         }
         break;
+    case HOME:
+        if (mCurCol > 1) {
+            mCurCol = 1;
+            drawCursor();
+        }
+        break;
+    case END:
+        if (mCurCol != mCurLine->len + 1) {
+            int col = mCurLine->len + 1;
+            if (col > 80)
+                col = 80;
+            if (mCurCol != col) {
+                mCurCol = col;
+                drawCursor();
+            }
+        }
+        break;
     default:
         break;
     }
