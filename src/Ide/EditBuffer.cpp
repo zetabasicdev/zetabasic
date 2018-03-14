@@ -144,3 +144,29 @@ EditBuffer::~EditBuffer()
         line = next;
     }
 }
+
+EditLine* EditBuffer::insertBreak(EditLine* line, int col)
+{
+    // first create the new line and move text as necessary
+    EditLine* newLine = new EditLine;
+    newLine->len = 0;
+    if (col - 1 < line->len) {
+        // there is data to be copied
+        newLine->len = line->len - (col - 1);
+        memcpy(newLine->text, line->text + col - 1, newLine->len);
+        line->len = col - 1;
+        line->text[line->len] = 0;
+    }
+    newLine->text[newLine->len] = 0;
+
+    // insert new line into list
+    newLine->next = line->next;
+    if (newLine->next)
+        newLine->next->prev = newLine;
+    line->next = newLine;
+    newLine->prev = line;
+    if (!newLine->next)
+        mLastLine = newLine;
+
+    return newLine;
+}

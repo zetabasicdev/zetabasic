@@ -60,4 +60,6 @@ private:
     void drawFromLine(EditLine* line, int row);
     void drawLine(EditLine* line, int row);
     void drawCursor();
+
+    void insertBreak();
 };

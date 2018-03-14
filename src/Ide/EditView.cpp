@@ -134,6 +134,9 @@ void EditView::handleKey(int key)
             }
         }
         break;
+    case ENTER:
+        insertBreak();
+        break;
     default:
         break;
     }
@@ -162,4 +165,38 @@ void EditView::drawLine(EditLine* line, int row)
 void EditView::drawCursor()
 {
     mWindow.locate(mCurRow - mTopRow + 1, mCurCol);
+}
+
+void EditView::insertBreak()
+{
+    EditLine* newLine = mBuffer.insertBreak(mCurLine, mCurCol);
+
+    // determine view scenario after line is inserted
+    if (mBottomRow - mTopRow + 1 < 24) {
+        // not a full view, so simply expand it
+        ++mBottomRow;
+        if (newLine->prev == mBottomLine)
+            // new line is at bottom, so move that
+            mBottomLine = newLine;
+    } else {
+        // full view
+        if (mCurRow < mBottomRow) {
+            // not at the bottom, so adjust new bottom accordingly
+            mBottomLine = mBottomLine->prev;
+        } else {
+            // at the bottom, so scrolling is required
+            ++mTopRow;
+            ++mBottomRow;
+            mTopLine = mTopLine->next;
+            mBottomLine = mBottomLine->next;
+        }
+    }
+
+    // and update the cursor to new line
+    ++mCurRow;
+    mCurCol = 1;
+    mCurLine = mCurLine->next;
+
+    drawAllLines();
+    drawCursor();
 }

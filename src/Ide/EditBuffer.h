@@ -47,6 +47,8 @@ public:
     EditBuffer(const std::string& filename);
     ~EditBuffer();
 
+    EditLine* insertBreak(EditLine* line, int col);
+
     EditLine* getFirstLine()
     {
         return mFirstLine;
