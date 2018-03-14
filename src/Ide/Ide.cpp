@@ -57,5 +57,6 @@ void Ide::run()
     int evt = 0;
     do {
         evt = mWindow.runOnce();
+        mEditor.handleKey(evt);
     } while (evt != QUIT && evt != ESCAPE && evt != F10);
 }

@@ -43,6 +43,7 @@ public:
     ~Editor();
 
     void draw();
+    void handleKey(int key);
 
 private:
     Window& mWindow;

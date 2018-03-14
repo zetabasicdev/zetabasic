@@ -56,3 +56,8 @@ void Editor::draw()
 {
     mView->draw();
 }
+
+void Editor::handleKey(int key)
+{
+    mView->handleKey(key);
+}

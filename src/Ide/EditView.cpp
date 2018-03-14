@@ -70,6 +70,58 @@ void EditView::draw()
     mWindow.showCursor();
 }
 
+void EditView::handleKey(int key)
+{
+    switch (key) {
+    case RIGHT:
+        if (mCurCol < 80) {
+            ++mCurCol;
+            drawCursor();
+        }
+        break;
+    case LEFT:
+        if (mCurCol > 1) {
+            --mCurCol;
+            drawCursor();
+        }
+        break;
+    case DOWN:
+        if (mCurRow < mBottomRow) {
+            mCurLine = mCurLine->next;
+            ++mCurRow;
+            drawCursor();
+        } else if (mBottomLine->next) {
+            mTopLine = mTopLine->next;
+            mBottomLine = mBottomLine->next;
+            mCurLine = mCurLine->next;
+            ++mTopRow;
+            ++mBottomRow;
+            ++mCurRow;
+            drawAllLines();
+            drawCursor();
+        }
+        break;
+    case UP:
+        if (mCurRow > mTopRow) {
+            mCurLine = mCurLine->prev;
+            --mCurRow;
+            drawCursor();
+        } else if (mTopLine->prev) {
+            mTopLine = mTopLine->prev;
+            mBottomLine = mBottomLine->prev;
+            mCurLine = mCurLine->prev;
+            --mTopRow;
+            --mBottomRow;
+            --mCurRow;
+            drawAllLines();
+            drawCursor();
+        }
+        break;
+    default:
+        break;
+    }
+}
+
 void EditView::drawAllLines()
 {
     drawFromLine(mTopLine, mTopRow);
