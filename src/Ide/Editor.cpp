@@ -33,13 +33,17 @@
 #include "EditView.h"
 #include "Window.h"
 
-Editor::Editor(Window& window)
+Editor::Editor(Window& window, const std::string& filename)
     :
     mWindow(window),
-    mBuffer(new EditBuffer),
-    mView(new EditView(window, *mBuffer))
+    mBuffer(nullptr),
+    mView(nullptr)
 {
-    
+    if (!filename.empty())
+        mBuffer = new EditBuffer(filename);
+    else
+        mBuffer = new EditBuffer();
+    mView = new EditView(window, *mBuffer);
 }
 
 Editor::~Editor()
@@ -50,11 +54,5 @@ Editor::~Editor()
 
 void Editor::draw()
 {
-    mWindow.color(7, 1);
-    for (int y = 1; y <= 24; ++y) {
-        mWindow.locate(y, 1);
-        mWindow.printn("", 80);
-    }
-    mWindow.locate(1, 1);
-    mWindow.showCursor();
+    mView->draw();
 }

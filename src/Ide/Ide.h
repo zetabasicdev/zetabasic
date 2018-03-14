@@ -37,7 +37,7 @@
 class Ide
 {
 public:
-    Ide();
+    Ide(const std::string& filename);
     ~Ide();
 
     void run();

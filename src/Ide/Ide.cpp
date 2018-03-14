@@ -30,11 +30,11 @@
 
 #include "Ide.h"
 
-Ide::Ide()
+Ide::Ide(const std::string& filename)
     :
     mWindow(),
     mStatusBar(mWindow),
-    mEditor(mWindow)
+    mEditor(mWindow, filename)
 {
     // intentionally left blank
 }

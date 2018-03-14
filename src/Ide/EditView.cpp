@@ -35,13 +35,62 @@
 EditView::EditView(Window& window, EditBuffer& buffer)
     :
     mWindow(window),
-    mBuffer(buffer)
+    mBuffer(buffer),
+    mTopLine(buffer.getFirstLine()),
+    mBottomLine(mTopLine),
+    mCurLine(mTopLine),
+    mTopRow(1),
+    mBottomRow(1),
+    mCurRow(1),
+    mCurCol(1)
 {
-
+    // calculate bottom line/row
+    for (auto j = 0; j < 23 && mBottomLine->next; ++j) {
+        ++mBottomRow;
+        mBottomLine = mBottomLine->next;
+    }
 }
 
 EditView::~EditView()
 {
-
+    // intentionally left blank
 }
 
+void EditView::draw()
+{
+    mWindow.color(7, 1);
+    drawAllLines();
+    if (mBottomRow - mTopRow + 1 < 24) {
+        for (auto i = 0; i < 24 - (mBottomRow - mTopRow + 1); ++i) {
+            mWindow.locate(i + mBottomRow + 1, 1);
+            mWindow.printn("", 80);
+        }
+    }
+    drawCursor();
+    mWindow.showCursor();
+}
+
+void EditView::drawAllLines()
+{
+    drawFromLine(mTopLine, mTopRow);
+}
+
+void EditView::drawFromLine(EditLine* line, int row)
+{
+    while (row <= mBottomRow) {
+        drawLine(line, row);
+        ++row;
+        line = line->next;
+    }
+}
+
+void EditView::drawLine(EditLine* line, int row)
+{
+    mWindow.locate(row - mTopRow + 1, 1);
+    mWindow.printn(line->text, 80);
+}
+
+void EditView::drawCursor()
+{
+    mWindow.locate(mCurRow - mTopRow + 1, mCurCol);
+}

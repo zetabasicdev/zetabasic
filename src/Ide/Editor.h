@@ -30,6 +30,8 @@
 
 #pragma once
 
+#include <string>
+
 class EditBuffer;
 class EditView;
 class Window;
@@ -37,7 +39,7 @@ class Window;
 class Editor
 {
 public:
-    Editor(Window& window);
+    Editor(Window& window, const std::string& filename);
     ~Editor();
 
     void draw();

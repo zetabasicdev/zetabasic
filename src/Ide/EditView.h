@@ -32,6 +32,7 @@
 
 class EditBuffer;
 class Window;
+struct EditLine;
 
 class EditView
 {
@@ -39,7 +40,23 @@ public:
     EditView(Window& window, EditBuffer& buffer);
     ~EditView();
 
+    void draw();
+
 private:
     Window& mWindow;
     EditBuffer& mBuffer;
+
+    EditLine* mTopLine;
+    EditLine* mBottomLine;
+    EditLine* mCurLine;
+
+    int mTopRow;
+    int mBottomRow;
+    int mCurRow;
+    int mCurCol;
+
+    void drawAllLines();
+    void drawFromLine(EditLine* line, int row);
+    void drawLine(EditLine* line, int row);
+    void drawCursor();
 };

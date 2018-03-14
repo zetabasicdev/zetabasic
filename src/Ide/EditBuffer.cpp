@@ -49,9 +49,9 @@ EditBuffer::EditBuffer(const std::string& filename)
 {
 #ifdef _WIN32
     FILE* file = nullptr;
-    (void)fopen_s(&file, "name", "r");
+    (void)fopen_s(&file, filename.c_str(), "r");
 #else
-    FILE* file = fopen(name, "r");
+    FILE* file = fopen(filename.c_str(), "r");
 #endif
     if (!file) {
         std::stringstream msg;

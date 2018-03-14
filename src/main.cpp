@@ -56,7 +56,11 @@ void fatalError(const std::string& title, const std::string& message)
 int main(int argc, char* argv[])
 {
     try {
-        Ide ide;
+        std::string filename;
+        if (argc == 2)
+            filename = argv[1];
+
+        Ide ide(filename);
         ide.run();
     }
     catch (const CompileError& err) {
