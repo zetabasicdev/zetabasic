@@ -48,6 +48,7 @@ public:
     ~EditBuffer();
 
     EditLine* insertBreak(EditLine* line, int col);
+    void insertChar(EditLine* line, int col, char ch);
 
     EditLine* getFirstLine()
     {

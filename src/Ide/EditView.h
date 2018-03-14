@@ -62,4 +62,5 @@ private:
     void drawCursor();
 
     void insertBreak();
+    void insertChar(char ch);
 };

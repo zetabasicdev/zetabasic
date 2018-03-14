@@ -138,6 +138,8 @@ void EditView::handleKey(int key)
         insertBreak();
         break;
     default:
+        if (key >= 32 && key <= 126)
+            insertChar((char)key);
         break;
     }
 }
@@ -198,5 +200,17 @@ void EditView::insertBreak()
     mCurLine = mCurLine->next;
 
     drawAllLines();
+    drawCursor();
+}
+
+void EditView::insertChar(char ch)
+{
+    mBuffer.insertChar(mCurLine, mCurCol, ch);
+
+    ++mCurCol;
+    if (mCurCol > 80)
+        mCurCol = 80;
+
+    drawLine(mCurLine, mCurRow);
     drawCursor();
 }

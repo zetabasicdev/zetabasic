@@ -170,3 +170,30 @@ EditLine* EditBuffer::insertBreak(EditLine* line, int col)
 
     return newLine;
 }
+
+void EditBuffer::insertChar(EditLine* line, int col, char ch)
+{
+    if (col - 1 < line->len) {
+        // inside the line, so move data first
+        for (int i = line->len - 1; i >= col - 1; --i)
+            line->text[i + 1] = line->text[i];
+        
+        // insert new character
+        line->text[col - 1] = ch;
+        ++line->len;
+
+        // ensure length stays within bounds
+        if (line->len > 80)
+            line->len = 80;
+        line->text[line->len] = 0;
+    } else {
+        // at or past end of line, so pad with spaces as necessary
+        for (int i = line->len; i < col - 1; ++i)
+            line->text[i] = ' ';
+
+        // insert new character
+        line->text[col - 1] = ch;
+        line->len = col;
+        line->text[line->len] = 0;
+    }
+}
