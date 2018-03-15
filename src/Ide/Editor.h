@@ -46,6 +46,7 @@ public:
     bool handleKey(int key);
 
     void newFile();
+    void loadFile(const std::string& filename);
 
 private:
     Window& mWindow;

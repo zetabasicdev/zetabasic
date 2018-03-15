@@ -280,7 +280,7 @@ void Window::printn(const char* text, int len)
     mDirty = true;
 }
 
-const std::string& Window::input()
+const std::string& Window::input(int maxLength, bool allowEscape, bool moveToNextLine)
 {
     static std::string text;
     text.clear();
@@ -296,6 +296,12 @@ const std::string& Window::input()
     while (!done) {
         int evt = runOnce();
         switch (evt) {
+        case ESCAPE:
+            if (allowEscape) {
+                text.clear();
+                done = true;
+            }
+            break;
         case ENTER:
             done = true;
             break;
@@ -320,7 +326,7 @@ const std::string& Window::input()
             break;
         default:
             if (evt >= 32 && evt <= 126) {
-                if (text.length() < 255) {
+                if ((maxLength == -1 && text.length() < 255) || text.length() < maxLength - 1) {
                     text.push_back((char)evt);
                     Cell* cell = mCells + ((mCursorRow - 1) * 80) + (mCursorCol - 1);
                     cell->ch = (char)evt;
@@ -348,12 +354,13 @@ const std::string& Window::input()
 
     hideCursor();
 
-    // move to next line
-    ++mCursorRow;
-    mCursorCol = 1;
-    if (mCursorRow > 25) {
-        --mCursorRow;
-        scroll();
+    if (moveToNextLine) {
+        ++mCursorRow;
+        mCursorCol = 1;
+        if (mCursorRow > 25) {
+            --mCursorRow;
+            scroll();
+        }
     }
 
     if (!rehideCursor)
@@ -416,6 +423,12 @@ void Window::hideCursor()
         mCursorVisible = false;
         mDirty = true;
     }
+}
+
+void Window::getCursorLocation(int& row, int& col)
+{
+    row = mCursorRow;
+    col = mCursorCol;
 }
 
 void Window::setPalette(const Palette& palette)

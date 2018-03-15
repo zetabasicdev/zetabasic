@@ -72,3 +72,16 @@ void Editor::newFile()
 
     mView->draw();
 }
+
+void Editor::loadFile(const std::string& filename)
+{
+    auto mNewBuffer = new EditBuffer(filename);
+
+    delete mView;
+    delete mBuffer;
+
+    mBuffer = mNewBuffer;
+    mView = new EditView(mWindow, *mBuffer);
+
+    mView->draw();
+}

@@ -77,13 +77,15 @@ public:
     void printf(const char* format, ...);
     void printn(const char* text, int len);
 
-    const std::string& input();
+    const std::string& input(int maxLength = -1, bool allowEscape = false, bool moveToNextLine = true);
 
     void locate(int row, int col);
     void color(int fg, int bg);
 
     void showCursor();
     void hideCursor();
+
+    void getCursorLocation(int& row, int& col);
 
     void setPalette(const Palette& palette);
 

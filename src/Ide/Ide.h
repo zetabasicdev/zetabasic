@@ -46,4 +46,7 @@ private:
     Window mWindow;
     StatusBar mStatusBar;
     Editor mEditor;
+
+    const std::string& getFilename();
+    void loadFile();
 };

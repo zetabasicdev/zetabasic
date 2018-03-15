@@ -49,7 +49,6 @@ void StatusBar::draw()
 {
     mWindow.color(1, 3);
     mWindow.locate(25, 1);
-    //mWindow.printn("", 80);
     mWindow.print("  F1=New  F2=Load  F3=Save  F4=Output  F5=Run  F10=Quit              ");
 
     mWindow.locate(25, 70);

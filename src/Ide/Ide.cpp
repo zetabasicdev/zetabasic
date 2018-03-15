@@ -49,7 +49,9 @@ void Ide::run()
     Palette idePalette;
     idePalette.setColor(1, Color(0x00, 0x2b, 0x36));
     idePalette.setColor(3, Color(0x2a, 0xa1, 0x98));
+    idePalette.setColor(4, Color(0xdc, 0x32, 0x2f));
     idePalette.setColor(7, Color(0x83, 0x94, 0x96));
+    idePalette.setColor(8, Color(0x6c, 0x71, 0xc4));
     mWindow.setPalette(idePalette);
     mStatusBar.draw();
     mEditor.draw();
@@ -63,6 +65,7 @@ void Ide::run()
                 mEditor.newFile();
                 break;
             case F2:
+                loadFile();
                 break;
             case F3:
                 break;
@@ -75,4 +78,47 @@ void Ide::run()
             }
         }
     } while (evt != QUIT && evt != ESCAPE && evt != F10);
+}
+
+const std::string& Ide::getFilename()
+{
+    int row = 0, col = 0;
+    mWindow.getCursorLocation(row, col);
+
+    mWindow.color(1, 8);
+    mWindow.locate(25, 1);
+    mWindow.printn("", 80);
+    mWindow.locate(25, 1);
+
+    auto& filename = mWindow.input(80, true, false);
+
+    mStatusBar.draw();
+    mWindow.locate(row, col);
+
+    return filename;
+}
+
+void Ide::loadFile()
+{
+    try {
+        auto& filename = getFilename();
+        mEditor.loadFile(filename);
+    }
+    catch (std::runtime_error& ex) {
+        int row = 0, col = 0;
+        mWindow.getCursorLocation(row, col);
+
+        mWindow.color(1, 4);
+        mWindow.locate(25, 1);
+        mWindow.printn("", 80);
+        mWindow.locate(25, 1);
+
+        mWindow.hideCursor();
+        mWindow.print("Unable to load specified file!");
+        (void)mWindow.runOnce();
+
+        mStatusBar.draw();
+        mWindow.locate(row, col);
+        mWindow.showCursor();
+    }
 }
