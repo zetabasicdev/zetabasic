@@ -57,7 +57,18 @@ void Editor::draw()
     mView->draw();
 }
 
-void Editor::handleKey(int key)
+bool Editor::handleKey(int key)
 {
-    mView->handleKey(key);
+    return mView->handleKey(key);
+}
+
+void Editor::newFile()
+{
+    delete mView;
+    delete mBuffer;
+
+    mBuffer = new EditBuffer();
+    mView = new EditView(mWindow, *mBuffer);
+
+    mView->draw();
 }

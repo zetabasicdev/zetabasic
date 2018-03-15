@@ -43,7 +43,9 @@ public:
     ~Editor();
 
     void draw();
-    void handleKey(int key);
+    bool handleKey(int key);
+
+    void newFile();
 
 private:
     Window& mWindow;

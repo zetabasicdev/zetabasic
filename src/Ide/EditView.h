@@ -41,7 +41,7 @@ public:
     ~EditView();
 
     void draw();
-    void handleKey(int key);
+    bool handleKey(int key);
 
 private:
     Window& mWindow;

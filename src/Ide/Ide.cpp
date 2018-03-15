@@ -57,6 +57,22 @@ void Ide::run()
     int evt = 0;
     do {
         evt = mWindow.runOnce();
-        mEditor.handleKey(evt);
+        if (!mEditor.handleKey(evt)) {
+            switch (evt) {
+            case F1:
+                mEditor.newFile();
+                break;
+            case F2:
+                break;
+            case F3:
+                break;
+            case F4:
+                break;
+            case F5:
+                break;
+            default:
+                break;
+            }
+        }
     } while (evt != QUIT && evt != ESCAPE && evt != F10);
 }

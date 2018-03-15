@@ -70,8 +70,10 @@ void EditView::draw()
     mWindow.showCursor();
 }
 
-void EditView::handleKey(int key)
+bool EditView::handleKey(int key)
 {
+    bool handled = true;
+
     switch (key) {
     case RIGHT:
         if (mCurCol < 80) {
@@ -182,8 +184,12 @@ void EditView::handleKey(int key)
     default:
         if (key >= 32 && key <= 126)
             insertChar((char)key);
+        else
+            handled = false;
         break;
     }
+
+    return handled;
 }
 
 void EditView::drawAllLines()
