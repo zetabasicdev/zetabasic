@@ -40,6 +40,8 @@ public:
 
     void draw();
 
+    void setCursorPostion(int row, int col);
+
 private:
     Window& mWindow;
     int mRow;

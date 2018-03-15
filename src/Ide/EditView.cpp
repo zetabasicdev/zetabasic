@@ -74,6 +74,9 @@ bool EditView::handleKey(int key)
 {
     bool handled = true;
 
+    int oldRow = mCurRow;
+    int oldCol = mCurCol;
+
     switch (key) {
     case RIGHT:
         if (mCurCol < 80) {
@@ -188,6 +191,9 @@ bool EditView::handleKey(int key)
             handled = false;
         break;
     }
+
+    if ((mCurRow != oldRow || mCurCol != oldCol) && mDelegate)
+        mDelegate->onCursorChanged(mCurRow, mCurCol);
 
     return handled;
 }
@@ -356,4 +362,10 @@ void EditView::deleteChar()
             drawCursor();
         }
     }
+}
+
+void EditView::setDelegate(Delegate* delegate)
+{
+    assert(delegate);
+    mDelegate = delegate;
 }

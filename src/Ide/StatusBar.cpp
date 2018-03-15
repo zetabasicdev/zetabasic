@@ -54,3 +54,13 @@ void StatusBar::draw()
     mWindow.locate(25, 70);
     mWindow.printf("%06d:%03d ", mRow, mCol);
 }
+
+void StatusBar::setCursorPostion(int row, int col)
+{
+    mRow = row;
+    mCol = col;
+
+    mWindow.color(1, 3);
+    mWindow.locate(25, 70);
+    mWindow.printf("%06d:%03d ", mRow, mCol);
+}

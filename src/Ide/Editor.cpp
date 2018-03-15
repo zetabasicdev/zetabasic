@@ -44,6 +44,7 @@ Editor::Editor(Window& window, const std::string& filename)
     else
         mBuffer = new EditBuffer();
     mView = new EditView(window, *mBuffer);
+    mView->setDelegate(this);
 }
 
 Editor::~Editor()
@@ -55,6 +56,7 @@ Editor::~Editor()
 void Editor::draw()
 {
     mView->draw();
+    onCursorChanged(1, 1);
 }
 
 bool Editor::handleKey(int key)
@@ -69,8 +71,10 @@ void Editor::newFile()
 
     mBuffer = new EditBuffer();
     mView = new EditView(mWindow, *mBuffer);
+    mView->setDelegate(this);
 
     mView->draw();
+    onCursorChanged(1, 1);
 }
 
 void Editor::loadFile(const std::string& filename)
@@ -82,11 +86,25 @@ void Editor::loadFile(const std::string& filename)
 
     mBuffer = mNewBuffer;
     mView = new EditView(mWindow, *mBuffer);
+    mView->setDelegate(this);
 
     mView->draw();
+    onCursorChanged(1, 1);
 }
 
 void Editor::saveFile(const std::string& filename)
 {
     mBuffer->save(filename);
+}
+
+void Editor::onCursorChanged(int row, int col)
+{
+    if (mDelegate)
+        mDelegate->onCursorChanged(row, col);
+}
+
+void Editor::setDelegate(Delegate* delegate)
+{
+    assert(delegate);
+    mDelegate = delegate;
 }

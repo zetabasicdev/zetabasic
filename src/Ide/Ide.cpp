@@ -36,7 +36,7 @@ Ide::Ide(const std::string& filename)
     mStatusBar(mWindow),
     mEditor(mWindow, filename)
 {
-    // intentionally left blank
+    mEditor.setDelegate(this);
 }
 
 Ide::~Ide()
@@ -79,6 +79,17 @@ void Ide::run()
             }
         }
     } while (evt != QUIT && evt != F10);
+}
+
+void Ide::onCursorChanged(int row, int col)
+{
+    int oldRow = 0, oldCol = 0;
+    mWindow.getCursorLocation(oldRow, oldCol);
+
+    mStatusBar.setCursorPostion(row, col);
+
+    mWindow.color(7, 1);
+    mWindow.locate(oldRow, oldCol);
 }
 
 const std::string& Ide::getFilename()

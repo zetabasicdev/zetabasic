@@ -31,14 +31,22 @@
 #pragma once
 
 #include <string>
+#include "EditView.h"
 
 class EditBuffer;
-class EditView;
 class Window;
 
 class Editor
+    :
+    public EditView::Delegate
 {
 public:
+    class Delegate
+    {
+    public:
+        virtual void onCursorChanged(int row, int col) = 0;
+    };
+
     Editor(Window& window, const std::string& filename);
     ~Editor();
 
@@ -49,8 +57,13 @@ public:
     void loadFile(const std::string& filename);
     void saveFile(const std::string& filename);
 
+    void onCursorChanged(int row, int col);
+    void setDelegate(Delegate* delegate);
+
 private:
     Window& mWindow;
     EditBuffer* mBuffer;
     EditView* mView;
+
+    Delegate* mDelegate;
 };

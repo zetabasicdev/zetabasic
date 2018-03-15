@@ -35,12 +35,16 @@
 #include "Window.h"
 
 class Ide
+    :
+    public Editor::Delegate
 {
 public:
     Ide(const std::string& filename);
     ~Ide();
 
     void run();
+
+    void onCursorChanged(int row, int col);
 
 private:
     Window mWindow;

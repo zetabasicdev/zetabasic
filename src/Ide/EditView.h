@@ -37,11 +37,19 @@ struct EditLine;
 class EditView
 {
 public:
+    class Delegate
+    {
+    public:
+        virtual void onCursorChanged(int row, int col) = 0;
+    };
+
     EditView(Window& window, EditBuffer& buffer);
     ~EditView();
 
     void draw();
     bool handleKey(int key);
+
+    void setDelegate(Delegate* delegate);
 
 private:
     Window& mWindow;
@@ -55,6 +63,8 @@ private:
     int mBottomRow;
     int mCurRow;
     int mCurCol;
+
+    Delegate* mDelegate;
 
     void drawAllLines();
     void drawFromLine(EditLine* line, int row);
