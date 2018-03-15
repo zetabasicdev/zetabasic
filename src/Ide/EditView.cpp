@@ -140,6 +140,45 @@ void EditView::handleKey(int key)
     case BACKSPACE:
         backspace();
         break;
+    case DEL:
+        deleteChar();
+        break;
+    case PAGE_DOWN:
+        if (mBottomLine->next) {
+            for (int i = 0; i < 24 && mBottomLine->next; ++i) {
+                mTopLine = mTopLine->next;
+                mCurLine = mCurLine->next;
+                mBottomLine = mBottomLine->next;
+                ++mTopRow;
+                ++mCurRow;
+                ++mBottomRow;
+            }
+            drawAllLines();
+            drawCursor();
+        } else if (mCurRow < mBottomRow) {
+            mCurLine = mBottomLine;
+            mCurRow = mBottomRow;
+            drawCursor();
+        }
+        break;
+    case PAGE_UP:
+        if (mTopLine->prev) {
+            for (int i = 0; i < 24 && mTopLine->prev; ++i) {
+                mTopLine = mTopLine->prev;
+                mCurLine = mCurLine->prev;
+                mBottomLine = mBottomLine->prev;
+                --mTopRow;
+                --mCurRow;
+                --mBottomRow;
+            }
+            drawAllLines();
+            drawCursor();
+        } else if (mCurRow > mTopRow) {
+            mCurLine = mTopLine;
+            mCurRow = mTopRow;
+            drawCursor();
+        }
+        break;
     default:
         if (key >= 32 && key <= 126)
             insertChar((char)key);
@@ -256,6 +295,50 @@ void EditView::backspace()
             if (mBottomRow - mTopRow + 1 < 24 && mTopRow > 1) {
                 --mTopRow;
                 mTopLine = mTopLine->prev;
+            }
+
+            drawAllLines();
+            if (mBottomRow - mTopRow + 1 < 24) {
+                // need to erase the last line due to upward movement
+                mWindow.locate(mBottomRow - mTopRow + 2, 1);
+                mWindow.printn("", 80);
+            }
+            drawCursor();
+        }
+    }
+}
+
+void EditView::deleteChar()
+{
+    if (mCurCol - 1 < mCurLine->len || mCurLine->next) {
+        auto nextLine = mCurLine->next;
+        auto lineRemoved = mBuffer.deleteChar(mCurLine, mCurCol);
+
+        if (!lineRemoved) {
+            // just need to redraw line
+            drawLine(mCurLine, mCurRow);
+            drawCursor();
+        } else {
+            // adjust view as necessary
+            if (nextLine == mBottomLine) {
+                // last line removed, so adjust view
+                mBottomLine = mCurLine;
+                --mBottomRow;
+                if (mTopLine->prev) {
+                    mTopLine = mTopLine->prev;
+                    --mTopRow;
+                }
+            } else {
+                // not last line, so try to bring up next as new bottom line
+                if (mBottomLine->next) {
+                    mBottomLine = mBottomLine->next;
+                }  else if (mTopLine->prev) {
+                    mTopLine = mTopLine->prev;
+                    --mTopRow;
+                    --mBottomRow;
+                } else {
+                    --mBottomRow;
+                }
             }
 
             drawAllLines();

@@ -50,6 +50,7 @@ public:
     EditLine* insertBreak(EditLine* line, int col);
     void insertChar(EditLine* line, int col, char ch);
     bool backspace(EditLine* line, int col);
+    bool deleteChar(EditLine* line, int col);
 
     EditLine* getFirstLine()
     {

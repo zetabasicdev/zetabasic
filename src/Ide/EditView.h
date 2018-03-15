@@ -64,4 +64,5 @@ private:
     void insertBreak();
     void insertChar(char ch);
     void backspace();
+    void deleteChar();
 };

@@ -167,6 +167,7 @@ EditLine* EditBuffer::insertBreak(EditLine* line, int col)
     newLine->prev = line;
     if (!newLine->next)
         mLastLine = newLine;
+    ++mLineCount;
 
     return newLine;
 }
@@ -225,6 +226,49 @@ bool EditBuffer::backspace(EditLine* line, int col)
         else
             mLastLine = line->prev;
         delete line;
+        --mLineCount;
+
+        // line was removed
+        return true;
+    }
+
+    // no line actually removed
+    return false;
+}
+
+bool EditBuffer::deleteChar(EditLine* line, int col)
+{
+    if (col - 1 < line->len) {
+        // move text back one character
+        for (int i = col; i < line->len; ++i)
+            line->text[i - 1] = line->text[i];
+        --line->len;
+        line->text[line->len] = 0;
+    } else if (line->next) {
+        // bring up next line
+        int newLength = col - 1;
+        int length = line->next->len;
+        if (length + newLength > 80)
+            length = 80 - newLength;
+
+        // pad with spaces if past end of current line
+        if (col > line->len + 1)
+            for (int i = line->len; i < col; ++i)
+                line->text[i] = ' ';
+        if (length > 0)
+            memcpy(line->text + col - 1, line->next->text, length);
+        line->len = newLength + length;
+        line->text[line->len] = 0;
+
+        // remove next line
+        EditLine* toDelete = line->next;
+        if (line->next == mLastLine)
+            mLastLine = line;
+        --mLineCount;
+        if (line->next->next)
+            line->next->next->prev = line;
+        line->next = line->next->next;
+        delete toDelete;
 
         // line was removed
         return true;
