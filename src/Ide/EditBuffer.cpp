@@ -145,6 +145,29 @@ EditBuffer::~EditBuffer()
     }
 }
 
+void EditBuffer::save(const std::string& filename)
+{
+#ifdef _WIN32
+    FILE* file = nullptr;
+    (void)fopen_s(&file, filename.c_str(), "w");
+#else
+    FILE* file = fopen(filename.c_str(), "w");
+#endif
+    if (!file) {
+        std::stringstream msg;
+        msg << "Failed to save file: " << filename;
+        throw std::runtime_error(msg.str());
+    }
+
+    EditLine* line = mFirstLine;
+    while (line) {
+        fprintf(file, "%s\n", line->text);
+        line = line->next;
+    }
+
+    fclose(file);
+}
+
 EditLine* EditBuffer::insertBreak(EditLine* line, int col)
 {
     // first create the new line and move text as necessary

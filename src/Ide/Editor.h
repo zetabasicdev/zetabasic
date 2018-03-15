@@ -47,6 +47,7 @@ public:
 
     void newFile();
     void loadFile(const std::string& filename);
+    void saveFile(const std::string& filename);
 
 private:
     Window& mWindow;

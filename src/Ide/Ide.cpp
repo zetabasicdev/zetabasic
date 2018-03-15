@@ -68,6 +68,7 @@ void Ide::run()
                 loadFile();
                 break;
             case F3:
+                saveFile();
                 break;
             case F4:
                 break;
@@ -77,7 +78,7 @@ void Ide::run()
                 break;
             }
         }
-    } while (evt != QUIT && evt != ESCAPE && evt != F10);
+    } while (evt != QUIT && evt != F10);
 }
 
 const std::string& Ide::getFilename()
@@ -104,7 +105,32 @@ void Ide::loadFile()
         auto& filename = getFilename();
         mEditor.loadFile(filename);
     }
-    catch (std::runtime_error& ex) {
+    catch (std::runtime_error) {
+        int row = 0, col = 0;
+        mWindow.getCursorLocation(row, col);
+
+        mWindow.color(1, 4);
+        mWindow.locate(25, 1);
+        mWindow.printn("", 80);
+        mWindow.locate(25, 1);
+
+        mWindow.hideCursor();
+        mWindow.print("Unable to load specified file!");
+        (void)mWindow.runOnce();
+
+        mStatusBar.draw();
+        mWindow.locate(row, col);
+        mWindow.showCursor();
+    }
+}
+
+void Ide::saveFile()
+{
+    try {
+        auto& filename = getFilename();
+        mEditor.saveFile(filename);
+    }
+    catch (std::runtime_error) {
         int row = 0, col = 0;
         mWindow.getCursorLocation(row, col);
 

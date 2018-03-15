@@ -85,3 +85,8 @@ void Editor::loadFile(const std::string& filename)
 
     mView->draw();
 }
+
+void Editor::saveFile(const std::string& filename)
+{
+    mBuffer->save(filename);
+}

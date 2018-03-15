@@ -49,4 +49,5 @@ private:
 
     const std::string& getFilename();
     void loadFile();
+    void saveFile();
 };

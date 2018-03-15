@@ -47,6 +47,8 @@ public:
     EditBuffer(const std::string& filename);
     ~EditBuffer();
 
+    void save(const std::string& filename);
+
     EditLine* insertBreak(EditLine* line, int col);
     void insertChar(EditLine* line, int col, char ch);
     bool backspace(EditLine* line, int col);
