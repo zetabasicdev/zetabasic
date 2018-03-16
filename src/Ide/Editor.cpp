@@ -56,7 +56,6 @@ Editor::~Editor()
 void Editor::draw()
 {
     mView->draw();
-    onCursorChanged(1, 1);
 }
 
 bool Editor::handleKey(int key)

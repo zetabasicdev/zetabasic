@@ -49,7 +49,7 @@ void StatusBar::draw()
 {
     mWindow.color(1, 3);
     mWindow.locate(25, 1);
-    mWindow.print("  F1=New  F2=Load  F3=Save  F4=Output  F5=Run  F10=Quit              ");
+    mWindow.print("  F1=New  F2=Load  F3=Save  F5=Run  F10=Quit                         ");
 
     mWindow.locate(25, 70);
     mWindow.printf("%06d:%03d ", mRow, mCol);

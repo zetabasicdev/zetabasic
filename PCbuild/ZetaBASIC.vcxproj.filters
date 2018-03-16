@@ -200,6 +200,7 @@
     </ClInclude>
     <ClInclude Include="..\src\Compiler\Nodes\IdentifierNode.h">
       <Filter>Header Files\Compiler\Nodes</Filter>
+    </ClInclude>
     <ClInclude Include="..\src\Ide\Editor.h">
       <Filter>Header Files\Ide</Filter>
     </ClInclude>
@@ -330,6 +331,7 @@
     </ClCompile>
     <ClCompile Include="..\src\Compiler\Nodes\IdentifierNode.cpp">
       <Filter>Source Files\Compiler\Nodes</Filter>
+    </ClCompile>
     <ClCompile Include="..\src\Ide\Editor.cpp">
       <Filter>Source Files\Ide</Filter>
     </ClCompile>

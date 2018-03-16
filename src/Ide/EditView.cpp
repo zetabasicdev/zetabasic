@@ -68,6 +68,8 @@ void EditView::draw()
     }
     drawCursor();
     mWindow.showCursor();
+    if (mDelegate)
+        mDelegate->onCursorChanged(mCurRow, mCurCol);
 }
 
 bool EditView::handleKey(int key)
