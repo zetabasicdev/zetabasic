@@ -39,19 +39,22 @@ OBJECTS=\
 	obj/Analyzer.o \
 	obj/AssignmentStatementNode.o \
 	obj/BinaryExpressionNode.o \
-	obj/CodePositionTable.o \
 	obj/Compiler.o \
 	obj/ConstantTable.o \
+	obj/EditBuffer.o \
+	obj/Editor.o \
+	obj/EditView.o \
 	obj/EndStatementNode.o \
 	obj/ExpressionNode.o \
-	obj/FixUpTable.o \
 	obj/ForStatementNode.o \
 	obj/FunctionCallExpressionNode.o \
 	obj/GotoStatementNode.o \
 	obj/Ide.o \
 	obj/IdentifierExpressionNode.o \
+	obj/IdentifierNode.o \
 	obj/IfStatementNode.o \
 	obj/InputStatementNode.o \
+	obj/Instructions.o \
 	obj/IntegerLiteralExpressionNode.o \
 	obj/Interpreter.o \
 	obj/LabelStatementNode.o \
@@ -71,6 +74,7 @@ OBJECTS=\
 	obj/TextSourceStream.o \
 	obj/Token.o \
 	obj/Translator.o \
+	obj/VirtualMachine.o \
 	obj/Window.o \
 	obj/main.o
 

@@ -162,7 +162,6 @@ void Translator::jump(const StringPiece& name)
 void Translator::jump(Label label)
 {
     assert(label >= 0 && label < (int)mLabelTargets.size());
-    assert(label <= JumpSizeMask);
 
     auto ops = mCodeBuffer.alloc(2);
     ops[0] = Op_jmp;
@@ -173,7 +172,6 @@ void Translator::jump(uint64_t opcode, Label label, const ResultIndex& result)
 {
     assert(opcode >= Op_jmp && opcode <= Op_jmp_not_zero);
     assert(label >= 0 && label < (int)mLabelTargets.size());
-    assert(label <= JumpSizeMask);
 
     auto ops = mCodeBuffer.alloc(2);
     ops[0] = opcode;

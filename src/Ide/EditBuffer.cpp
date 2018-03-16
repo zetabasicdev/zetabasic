@@ -85,7 +85,6 @@ EditBuffer::EditBuffer(const std::string& filename)
     while (size > 0) {
         // find next end-of-line
         int len = 0;
-        bool hasEol = false;
         char* start = ptr;
         while (size > 0 && len < 80 && *ptr != '\n') {
             ++ptr;
@@ -214,7 +213,7 @@ void EditBuffer::insertChar(EditLine* line, int col, char ch)
         // inside the line, so move data first
         for (int i = line->len - 1; i >= col - 1; --i)
             line->text[i + 1] = line->text[i];
-        
+
         // insert new character
         line->text[col - 1] = ch;
         ++line->len;
