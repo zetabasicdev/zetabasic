@@ -64,7 +64,9 @@ void Translator::run()
 {
     mRoot.translate(*this);
     fixupLabels();
+#ifdef DUMP_INTERNALS
     dumpCode();
+#endif
 }
 
 void Translator::startCodeBody()
