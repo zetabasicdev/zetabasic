@@ -34,7 +34,6 @@
 #include "Instructions.h"
 #include "Opcodes.h"
 #include "Program.h"
-#include "SystemCalls.h"
 #include "Window.h"
 
 Interpreter::Interpreter(Window& window, const Program& program)

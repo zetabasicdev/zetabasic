@@ -35,7 +35,6 @@
 #include "Parser.h"
 #include "Symbol.h"
 #include "SymbolTable.h"
-#include "SystemCalls.h"
 #include "Translator.h"
 
 InputStatementNode::InputStatementNode()

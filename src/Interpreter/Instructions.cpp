@@ -33,7 +33,6 @@
 #include "Stack.h"
 #include "StringManager.h"
 #include "StringStack.h"
-#include "SystemCalls.h"
 #include "Window.h"
 
 VmWord* ExecuteNop(ExecutionContext* context, VmWord* ip)

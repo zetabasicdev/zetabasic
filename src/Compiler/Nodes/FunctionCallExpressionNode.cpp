@@ -32,7 +32,6 @@
 #include "FunctionCallExpressionNode.h"
 #include "Opcodes.h"
 #include "Parser.h"
-#include "SystemCalls.h"
 #include "Translator.h"
 
 static struct {

@@ -189,15 +189,6 @@
     <ClInclude Include="..\src\StringPiece.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\Instructions.h">
-      <Filter>Header Files\Interpreter</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\VirtualMachine.h">
-      <Filter>Header Files\Interpreter</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\ResultIndex.h">
-      <Filter>Header Files\Compiler</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\Compiler\Nodes\IdentifierNode.h">
       <Filter>Header Files\Compiler\Nodes</Filter>
     </ClInclude>
@@ -221,6 +212,15 @@
     </ClInclude>
     <ClInclude Include="..\src\Ide\EditView.h">
       <Filter>Header Files\Ide</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Interpreter\Instructions.h">
+      <Filter>Header Files\Interpreter</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Interpreter\VirtualMachine.h">
+      <Filter>Header Files\Interpreter</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Compiler\ResultIndex.h">
+      <Filter>Header Files\Compiler</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -323,9 +323,6 @@
     <ClCompile Include="..\src\Compiler\Compiler.cpp">
       <Filter>Source Files\Compiler</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\Instructions.cpp">
-      <Filter>Source Files\Interpreter</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\Interpreter\VirtualMachine.cpp">
       <Filter>Source Files\Interpreter</Filter>
     </ClCompile>
@@ -346,6 +343,9 @@
     </ClCompile>
     <ClCompile Include="..\src\Ide\EditView.cpp">
       <Filter>Source Files\Ide</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Interpreter\Instructions.cpp">
+      <Filter>Source Files\Interpreter</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

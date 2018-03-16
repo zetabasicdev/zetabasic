@@ -72,8 +72,9 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="..\src\Compiler\Nodes\IdentifierNode.h" />
-    <ClInclude Include="..\src\ResultIndex.h" />
-    <ClInclude Include="..\src\VirtualMachine.h" />
+    <ClInclude Include="..\src\Compiler\ResultIndex.h" />
+    <ClInclude Include="..\src\Interpreter\Instructions.h" />
+    <ClInclude Include="..\src\Interpreter\VirtualMachine.h" />
     <ClInclude Include="..\src\Color.h" />
     <ClInclude Include="..\src\Compiler\Analyzer.h" />
     <ClInclude Include="..\src\Compiler\CompileError.h" />
@@ -110,7 +111,6 @@
     <ClInclude Include="..\src\Compiler\Translator.h" />
     <ClInclude Include="..\src\Compiler\Typename.h" />
     <ClInclude Include="..\src\Font.h" />
-    <ClInclude Include="..\src\Instructions.h" />
     <ClInclude Include="..\src\Ide\EditBuffer.h" />
     <ClInclude Include="..\src\Ide\Editor.h" />
     <ClInclude Include="..\src\Ide\EditView.h" />
@@ -162,12 +162,12 @@
     <ClCompile Include="..\src\Compiler\TextSourceStream.cpp" />
     <ClCompile Include="..\src\Compiler\Token.cpp" />
     <ClCompile Include="..\src\Compiler\Translator.cpp" />
-    <ClCompile Include="..\src\Instructions.cpp" />
     <ClCompile Include="..\src\Ide\EditBuffer.cpp" />
     <ClCompile Include="..\src\Ide\Editor.cpp" />
     <ClCompile Include="..\src\Ide\EditView.cpp" />
     <ClCompile Include="..\src\Ide\Ide.cpp" />
     <ClCompile Include="..\src\Ide\StatusBar.cpp" />
+    <ClCompile Include="..\src\Interpreter\Instructions.cpp" />
     <ClCompile Include="..\src\Interpreter\Interpreter.cpp" />
     <ClCompile Include="..\src\Interpreter\Stack.cpp" />
     <ClCompile Include="..\src\Interpreter\StringManager.cpp" />

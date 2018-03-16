@@ -32,7 +32,6 @@
 #include "Opcodes.h"
 #include "Parser.h"
 #include "PrintStatementNode.h"
-#include "SystemCalls.h"
 #include "Translator.h"
 
 PrintStatementNode::PrintStatementNode()
