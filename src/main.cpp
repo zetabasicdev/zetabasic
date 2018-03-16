@@ -38,6 +38,7 @@
 
 #include "CompileError.h"
 #include "Compiler.h"
+#include "Ide.h"
 #include "Interpreter.h"
 #include "TextSourceStream.h"
 #include "Window.h"
@@ -55,37 +56,12 @@ void fatalError(const std::string& title, const std::string& message)
 int main(int argc, char* argv[])
 {
     try {
-        const char* code =
-            "INPUT \"What is your name: \"; U$\n"
-            "PRINT \"Hello \"; U$\n"
-            "\n"
-            "Start:\n"
-            "INPUT \"How many stars do you want: \"; N\n"
-            "LET S$ = \"\"\n"
-            "FOR I = 1 TO N\n"
-            "  LET S$ = S$ + \"*\"\n"
-            "NEXT I\n"
-            "PRINT S$\n"
-            "\n"
-            "Again:\n"
-            "INPUT \"Do you want more stars? \"; A$\n"
-            "IF LEN(A$) = 0 THEN GOTO Again\n"
-            "LET A$ = LEFT$(A$, 1)\n"
-            "IF A$ = \"Y\" OR A$ = \"y\" THEN GOTO Start\n"
-            "PRINT \"Goodbye \"; U$\n"
-            "END";
+        std::string filename;
+        if (argc == 2)
+            filename = argv[1];
 
-        Compiler compiler;
-        TextSourceStream stream(code);
-
-        auto program = compiler.run(stream);
-
-        Window window;
-
-        Interpreter interpreter(window, program);
-        auto result = interpreter.run();
-        if (result == InterpreterResult::BadOpcode)
-            fatalError("Fatal Error", "Interpreter encountered bad opcode");
+        Ide ide(filename);
+        ide.run();
     }
     catch (const CompileError& err) {
         std::stringstream msg;

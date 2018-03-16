@@ -49,7 +49,7 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SDL_INC_PATH);..\src;..\src\Compiler;..\src\Compiler\Nodes;..\src\Interpreter</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SDL_INC_PATH);..\src;..\src\Compiler;..\src\Compiler\Nodes;..\src\Interpreter;..\src\Ide</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>$(SDL_LIB_PATH)</AdditionalLibraryDirectories>
@@ -74,6 +74,7 @@
     <ClInclude Include="..\src\Compiler\Nodes\IdentifierNode.h" />
     <ClInclude Include="..\src\ResultIndex.h" />
     <ClInclude Include="..\src\VirtualMachine.h" />
+    <ClInclude Include="..\src\Color.h" />
     <ClInclude Include="..\src\Compiler\Analyzer.h" />
     <ClInclude Include="..\src\Compiler\CompileError.h" />
     <ClInclude Include="..\src\Compiler\Compiler.h" />
@@ -110,6 +111,11 @@
     <ClInclude Include="..\src\Compiler\Typename.h" />
     <ClInclude Include="..\src\Font.h" />
     <ClInclude Include="..\src\Instructions.h" />
+    <ClInclude Include="..\src\Ide\EditBuffer.h" />
+    <ClInclude Include="..\src\Ide\Editor.h" />
+    <ClInclude Include="..\src\Ide\EditView.h" />
+    <ClInclude Include="..\src\Ide\Ide.h" />
+    <ClInclude Include="..\src\Ide\StatusBar.h" />
     <ClInclude Include="..\src\Interpreter\Interpreter.h" />
     <ClInclude Include="..\src\Interpreter\Opcodes.h" />
     <ClInclude Include="..\src\Interpreter\Program.h" />
@@ -117,6 +123,7 @@
     <ClInclude Include="..\src\Interpreter\StringManager.h" />
     <ClInclude Include="..\src\Interpreter\StringStack.h" />
     <ClInclude Include="..\src\MemoryPool.h" />
+    <ClInclude Include="..\src\Palette.h" />
     <ClInclude Include="..\src\StringPiece.h" />
     <ClInclude Include="..\src\StringPool.h" />
     <ClInclude Include="..\src\SystemCalls.h" />
@@ -156,6 +163,11 @@
     <ClCompile Include="..\src\Compiler\Token.cpp" />
     <ClCompile Include="..\src\Compiler\Translator.cpp" />
     <ClCompile Include="..\src\Instructions.cpp" />
+    <ClCompile Include="..\src\Ide\EditBuffer.cpp" />
+    <ClCompile Include="..\src\Ide\Editor.cpp" />
+    <ClCompile Include="..\src\Ide\EditView.cpp" />
+    <ClCompile Include="..\src\Ide\Ide.cpp" />
+    <ClCompile Include="..\src\Ide\StatusBar.cpp" />
     <ClCompile Include="..\src\Interpreter\Interpreter.cpp" />
     <ClCompile Include="..\src\Interpreter\Stack.cpp" />
     <ClCompile Include="..\src\Interpreter\StringManager.cpp" />

@@ -31,6 +31,12 @@
     <Filter Include="Source Files\Interpreter">
       <UniqueIdentifier>{029275ae-587e-495f-af5e-9167a5587d44}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Ide">
+      <UniqueIdentifier>{fe9814dd-7c20-45e9-aa31-ea4f76340701}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Ide">
+      <UniqueIdentifier>{5fad13e0-1361-44a3-a458-79825f003f0e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\TItemPool.h">
@@ -194,6 +200,26 @@
     </ClInclude>
     <ClInclude Include="..\src\Compiler\Nodes\IdentifierNode.h">
       <Filter>Header Files\Compiler\Nodes</Filter>
+    <ClInclude Include="..\src\Ide\Editor.h">
+      <Filter>Header Files\Ide</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Ide\Ide.h">
+      <Filter>Header Files\Ide</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Ide\StatusBar.h">
+      <Filter>Header Files\Ide</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Color.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Palette.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Ide\EditBuffer.h">
+      <Filter>Header Files\Ide</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Ide\EditView.h">
+      <Filter>Header Files\Ide</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -304,6 +330,20 @@
     </ClCompile>
     <ClCompile Include="..\src\Compiler\Nodes\IdentifierNode.cpp">
       <Filter>Source Files\Compiler\Nodes</Filter>
+    <ClCompile Include="..\src\Ide\Editor.cpp">
+      <Filter>Source Files\Ide</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Ide\Ide.cpp">
+      <Filter>Source Files\Ide</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Ide\StatusBar.cpp">
+      <Filter>Source Files\Ide</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Ide\EditBuffer.cpp">
+      <Filter>Source Files\Ide</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Ide\EditView.cpp">
+      <Filter>Source Files\Ide</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

@@ -28,91 +28,39 @@
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#pragma once
+#include "StatusBar.h"
+#include "Window.h"
 
-#include <cstdint>
-#include <string>
-#include "Palette.h"
-
-enum
+StatusBar::StatusBar(Window& window)
+    :
+    mWindow(window),
+    mRow(0),
+    mCol(0)
 {
-    UP = 256,
-    DOWN,
-    LEFT,
-    RIGHT,
-    PAGE_UP,
-    PAGE_DOWN,
-    HOME,
-    END,
-    INS,
-    DEL,
-    BACKSPACE,
-    ENTER,
-    ESCAPE,
-    TAB,
-    F1,
-    F2,
-    F3,
-    F4,
-    F5,
-    F6,
-    F7,
-    F8,
-    F9,
-    F10,
-    F11,
-    F12,
-    QUIT = 1024
-};
+    // intentionally left blank
+}
 
-class Window
+StatusBar::~StatusBar()
 {
-public:
-    Window();
-    ~Window();
+    // intentionally left blank
+}
 
-    int runOnce();
+void StatusBar::draw()
+{
+    mWindow.color(1, 3);
+    mWindow.locate(25, 1);
+    mWindow.print("  F1=New  F2=Load  F3=Save  F4=Output  F5=Run  F10=Quit              ");
 
-    void clear();
+    mWindow.locate(25, 70);
+    mWindow.printf("%06d:%03d ", mRow, mCol);
+}
 
-    void print(const char* text);
-    void printf(const char* format, ...);
-    void printn(const char* text, int len);
+void StatusBar::setCursorPostion(int row, int col)
+{
+    mRow = row;
+    mCol = col;
 
-    const std::string& input(int maxLength = -1, bool allowEscape = false, bool moveToNextLine = true);
-
-    void locate(int row, int col);
-    void color(int fg, int bg);
-
-    void showCursor();
-    void hideCursor();
-
-    void getCursorLocation(int& row, int& col);
-
-    void setPalette(const Palette& palette);
-
-private:
-    void* mWindow;
-    void* mScreen;
-
-    struct Cell
-    {
-        char ch;
-        uint8_t color;
-    };
-    Cell* mCells;
-
-    int mCursorRow;
-    int mCursorCol;
-    bool mCursorVisible;
-    int mFg;
-    int mBg;
-    bool mDirty;
-
-    Palette mPalette;
-
-    void renderCell(char ch, int row, int col, int fg, int bg);
-    void scroll();
-    void drawCursor();
-    void eraseCursor();
-};
+    mWindow.color(1, 3);
+    mWindow.locate(25, 70);
+    mWindow.printf("%06d:%03d ", mRow, mCol);
+}

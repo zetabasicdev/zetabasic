@@ -30,89 +30,49 @@
 
 #pragma once
 
-#include <cstdint>
 #include <string>
-#include "Palette.h"
 
-enum
+struct EditLine
 {
-    UP = 256,
-    DOWN,
-    LEFT,
-    RIGHT,
-    PAGE_UP,
-    PAGE_DOWN,
-    HOME,
-    END,
-    INS,
-    DEL,
-    BACKSPACE,
-    ENTER,
-    ESCAPE,
-    TAB,
-    F1,
-    F2,
-    F3,
-    F4,
-    F5,
-    F6,
-    F7,
-    F8,
-    F9,
-    F10,
-    F11,
-    F12,
-    QUIT = 1024
+    char text[81];
+    int len;
+    EditLine* prev;
+    EditLine* next;
 };
 
-class Window
+class EditBuffer
 {
 public:
-    Window();
-    ~Window();
+    EditBuffer();
+    EditBuffer(const std::string& filename);
+    ~EditBuffer();
 
-    int runOnce();
+    void save(const std::string& filename);
 
-    void clear();
+    void getContents(std::string& contents);
 
-    void print(const char* text);
-    void printf(const char* format, ...);
-    void printn(const char* text, int len);
+    EditLine* insertBreak(EditLine* line, int col);
+    void insertChar(EditLine* line, int col, char ch);
+    bool backspace(EditLine* line, int col);
+    bool deleteChar(EditLine* line, int col);
 
-    const std::string& input(int maxLength = -1, bool allowEscape = false, bool moveToNextLine = true);
+    EditLine* getFirstLine()
+    {
+        return mFirstLine;
+    }
 
-    void locate(int row, int col);
-    void color(int fg, int bg);
+    EditLine* getLastLine()
+    {
+        return mLastLine;
+    }
 
-    void showCursor();
-    void hideCursor();
-
-    void getCursorLocation(int& row, int& col);
-
-    void setPalette(const Palette& palette);
+    int getLineCount()
+    {
+        return mLineCount;
+    }
 
 private:
-    void* mWindow;
-    void* mScreen;
-
-    struct Cell
-    {
-        char ch;
-        uint8_t color;
-    };
-    Cell* mCells;
-
-    int mCursorRow;
-    int mCursorCol;
-    bool mCursorVisible;
-    int mFg;
-    int mBg;
-    bool mDirty;
-
-    Palette mPalette;
-
-    void renderCell(char ch, int row, int col, int fg, int bg);
-    void scroll();
-    void drawCursor();
-    void eraseCursor();
+    EditLine* mFirstLine;
+    EditLine* mLastLine;
+    int mLineCount;
 };

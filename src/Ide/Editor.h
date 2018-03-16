@@ -30,89 +30,42 @@
 
 #pragma once
 
-#include <cstdint>
 #include <string>
-#include "Palette.h"
+#include "EditView.h"
 
-enum
-{
-    UP = 256,
-    DOWN,
-    LEFT,
-    RIGHT,
-    PAGE_UP,
-    PAGE_DOWN,
-    HOME,
-    END,
-    INS,
-    DEL,
-    BACKSPACE,
-    ENTER,
-    ESCAPE,
-    TAB,
-    F1,
-    F2,
-    F3,
-    F4,
-    F5,
-    F6,
-    F7,
-    F8,
-    F9,
-    F10,
-    F11,
-    F12,
-    QUIT = 1024
-};
+class EditBuffer;
+class Window;
 
-class Window
+class Editor
+    :
+    public EditView::Delegate
 {
 public:
-    Window();
-    ~Window();
+    class Delegate
+    {
+    public:
+        virtual void onCursorChanged(int row, int col) = 0;
+    };
 
-    int runOnce();
+    Editor(Window& window, const std::string& filename);
+    ~Editor();
 
-    void clear();
+    void draw();
+    bool handleKey(int key);
 
-    void print(const char* text);
-    void printf(const char* format, ...);
-    void printn(const char* text, int len);
+    void newFile();
+    void loadFile(const std::string& filename);
+    void saveFile(const std::string& filename);
 
-    const std::string& input(int maxLength = -1, bool allowEscape = false, bool moveToNextLine = true);
+    void onCursorChanged(int row, int col);
+    void setDelegate(Delegate* delegate);
 
-    void locate(int row, int col);
-    void color(int fg, int bg);
-
-    void showCursor();
-    void hideCursor();
-
-    void getCursorLocation(int& row, int& col);
-
-    void setPalette(const Palette& palette);
+    void getCode(std::string& code);
 
 private:
-    void* mWindow;
-    void* mScreen;
+    Window& mWindow;
+    EditBuffer* mBuffer;
+    EditView* mView;
 
-    struct Cell
-    {
-        char ch;
-        uint8_t color;
-    };
-    Cell* mCells;
-
-    int mCursorRow;
-    int mCursorCol;
-    bool mCursorVisible;
-    int mFg;
-    int mBg;
-    bool mDirty;
-
-    Palette mPalette;
-
-    void renderCell(char ch, int row, int col, int fg, int bg);
-    void scroll();
-    void drawCursor();
-    void eraseCursor();
+    Delegate* mDelegate;
 };

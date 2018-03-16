@@ -30,89 +30,49 @@
 
 #pragma once
 
-#include <cstdint>
-#include <string>
-#include "Palette.h"
+class EditBuffer;
+class Window;
+struct EditLine;
 
-enum
-{
-    UP = 256,
-    DOWN,
-    LEFT,
-    RIGHT,
-    PAGE_UP,
-    PAGE_DOWN,
-    HOME,
-    END,
-    INS,
-    DEL,
-    BACKSPACE,
-    ENTER,
-    ESCAPE,
-    TAB,
-    F1,
-    F2,
-    F3,
-    F4,
-    F5,
-    F6,
-    F7,
-    F8,
-    F9,
-    F10,
-    F11,
-    F12,
-    QUIT = 1024
-};
-
-class Window
+class EditView
 {
 public:
-    Window();
-    ~Window();
+    class Delegate
+    {
+    public:
+        virtual void onCursorChanged(int row, int col) = 0;
+    };
 
-    int runOnce();
+    EditView(Window& window, EditBuffer& buffer);
+    ~EditView();
 
-    void clear();
+    void draw();
+    bool handleKey(int key);
 
-    void print(const char* text);
-    void printf(const char* format, ...);
-    void printn(const char* text, int len);
-
-    const std::string& input(int maxLength = -1, bool allowEscape = false, bool moveToNextLine = true);
-
-    void locate(int row, int col);
-    void color(int fg, int bg);
-
-    void showCursor();
-    void hideCursor();
-
-    void getCursorLocation(int& row, int& col);
-
-    void setPalette(const Palette& palette);
+    void setDelegate(Delegate* delegate);
 
 private:
-    void* mWindow;
-    void* mScreen;
+    Window& mWindow;
+    EditBuffer& mBuffer;
 
-    struct Cell
-    {
-        char ch;
-        uint8_t color;
-    };
-    Cell* mCells;
+    EditLine* mTopLine;
+    EditLine* mBottomLine;
+    EditLine* mCurLine;
 
-    int mCursorRow;
-    int mCursorCol;
-    bool mCursorVisible;
-    int mFg;
-    int mBg;
-    bool mDirty;
+    int mTopRow;
+    int mBottomRow;
+    int mCurRow;
+    int mCurCol;
 
-    Palette mPalette;
+    Delegate* mDelegate;
 
-    void renderCell(char ch, int row, int col, int fg, int bg);
-    void scroll();
+    void drawAllLines();
+    void drawFromLine(EditLine* line, int row);
+    void drawLine(EditLine* line, int row);
     void drawCursor();
-    void eraseCursor();
+
+    void insertBreak();
+    void insertChar(char ch);
+    void backspace();
+    void deleteChar();
 };

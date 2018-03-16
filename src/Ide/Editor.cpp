@@ -28,91 +28,88 @@
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#pragma once
+#include "EditBuffer.h"
+#include "Editor.h"
+#include "EditView.h"
+#include "Window.h"
 
-#include <cstdint>
-#include <string>
-#include "Palette.h"
-
-enum
+Editor::Editor(Window& window, const std::string& filename)
+    :
+    mWindow(window),
+    mBuffer(nullptr),
+    mView(nullptr)
 {
-    UP = 256,
-    DOWN,
-    LEFT,
-    RIGHT,
-    PAGE_UP,
-    PAGE_DOWN,
-    HOME,
-    END,
-    INS,
-    DEL,
-    BACKSPACE,
-    ENTER,
-    ESCAPE,
-    TAB,
-    F1,
-    F2,
-    F3,
-    F4,
-    F5,
-    F6,
-    F7,
-    F8,
-    F9,
-    F10,
-    F11,
-    F12,
-    QUIT = 1024
-};
+    if (!filename.empty())
+        mBuffer = new EditBuffer(filename);
+    else
+        mBuffer = new EditBuffer();
+    mView = new EditView(window, *mBuffer);
+    mView->setDelegate(this);
+}
 
-class Window
+Editor::~Editor()
 {
-public:
-    Window();
-    ~Window();
+    delete mView;
+    delete mBuffer;
+}
 
-    int runOnce();
+void Editor::draw()
+{
+    mView->draw();
+    onCursorChanged(1, 1);
+}
 
-    void clear();
+bool Editor::handleKey(int key)
+{
+    return mView->handleKey(key);
+}
 
-    void print(const char* text);
-    void printf(const char* format, ...);
-    void printn(const char* text, int len);
+void Editor::newFile()
+{
+    delete mView;
+    delete mBuffer;
 
-    const std::string& input(int maxLength = -1, bool allowEscape = false, bool moveToNextLine = true);
+    mBuffer = new EditBuffer();
+    mView = new EditView(mWindow, *mBuffer);
+    mView->setDelegate(this);
 
-    void locate(int row, int col);
-    void color(int fg, int bg);
+    mView->draw();
+    onCursorChanged(1, 1);
+}
 
-    void showCursor();
-    void hideCursor();
+void Editor::loadFile(const std::string& filename)
+{
+    auto mNewBuffer = new EditBuffer(filename);
 
-    void getCursorLocation(int& row, int& col);
+    delete mView;
+    delete mBuffer;
 
-    void setPalette(const Palette& palette);
+    mBuffer = mNewBuffer;
+    mView = new EditView(mWindow, *mBuffer);
+    mView->setDelegate(this);
 
-private:
-    void* mWindow;
-    void* mScreen;
+    mView->draw();
+    onCursorChanged(1, 1);
+}
 
-    struct Cell
-    {
-        char ch;
-        uint8_t color;
-    };
-    Cell* mCells;
+void Editor::saveFile(const std::string& filename)
+{
+    mBuffer->save(filename);
+}
 
-    int mCursorRow;
-    int mCursorCol;
-    bool mCursorVisible;
-    int mFg;
-    int mBg;
-    bool mDirty;
+void Editor::onCursorChanged(int row, int col)
+{
+    if (mDelegate)
+        mDelegate->onCursorChanged(row, col);
+}
 
-    Palette mPalette;
+void Editor::setDelegate(Delegate* delegate)
+{
+    assert(delegate);
+    mDelegate = delegate;
+}
 
-    void renderCell(char ch, int row, int col, int fg, int bg);
-    void scroll();
-    void drawCursor();
-    void eraseCursor();
-};
+void Editor::getCode(std::string& code)
+{
+    mBuffer->getContents(code);
+}

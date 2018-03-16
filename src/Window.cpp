@@ -38,13 +38,6 @@
 #include "Font.h"
 #include "Window.h"
 
-static const Uint32 palette[] = {
-    0x00000000, 0x000000aa, 0x0000aa00, 0x0000aaaa,
-    0x00aa0000, 0x00aa00aa, 0x00aa5500, 0x00aaaaaa,
-    0x00555555, 0x005555ff, 0x0055ff55, 0x0055ffff,
-    0x00ff5555, 0x00ff55ff, 0x00ffff55, 0x00ffffff
-};
-
 Window::Window()
     :
     mWindow(nullptr),
@@ -55,7 +48,8 @@ Window::Window()
     mCursorVisible(false),
     mFg(7),
     mBg(0),
-    mDirty(true)
+    mDirty(true),
+    mPalette()
 {
     if (SDL_Init(SDL_INIT_VIDEO) == -1) {
         std::stringstream msg;
@@ -171,8 +165,8 @@ void Window::renderCell(char ch, int row, int col, int fg, int bg)
 
     Uint32 pitch = ((SDL_Surface*)mScreen)->pitch / sizeof(Uint32);
     Uint32* pixel = (Uint32*)((SDL_Surface*)mScreen)->pixels + (((row - 1) * 16) * pitch) + ((col - 1) * 8);
-    uint8_t* chr = (uint8_t*)font8x16 + ((uint8_t)ch * 16);
-    Uint32 colr[2] = { palette[bg], palette[fg] };
+    uint8_t* chr = (uint8_t*)font8x16 + (ch * 16);
+    Uint32 colr[2] = { mPalette[bg].getValue(), mPalette[fg].getValue() };
 
     for (int y = 0; y < 16; ++y) {
         *(pixel) = colr[(*chr & 0x80) >> 7];
@@ -186,6 +180,24 @@ void Window::renderCell(char ch, int row, int col, int fg, int bg)
         ++chr;
         pixel += pitch;
     }
+}
+
+void Window::clear()
+{
+    mFg = 7;
+    mBg = 0;
+    for (int y = 0; y < 25; ++y) {
+        for (int x = 0; x < 80; ++x) {
+            mCells[(y * 80) + x].ch = 0;
+            mCells[(y * 80) + x].color = (mBg << 4) | mFg;
+            renderCell(0, y + 1, x + 1, mFg, mBg);
+        }
+    }
+    mCursorRow = 1;
+    mCursorCol = 1;
+    if (mCursorVisible)
+        drawCursor();
+    mDirty = true;
 }
 
 void Window::scroll()
@@ -231,7 +243,7 @@ void Window::drawCursor()
 {
     Cell* cell = mCells + ((mCursorRow - 1) * 80) + (mCursorCol - 1);
     SDL_Rect dst = { (mCursorCol - 1) * 8, ((mCursorRow - 1) * 16) + 12, 8, 4 };
-    SDL_FillRect((SDL_Surface*)mScreen, &dst, palette[cell->color & 0xf]);
+    SDL_FillRect((SDL_Surface*)mScreen, &dst, mPalette[cell->color & 0xf].getValue());
 }
 
 void Window::eraseCursor()
@@ -286,7 +298,7 @@ void Window::printn(const char* text, int len)
     mDirty = true;
 }
 
-const std::string& Window::input()
+const std::string& Window::input(int maxLength, bool allowEscape, bool moveToNextLine)
 {
     static std::string text;
     text.clear();
@@ -302,6 +314,12 @@ const std::string& Window::input()
     while (!done) {
         int evt = runOnce();
         switch (evt) {
+        case ESCAPE:
+            if (allowEscape) {
+                text.clear();
+                done = true;
+            }
+            break;
         case ENTER:
             done = true;
             break;
@@ -326,7 +344,7 @@ const std::string& Window::input()
             break;
         default:
             if (evt >= 32 && evt <= 126) {
-                if (text.length() < 255) {
+                if ((maxLength == -1 && text.length() < 255) || text.length() < maxLength - 1) {
                     text.push_back((char)evt);
                     Cell* cell = mCells + ((mCursorRow - 1) * 80) + (mCursorCol - 1);
                     cell->ch = (char)evt;
@@ -354,12 +372,13 @@ const std::string& Window::input()
 
     hideCursor();
 
-    // move to next line
-    ++mCursorRow;
-    mCursorCol = 1;
-    if (mCursorRow > 25) {
-        --mCursorRow;
-        scroll();
+    if (moveToNextLine) {
+        ++mCursorRow;
+        mCursorCol = 1;
+        if (mCursorRow > 25) {
+            --mCursorRow;
+            scroll();
+        }
     }
 
     if (!rehideCursor)
@@ -422,4 +441,15 @@ void Window::hideCursor()
         mCursorVisible = false;
         mDirty = true;
     }
+}
+
+void Window::getCursorLocation(int& row, int& col)
+{
+    row = mCursorRow;
+    col = mCursorCol;
+}
+
+void Window::setPalette(const Palette& palette)
+{
+    mPalette = palette;
 }

@@ -102,6 +102,7 @@ void Lexer::run()
         mTokens.push(mTokenPool.alloc(TokenId::EndOfLine, TokenTag::None, StringPiece(), Range()));
     mTokens.push(mTokenPool.alloc(TokenId::EndOfSource, TokenTag::None, StringPiece(), Range()));
 
+#ifdef DUMP_INTERNALS
     for (int ix = 0; ix < mTokens.getSize(); ++ix) {
         auto& token = mTokens[ix];
         printf("%04d [%02d:%02d] %s (%s) \"%s\"\n",
@@ -110,6 +111,7 @@ void Lexer::run()
                (token.getId() != TokenId::EndOfLine) ? token.getText().getText() : "");
     }
     printf("\n");
+#endif
 }
 
 static bool isSymbolStart(char ch)

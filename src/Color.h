@@ -31,88 +31,81 @@
 #pragma once
 
 #include <cstdint>
-#include <string>
-#include "Palette.h"
 
-enum
-{
-    UP = 256,
-    DOWN,
-    LEFT,
-    RIGHT,
-    PAGE_UP,
-    PAGE_DOWN,
-    HOME,
-    END,
-    INS,
-    DEL,
-    BACKSPACE,
-    ENTER,
-    ESCAPE,
-    TAB,
-    F1,
-    F2,
-    F3,
-    F4,
-    F5,
-    F6,
-    F7,
-    F8,
-    F9,
-    F10,
-    F11,
-    F12,
-    QUIT = 1024
-};
-
-class Window
+class Color
 {
 public:
-    Window();
-    ~Window();
+    Color()
+        :
+        mRed(0),
+        mGreen(0),
+        mBlue(0),
+        mAlpha(0),
+        mValue(0)
+    {
+        // intentionally left blank
+    }
 
-    int runOnce();
+    Color(uint32_t value)
+        :
+        mRed((value >> 16) & 0xff),
+        mGreen((value >> 8) & 0xff),
+        mBlue(value & 0xff),
+        mAlpha((value >> 24) & 0xff),
+        mValue(value)
+    {
+        // intentionally left blank
+    }
 
-    void clear();
+    Color(int red, int green, int blue, int alpha = 255)
+        :
+        mRed(red),
+        mGreen(green),
+        mBlue(blue),
+        mAlpha(alpha),
+        mValue(0)
+    {
+        assert(mRed >= 0 && mRed < 256);
+        assert(mGreen >= 0 && mGreen < 256);
+        assert(mBlue >= 0 && mBlue < 256);
+        assert(mAlpha >= 0 && mAlpha < 256);
+        mValue = (mAlpha << 24) | (mRed << 16) | (mGreen << 8) | mBlue;
+    }
 
-    void print(const char* text);
-    void printf(const char* format, ...);
-    void printn(const char* text, int len);
+    ~Color()
+    {
+        // intentionally left blank
+    }
 
-    const std::string& input(int maxLength = -1, bool allowEscape = false, bool moveToNextLine = true);
+    int getRed() const
+    {
+        return mRed;
+    }
 
-    void locate(int row, int col);
-    void color(int fg, int bg);
+    int getGreen() const
+    {
+        return mGreen;
+    }
 
-    void showCursor();
-    void hideCursor();
+    int getBlue() const
+    {
+        return mBlue;
+    }
 
-    void getCursorLocation(int& row, int& col);
+    int getAlpha() const
+    {
+        return mAlpha;
+    }
 
-    void setPalette(const Palette& palette);
+    uint32_t getValue() const
+    {
+        return mValue;
+    }
 
 private:
-    void* mWindow;
-    void* mScreen;
-
-    struct Cell
-    {
-        char ch;
-        uint8_t color;
-    };
-    Cell* mCells;
-
-    int mCursorRow;
-    int mCursorCol;
-    bool mCursorVisible;
-    int mFg;
-    int mBg;
-    bool mDirty;
-
-    Palette mPalette;
-
-    void renderCell(char ch, int row, int col, int fg, int bg);
-    void scroll();
-    void drawCursor();
-    void eraseCursor();
+    int mRed;
+    int mGreen;
+    int mBlue;
+    int mAlpha;
+    uint32_t mValue;
 };
