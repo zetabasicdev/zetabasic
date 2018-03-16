@@ -168,6 +168,19 @@ void EditBuffer::save(const std::string& filename)
     fclose(file);
 }
 
+void EditBuffer::getContents(std::string& contents)
+{
+    contents.clear();
+
+    EditLine* line = mFirstLine;
+    while (line) {
+        if (line->len > 0)
+            contents.append(line->text, line->len);
+        contents.push_back('\n');
+        line = line->next;
+    }
+}
+
 EditLine* EditBuffer::insertBreak(EditLine* line, int col)
 {
     // first create the new line and move text as necessary

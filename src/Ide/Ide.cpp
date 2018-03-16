@@ -29,12 +29,16 @@
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "Ide.h"
+#include "Interpreter.h"
+#include "CompileError.h"
+#include "TextSourceStream.h"
 
 Ide::Ide(const std::string& filename)
     :
     mWindow(),
     mStatusBar(mWindow),
-    mEditor(mWindow, filename)
+    mEditor(mWindow, filename),
+    mCompiler()
 {
     mEditor.setDelegate(this);
 }
@@ -73,6 +77,7 @@ void Ide::run()
             case F4:
                 break;
             case F5:
+                runProgram();
                 break;
             default:
                 break;
@@ -114,7 +119,8 @@ void Ide::loadFile()
 {
     try {
         auto& filename = getFilename();
-        mEditor.loadFile(filename);
+        if (!filename.empty())
+            mEditor.loadFile(filename);
     }
     catch (std::runtime_error) {
         int row = 0, col = 0;
@@ -139,7 +145,8 @@ void Ide::saveFile()
 {
     try {
         auto& filename = getFilename();
-        mEditor.saveFile(filename);
+        if (!filename.empty())
+            mEditor.saveFile(filename);
     }
     catch (std::runtime_error) {
         int row = 0, col = 0;
@@ -152,6 +159,45 @@ void Ide::saveFile()
 
         mWindow.hideCursor();
         mWindow.print("Unable to load specified file!");
+        (void)mWindow.runOnce();
+
+        mStatusBar.draw();
+        mWindow.locate(row, col);
+        mWindow.showCursor();
+    }
+}
+
+void Ide::runProgram()
+{
+    static std::string code;
+    mEditor.getCode(code);
+
+    try {
+        TextSourceStream stream(code.data(), (int)code.length());
+        auto program = mCompiler.run(stream);
+
+        Interpreter interpreter(mWindow, program);
+        mWindow.hideCursor();
+        mWindow.clear();
+        interpreter.run();
+        mWindow.showCursor();
+
+        mStatusBar.draw();
+        mEditor.draw();
+    }
+    catch (const CompileError& error) {
+        mEditor.draw();
+
+        int row = 0, col = 0;
+        mWindow.getCursorLocation(row, col);
+
+        mWindow.color(1, 4);
+        mWindow.locate(25, 1);
+        mWindow.printn("", 80);
+        mWindow.locate(25, 1);
+
+        mWindow.hideCursor();
+        mWindow.printf("[%d:%d] %s", error.getRange().getStartRow(), error.getRange().getStartCol(), error.what());
         (void)mWindow.runOnce();
 
         mStatusBar.draw();

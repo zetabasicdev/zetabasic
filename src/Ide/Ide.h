@@ -30,6 +30,7 @@
 
 #pragma once
 
+#include "Compiler.h"
 #include "Editor.h"
 #include "StatusBar.h"
 #include "Window.h"
@@ -50,8 +51,10 @@ private:
     Window mWindow;
     StatusBar mStatusBar;
     Editor mEditor;
+    Compiler mCompiler;
 
     const std::string& getFilename();
     void loadFile();
     void saveFile();
+    void runProgram();
 };

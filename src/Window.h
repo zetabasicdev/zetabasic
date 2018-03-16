@@ -73,6 +73,8 @@ public:
 
     int runOnce();
 
+    void clear();
+
     void print(const char* text);
     void printf(const char* format, ...);
     void printn(const char* text, int len);

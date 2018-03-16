@@ -60,6 +60,8 @@ public:
     void onCursorChanged(int row, int col);
     void setDelegate(Delegate* delegate);
 
+    void getCode(std::string& code);
+
 private:
     Window& mWindow;
     EditBuffer* mBuffer;

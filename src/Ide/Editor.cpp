@@ -108,3 +108,8 @@ void Editor::setDelegate(Delegate* delegate)
     assert(delegate);
     mDelegate = delegate;
 }
+
+void Editor::getCode(std::string& code)
+{
+    mBuffer->getContents(code);
+}

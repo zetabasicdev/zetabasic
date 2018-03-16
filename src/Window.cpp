@@ -182,6 +182,24 @@ void Window::renderCell(char ch, int row, int col, int fg, int bg)
     }
 }
 
+void Window::clear()
+{
+    mFg = 7;
+    mBg = 0;
+    for (int y = 0; y < 25; ++y) {
+        for (int x = 0; x < 80; ++x) {
+            mCells[(y * 80) + x].ch = 0;
+            mCells[(y * 80) + x].color = (mBg << 4) | mFg;
+            renderCell(0, y + 1, x + 1, mFg, mBg);
+        }
+    }
+    mCursorRow = 1;
+    mCursorCol = 1;
+    if (mCursorVisible)
+        drawCursor();
+    mDirty = true;
+}
+
 void Window::scroll()
 {
     for (int y = 1; y < 25; ++y)
