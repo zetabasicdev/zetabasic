@@ -1,0 +1,49 @@
+module = { statement }
+
+statement = assign-statement
+	| end-statement
+	| for-statement
+	| goto-statement
+	| if-statement
+	| input-statement
+	| label-statement
+	| print-statement
+
+assign-statement = "LET" identifier "=" expression eol
+
+end-statement = "END" eol
+
+for-statement = "FOR" identifier "=" expression "TO" expression eol
+	{ statement }
+	"NEXT" identifier eol
+
+goto-statement = "GOTO" name eol
+
+if-statement = "IF" expression "THEN" statement
+
+input-statement = "INPUT" string-literal ";" identifier eol
+
+label-statemet = name ":" eol
+
+print-statement = "PRINT" [ expression { ";" expression } ] eol
+
+expression = identifier
+	| string-literal
+	| integer-literal
+	| binary-expression
+
+string-literal = ? \"[^\n\"]*\" ?
+
+integer-literal = ? [0-9][0-9]* ?
+
+binary-expression = expression "+" expression
+	| expression "=" expression
+	| expression "OR" expression
+
+identifier = name | typed_name
+
+name = ? [a-zA-Z][a-zA-Z0-9]* ?
+
+typed_name = name "$"
+
+eol = '\n'
