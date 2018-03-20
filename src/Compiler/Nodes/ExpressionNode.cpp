@@ -62,16 +62,24 @@ ExpressionNode* ExpressionNode::parseExpression(Parser& parser, int precedence)
 {
     // first parse potential prefix expression
     ExpressionNode* expr = nullptr;
-    if (parser.isToken(TokenId::StringPiece))
-        expr = parser.getNodePool().alloc<StringLiteralExpressionNode>();
-    else if (parser.isToken(TokenId::Integer))
-        expr = parser.getNodePool().alloc<IntegerLiteralExpressionNode>();
-    else if (parser.isToken(TokenId::Name) && parser.getToken().getTag() == TokenTag::None)
-        expr = parser.getNodePool().alloc<IdentifierExpressionNode>();
-    else if (parser.getToken().getTag() != TokenTag::None && FunctionCallExpressionNode::isBuiltin(parser.getToken().getTag()))
-        expr = parser.getNodePool().alloc<FunctionCallExpressionNode>();
-    if (expr)
-        expr->parse(parser);
+    if (parser.getToken().getTag() == TokenTag::Sym_OpenParen) {
+        parser.eatToken();
+        expr = parseExpression(parser);
+        if (parser.getToken().getTag() != TokenTag::Sym_CloseParen)
+            parser.raiseError(CompileErrorId::SyntaxError, "Expected Closing Parenthesis");
+        parser.eatToken();
+    } else {
+        if (parser.isToken(TokenId::StringPiece))
+            expr = parser.getNodePool().alloc<StringLiteralExpressionNode>();
+        else if (parser.isToken(TokenId::Integer))
+            expr = parser.getNodePool().alloc<IntegerLiteralExpressionNode>();
+        else if (parser.isToken(TokenId::Name) && parser.getToken().getTag() == TokenTag::None)
+            expr = parser.getNodePool().alloc<IdentifierExpressionNode>();
+        else if (parser.getToken().getTag() != TokenTag::None && FunctionCallExpressionNode::isBuiltin(parser.getToken().getTag()))
+            expr = parser.getNodePool().alloc<FunctionCallExpressionNode>();
+        if (expr)
+            expr->parse(parser);
+    }
 
     // then search for infix expressions
     while (precedence < getPrecedence(parser.getToken().getTag())) {
