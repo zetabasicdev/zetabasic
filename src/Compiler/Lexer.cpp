@@ -229,7 +229,7 @@ bool Lexer::runNameState()
 {
     if ((mChar >= 'a' && mChar <= 'z') || (mChar >= 'A' && mChar <= 'Z') || (mChar >= '0' && mChar <= '9')) {
         return true;
-    } else if (mChar == '$' || mChar == '?') {
+    } else if (mChar == '$' || mChar == '?' || mChar == '%') {
         mId = TokenId::Name;
         mState = State::End;
         return true;
