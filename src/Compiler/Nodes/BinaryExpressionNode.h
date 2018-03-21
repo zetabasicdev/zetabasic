@@ -54,6 +54,7 @@ public:
 
 private:
     Operator mOp;
+    Range mOpRange;
     ExpressionNode* mLhs;
     ExpressionNode* mRhs;
 };

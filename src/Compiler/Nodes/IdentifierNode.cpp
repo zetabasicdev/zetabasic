@@ -63,9 +63,17 @@ void IdentifierNode::analyze(Analyzer& analyzer)
 {
     Typename type = Typename::Integer;
 
-    char lastChar = mName.getText()[mName.getLength() - 1];
-    if (lastChar == '$')
+    switch (mName.getText()[mName.getLength() - 1]) {
+    case '?':
+        type = Typename::Boolean;
+        break;
+    case '$':
         type = Typename::String;
+        break;
+    default:
+        assert(false);
+        break;
+    }
 
     mSymbol = analyzer.getSymbolTable().getSymbol(mRange, mName, type);
 }

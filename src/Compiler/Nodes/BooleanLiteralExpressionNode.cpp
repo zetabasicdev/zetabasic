@@ -28,92 +28,36 @@
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#pragma once
+#include "BooleanLiteralExpressionNode.h"
+#include "Parser.h"
+#include "Translator.h"
 
-#include "Range.h"
-#include "StringPiece.h"
-
-enum class TokenId
+BooleanLiteralExpressionNode::BooleanLiteralExpressionNode()
+    :
+    mValue(false)
 {
-    Unknown,
-    EndOfSource,
-    EndOfLine,
-    Name,
-    Integer,
-    StringPiece,
-    Symbol,
-    Label
-};
-const char* ToString(TokenId id);
+    // intentionally left blank
+}
 
-enum class TokenTag
+BooleanLiteralExpressionNode::~BooleanLiteralExpressionNode()
 {
-    None,
-    Key_End,
-    Key_False,
-    Key_For,
-    Key_Goto,
-    Key_If,
-    Key_Input,
-    Key_Len,
-    Key_LeftS,
-    Key_Let,
-    Key_Next,
-    Key_Or,
-    Key_Print,
-    Key_Then,
-    Key_To,
-    Key_True,
-    Sym_Add,
-    Sym_Equals,
-    Sym_OpenParen,
-    Sym_CloseParen,
-    Sym_Comma,
-    Sym_Semicolon
-};
-const char* ToString(TokenTag tag);
+    // intentionally left blank
+}
 
-class Token
+void BooleanLiteralExpressionNode::parse(Parser& parser)
 {
-public:
-    Token(TokenId id, TokenTag tag, const StringPiece& text, const Range& range)
-        :
-        mId(id),
-        mTag(tag),
-        mText(text),
-        mRange(range)
-    {
-        // intentionally left blank
-    }
+    assert(parser.getToken().getTag() == TokenTag::Key_True || parser.getToken().getTag() == TokenTag::Key_False);
 
-    ~Token()
-    {
-        // intentionally left blank
-    }
+    mValue = parser.getToken().getTag() == TokenTag::Key_True ? true : false;
+    parser.eatToken();
+}
 
-    TokenId getId() const
-    {
-        return mId;
-    }
+void BooleanLiteralExpressionNode::analyze(Analyzer& analyzer)
+{
+    mType = Typename::Boolean;
+}
 
-    TokenTag getTag() const
-    {
-        return mTag;
-    }
-
-    const StringPiece& getText() const
-    {
-        return mText;
-    }
-
-    const Range& getRange() const
-    {
-        return mRange;
-    }
-
-private:
-    TokenId mId;
-    TokenTag mTag;
-    StringPiece mText;
-    Range mRange;
-};
+void BooleanLiteralExpressionNode::translate(Translator& translator)
+{
+    mResultIndex = translator.loadConstant(mValue ? 1 : 0);
+}

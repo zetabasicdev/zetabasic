@@ -62,6 +62,7 @@ VmWord* ExecuteJmpNotZero(ExecutionContext* context, VmWord* ip);
 
 VmWord* ExecuteLoadConstant(ExecutionContext* context, VmWord* ip);
 VmWord* ExecuteLoadString(ExecutionContext* context, VmWord* ip);
+
 VmWord* ExecuteAddIntegers0(ExecutionContext* context, VmWord* ip);
 VmWord* ExecuteAddIntegers1(ExecutionContext* context, VmWord* ip);
 VmWord* ExecuteAddIntegers2(ExecutionContext* context, VmWord* ip);
@@ -88,6 +89,11 @@ VmWord* ExecuteOrIntegers2(ExecutionContext* context, VmWord* ip);
 VmWord* ExecuteOrIntegers3(ExecutionContext* context, VmWord* ip);
 VmWord* ExecuteMove0(ExecutionContext* context, VmWord* ip);
 VmWord* ExecuteMove1(ExecutionContext* context, VmWord* ip);
+
+VmWord* ExecutePrintBoolean0(ExecutionContext* context, VmWord* ip);
+VmWord* ExecutePrintBoolean1(ExecutionContext* context, VmWord* ip);
+VmWord* ExecutePrintBoolean0Newline(ExecutionContext* context, VmWord* ip);
+VmWord* ExecutePrintBoolean1Newline(ExecutionContext* context, VmWord* ip);
 VmWord* ExecutePrintInteger0(ExecutionContext* context, VmWord* ip);
 VmWord* ExecutePrintInteger1(ExecutionContext* context, VmWord* ip);
 VmWord* ExecutePrintInteger0Newline(ExecutionContext* context, VmWord* ip);

@@ -33,6 +33,7 @@
 enum class Typename
 {
     Unknown,
+    Boolean,
     Integer,
     String
 };

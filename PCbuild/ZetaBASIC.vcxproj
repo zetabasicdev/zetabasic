@@ -71,6 +71,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="..\src\Compiler\Nodes\BooleanLiteralExpressionNode.h" />
     <ClInclude Include="..\src\Compiler\Nodes\IdentifierNode.h" />
     <ClInclude Include="..\src\Compiler\ResultIndex.h" />
     <ClInclude Include="..\src\Interpreter\Instructions.h" />
@@ -154,6 +155,7 @@
     <ClCompile Include="..\src\Compiler\Nodes\ModuleNode.cpp" />
     <ClCompile Include="..\src\Compiler\Nodes\Node.cpp" />
     <ClCompile Include="..\src\Compiler\Nodes\PrintStatementNode.cpp" />
+    <ClCompile Include="..\src\Compiler\Nodes\BooleanLiteralExpressionNode.cpp" />
     <ClCompile Include="..\src\Compiler\Nodes\StatementNode.cpp" />
     <ClCompile Include="..\src\Compiler\Nodes\StringLiteralExpressionNode.cpp" />
     <ClCompile Include="..\src\Compiler\Parser.cpp" />

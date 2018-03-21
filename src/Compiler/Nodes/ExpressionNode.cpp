@@ -29,6 +29,7 @@
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "BinaryExpressionNode.h"
+#include "BooleanLiteralExpressionNode.h"
 #include "ExpressionNode.h"
 #include "FunctionCallExpressionNode.h"
 #include "IdentifierExpressionNode.h"
@@ -73,6 +74,8 @@ ExpressionNode* ExpressionNode::parseExpression(Parser& parser, int precedence)
             expr = parser.getNodePool().alloc<StringLiteralExpressionNode>();
         else if (parser.isToken(TokenId::Integer))
             expr = parser.getNodePool().alloc<IntegerLiteralExpressionNode>();
+        else if (parser.getToken().getTag() == TokenTag::Key_True || parser.getToken().getTag() == TokenTag::Key_False)
+            expr = parser.getNodePool().alloc<BooleanLiteralExpressionNode>();
         else if (parser.isToken(TokenId::Name) && parser.getToken().getTag() == TokenTag::None)
             expr = parser.getNodePool().alloc<IdentifierExpressionNode>();
         else if (parser.getToken().getTag() != TokenTag::None && FunctionCallExpressionNode::isBuiltin(parser.getToken().getTag()))

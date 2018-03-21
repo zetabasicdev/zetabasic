@@ -37,6 +37,7 @@
 BinaryExpressionNode::BinaryExpressionNode(ExpressionNode* lhs)
     :
     mOp(Operator::Unknown),
+    mOpRange(),
     mLhs(lhs),
     mRhs(nullptr)
 {
@@ -65,13 +66,15 @@ void BinaryExpressionNode::parse(Parser& parser)
         assert(false);
         break;
     }
-    mRange = parser.getToken().getRange();
+    mOpRange = parser.getToken().getRange();
     parser.eatToken();
 
     // parse sub-expressions on the right-hand side
     mRhs = ExpressionNode::parseExpression(parser, precedence);
     if (!mRhs)
         parser.raiseError(CompileErrorId::SyntaxError, "Expected Expression");
+
+    mRange = Range(mLhs->getRange(), mRhs->getRange());
 }
 
 void BinaryExpressionNode::analyze(Analyzer& analyzer)
@@ -88,15 +91,25 @@ void BinaryExpressionNode::analyze(Analyzer& analyzer)
     if (leftType != rightType)
         throw CompileError(CompileErrorId::TypeError, mRange, "Mis-matched Expression Types");
 
-    // todo - fix this...
-    if (mOp == Operator::BitwiseOr && leftType != Typename::Integer)
-        throw CompileError(CompileErrorId::TypeError, mRange, "Bad Type For Bitwise OR");
-
-    // certain types of operators result in different types
-    if (mOp == Operator::Equals)
-        mType = Typename::Integer;
-    else
+    // check type based on operator
+    switch (mOp) {
+    case Operator::Addition:
+        if (leftType != Typename::Integer && leftType != Typename::String)
+            throw CompileError(CompileErrorId::TypeError, mOpRange, "Unknown Operation For Types");
         mType = leftType;
+        break;
+    case Operator::Equals:
+        mType = Typename::Boolean;
+        break;
+    case Operator::BitwiseOr:
+        if (leftType != Typename::Boolean && leftType != Typename::Integer)
+            throw CompileError(CompileErrorId::TypeError, mOpRange, "Unknown Operation For Types");
+        mType = leftType;
+        break;
+    default:
+        assert(false);
+        break;
+    }
 }
 
 void BinaryExpressionNode::translate(Translator& translator)
@@ -107,23 +120,28 @@ void BinaryExpressionNode::translate(Translator& translator)
     // need to base this on operand type, not result type
     auto opType = mLhs->getType();
 
+    uint64_t opcode = 0;
     switch (mOp) {
     case Operator::Addition:
         if (opType == Typename::Integer)
-            mResultIndex = translator.binaryOperator(Op_add_integers0, mLhs->getResultIndex(), mRhs->getResultIndex());
-        else
-            mResultIndex = translator.binaryOperator(Op_add_strings0, mLhs->getResultIndex(), mRhs->getResultIndex());
+            opcode = Op_add_integers0;
+        else if (opType == Typename::String)
+            opcode = Op_add_strings0;
         break;
     case Operator::Equals:
-        if (opType == Typename::Integer)
-            mResultIndex = translator.binaryOperator(Op_eq_integers0, mLhs->getResultIndex(), mRhs->getResultIndex());
-        else
-            mResultIndex = translator.binaryOperator(Op_eq_strings0, mLhs->getResultIndex(), mRhs->getResultIndex());
+        if (opType == Typename::Boolean || opType == Typename::Integer)
+            opcode = Op_eq_integers0;
+        else if (opType == Typename::String)
+            opcode = Op_eq_strings0;
         break;
     case Operator::BitwiseOr:
-        mResultIndex = translator.binaryOperator(Op_or_integers0, mLhs->getResultIndex(), mRhs->getResultIndex());
+        if (opType == Typename::Boolean || opType == Typename::Integer)
+            opcode = Op_or_integers0;
         break;
     default:
         break;
     }
+
+    assert(opcode != 0);
+    mResultIndex = translator.binaryOperator(opcode, mLhs->getResultIndex(), mRhs->getResultIndex());
 }

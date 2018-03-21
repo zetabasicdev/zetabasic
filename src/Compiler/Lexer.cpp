@@ -167,6 +167,7 @@ bool Lexer::runEndState()
                 TokenTag tag;
             } keywords[] = {
                 { "END", TokenTag::Key_End },
+                { "FALSE", TokenTag::Key_False },
                 { "FOR", TokenTag::Key_For },
                 { "IF", TokenTag::Key_If },
                 { "INPUT", TokenTag::Key_Input },
@@ -179,6 +180,7 @@ bool Lexer::runEndState()
                 { "PRINT", TokenTag::Key_Print },
                 { "THEN", TokenTag::Key_Then },
                 { "TO", TokenTag::Key_To },
+                { "TRUE", TokenTag::Key_True },
                 { "", TokenTag::None }
             };
             for (int i = 0; keywords[i].tag != TokenTag::None; ++i) {
@@ -227,7 +229,7 @@ bool Lexer::runNameState()
 {
     if ((mChar >= 'a' && mChar <= 'z') || (mChar >= 'A' && mChar <= 'Z') || (mChar >= '0' && mChar <= '9')) {
         return true;
-    } else if (mChar == '$') {
+    } else if (mChar == '$' || mChar == '?') {
         mId = TokenId::Name;
         mState = State::End;
         return true;

@@ -227,6 +227,12 @@ void Translator::print(Typename type, const ResultIndex& index, bool trailingSem
     // target index/value is stored in first operand
     ops[1] = (uint64_t)index.getValue();
     switch (type) {
+    case Typename::Boolean:
+        if (index.getType() == ResultIndexType::Literal)
+            ops[0] = trailingSemicolon ? Op_print_boolean0 : Op_print_boolean0_newline;
+        else if (index.getType() == ResultIndexType::Local)
+            ops[0] = trailingSemicolon ? Op_print_boolean1 : Op_print_boolean1_newline;
+        break;
     case Typename::Integer:
         if (index.getType() == ResultIndexType::Literal)
             ops[0] = trailingSemicolon ? Op_print_integer0 : Op_print_integer0_newline;
@@ -240,6 +246,7 @@ void Translator::print(Typename type, const ResultIndex& index, bool trailingSem
             ops[0] = trailingSemicolon ? Op_print_string1 : Op_print_string1_newline;
         break;
     default:
+        assert(false);
         break;
     }
 }
@@ -375,6 +382,8 @@ void Translator::dumpCode()
         "gr_integers", "gr_integers", "gr_integers", "gr_integers",
         "or_integers", "or_integers", "or_integers", "or_integers",
         "move", "move",
+        "print_boolean", "print_boolean",
+        "print_boolean_newline", "print_boolean_newline",
         "print_integer", "print_integer",
         "print_integer_newline", "print_integer_newline",
         "print_string", "print_string",

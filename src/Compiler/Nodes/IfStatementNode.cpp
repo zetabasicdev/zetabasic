@@ -29,6 +29,7 @@
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "Analyzer.h"
+#include "CompileError.h"
 #include "ExpressionNode.h"
 #include "IfStatementNode.h"
 #include "Opcodes.h"
@@ -71,6 +72,9 @@ void IfStatementNode::parse(Parser& parser)
 void IfStatementNode::analyze(Analyzer& analyzer)
 {
     mExpression->analyze(analyzer);
+    if (mExpression->getType() != Typename::Boolean)
+        throw CompileError(CompileErrorId::TypeError, mExpression->getRange(), "IF Expression Must Be BOOLEAN");
+
     mStatement->analyze(analyzer);
 }
 

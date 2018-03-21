@@ -222,6 +222,9 @@
     <ClInclude Include="..\src\Compiler\ResultIndex.h">
       <Filter>Header Files\Compiler</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\Compiler\Nodes\BooleanLiteralExpressionNode.h">
+      <Filter>Header Files\Compiler\Nodes</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\main.cpp">
@@ -346,6 +349,9 @@
     </ClCompile>
     <ClCompile Include="..\src\Interpreter\Instructions.cpp">
       <Filter>Source Files\Interpreter</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Compiler\Nodes\BooleanLiteralExpressionNode.cpp">
+      <Filter>Source Files\Compiler\Nodes</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

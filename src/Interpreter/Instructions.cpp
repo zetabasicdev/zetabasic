@@ -324,6 +324,33 @@ VmWord* ExecuteMove1(ExecutionContext* context, VmWord* ip)
     return ip + 2;
 }
 
+VmWord* ExecutePrintBoolean0(ExecutionContext* context, VmWord* ip)
+{
+    context->window->print(((int64_t)(ip[1] & OperandSizeMask) != 0) ? "True" : "False");
+    return ip + 2;
+}
+
+VmWord* ExecutePrintBoolean1(ExecutionContext* context, VmWord* ip)
+{
+    int index = ip[1] & OperandSizeMask;
+    context->window->print((context->stack->getLocal(index) != 0) ? "True" : "False");
+    return ip + 2;
+}
+
+VmWord* ExecutePrintBoolean0Newline(ExecutionContext* context, VmWord* ip)
+{
+    context->window->print(((int64_t)(ip[1] & OperandSizeMask) != 0) ? "True\n" : "False\n");
+    return ip + 2;
+}
+
+VmWord* ExecutePrintBoolean1Newline(ExecutionContext* context, VmWord* ip)
+{
+    int index = ip[1] & OperandSizeMask;
+    context->window->print((context->stack->getLocal(index) != 0) ? "True\n" : "False\n");
+    return ip + 2;
+}
+
+
 VmWord* ExecutePrintInteger0(ExecutionContext* context, VmWord* ip)
 {
     context->window->printf("%lld", (int64_t)(ip[1] & OperandSizeMask));
