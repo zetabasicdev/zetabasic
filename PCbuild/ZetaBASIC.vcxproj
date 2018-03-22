@@ -74,6 +74,7 @@
     <ClInclude Include="..\src\Compiler\Nodes\BooleanLiteralExpressionNode.h" />
     <ClInclude Include="..\src\Compiler\Nodes\IdentifierNode.h" />
     <ClInclude Include="..\src\Compiler\Nodes\RealLiteralExpressionNode.h" />
+    <ClInclude Include="..\src\Compiler\Nodes\TypeConversionExpressionNode.h" />
     <ClInclude Include="..\src\Compiler\ResultIndex.h" />
     <ClInclude Include="..\src\Interpreter\Instructions.h" />
     <ClInclude Include="..\src\Interpreter\VirtualMachine.h" />
@@ -160,6 +161,7 @@
     <ClCompile Include="..\src\Compiler\Nodes\RealLiteralExpressionNode.cpp" />
     <ClCompile Include="..\src\Compiler\Nodes\StatementNode.cpp" />
     <ClCompile Include="..\src\Compiler\Nodes\StringLiteralExpressionNode.cpp" />
+    <ClCompile Include="..\src\Compiler\Nodes\TypeConversionExpressionNode.cpp" />
     <ClCompile Include="..\src\Compiler\Parser.cpp" />
     <ClCompile Include="..\src\Compiler\StringTable.cpp" />
     <ClCompile Include="..\src\Compiler\SymbolTable.cpp" />

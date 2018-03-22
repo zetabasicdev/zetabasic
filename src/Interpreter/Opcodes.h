@@ -56,6 +56,9 @@ enum class Instruction
     EqStrings0, EqStrings1, EqStrings2, EqStrings3,
     GrIntegers0, GrIntegers1, GrIntegers2, GrIntegers3,
     OrIntegers0, OrIntegers1, OrIntegers2, OrIntegers3,
+    IntToReal0,
+    IntToReal1,
+    RealToInt1,
     Move0, Move1,
     PrintBoolean0, PrintBoolean1,
     PrintBooleanNewline0, PrintBooleanNewline1,
@@ -110,6 +113,10 @@ enum Opcode : VmWord
     Op_or_integers1 = OP_3ARGS(Instruction::OrIntegers1),
     Op_or_integers2 = OP_3ARGS(Instruction::OrIntegers2),
     Op_or_integers3 = OP_3ARGS(Instruction::OrIntegers3),
+
+    Op_int_to_real0 = OP_2ARGS(Instruction::IntToReal0),
+    Op_int_to_real1 = OP_2ARGS(Instruction::IntToReal1),
+    Op_real_to_int1 = OP_2ARGS(Instruction::RealToInt1),
 
     Op_move0 = OP_2ARGS(Instruction::Move0),
     Op_move1 = OP_2ARGS(Instruction::Move1),

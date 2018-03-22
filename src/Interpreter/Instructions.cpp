@@ -334,6 +334,33 @@ VmWord* ExecuteOrIntegers3(ExecutionContext* context, VmWord* ip)
     return ip + 2;
 }
 
+VmWord* ExecuteIntToReal0(ExecutionContext* context, VmWord* ip)
+{
+    int64_t original = (int64_t)((ip[1] >> Operand2Shift) & OperandSizeMask);
+    double value = (double)original;
+    int64_t ivalue = *(int64_t*)&value;
+    context->stack->setLocal((int)(ip[1] & OperandSizeMask), ivalue);
+    return ip + 2;
+}
+
+VmWord* ExecuteIntToReal1(ExecutionContext* context, VmWord* ip)
+{
+    int64_t original = context->stack->getLocal((ip[1] >> Operand2Shift) & OperandSizeMask);
+    double value = (double)original;
+    int64_t ivalue = *(int64_t*)&value;
+    context->stack->setLocal((int)(ip[1] & OperandSizeMask), ivalue);
+    return ip + 2;
+}
+
+VmWord* ExecuteRealToInt1(ExecutionContext* context, VmWord* ip)
+{
+    int64_t ioriginal = context->stack->getLocal((ip[1] >> Operand2Shift) & OperandSizeMask);
+    double original = *(double*)&ioriginal;
+    int64_t value = (int64_t)original;
+    context->stack->setLocal((int)(ip[1] & OperandSizeMask), value);
+    return ip + 2;
+}
+
 VmWord* ExecuteMove0(ExecutionContext* context, VmWord* ip)
 {
     context->stack->setLocal((int)(ip[1] & OperandSizeMask), (int64_t)((ip[1] >> Operand2Shift) & OperandSizeMask));

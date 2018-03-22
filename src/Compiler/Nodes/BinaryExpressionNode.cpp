@@ -33,6 +33,7 @@
 #include "Opcodes.h"
 #include "Parser.h"
 #include "Translator.h"
+#include "TypeConversionExpressionNode.h"
 
 BinaryExpressionNode::BinaryExpressionNode(ExpressionNode* lhs)
     :
@@ -87,6 +88,17 @@ void BinaryExpressionNode::analyze(Analyzer& analyzer)
 
     assert(leftType != Typename::Unknown);
     assert(rightType != Typename::Unknown);
+
+    // try converting up to real if one side is int and the other is real
+    if (leftType == Typename::Integer && rightType == Typename::Real) {
+        mLhs = analyzer.getNodePool().alloc<TypeConversionExpressionNode>(Typename::Real, mLhs);
+        mLhs->analyze(analyzer);
+        leftType = mLhs->getType();
+    } else if (leftType == Typename::Real && rightType == Typename::Integer) {
+        mRhs = analyzer.getNodePool().alloc<TypeConversionExpressionNode>(Typename::Real, mRhs);
+        mRhs->analyze(analyzer);
+        rightType = mRhs->getType();
+    }
 
     if (leftType != rightType)
         throw CompileError(CompileErrorId::TypeError, mRange, "Mis-matched Expression Types");

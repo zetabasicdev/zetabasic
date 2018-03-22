@@ -68,6 +68,8 @@ public:
     ResultIndex loadStringConstant(const StringPiece& value);
     ResultIndex loadIdentifier(Symbol* symbol);
     ResultIndex binaryOperator(uint64_t baseOpcode, const ResultIndex& lhs, const ResultIndex& rhs, bool autoAdjust=true);
+    ResultIndex intToReal(const ResultIndex& rhs);
+    ResultIndex realToInt(const ResultIndex& rhs);
 
     void jump(const StringPiece& name);
     void jump(Label label);

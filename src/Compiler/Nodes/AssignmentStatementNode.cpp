@@ -36,6 +36,7 @@
 #include "Symbol.h"
 #include "SymbolTable.h"
 #include "Translator.h"
+#include "TypeConversionExpressionNode.h"
 
 AssignmentStatementNode::AssignmentStatementNode()
     :
@@ -73,8 +74,16 @@ void AssignmentStatementNode::analyze(Analyzer& analyzer)
     mIdentifier.analyze(analyzer);
     mValue->analyze(analyzer);
 
-    if (mIdentifier.getSymbol()->getType() != mValue->getType())
+    // try to cast ints/reals as needed
+    if (mIdentifier.getSymbol()->getType() == Typename::Integer && mValue->getType() == Typename::Real) {
+        mValue = analyzer.getNodePool().alloc<TypeConversionExpressionNode>(Typename::Integer, mValue);
+        mValue->analyze(analyzer);
+    } else if (mIdentifier.getSymbol()->getType() == Typename::Real && mValue->getType() == Typename::Integer) {
+        mValue = analyzer.getNodePool().alloc<TypeConversionExpressionNode>(Typename::Real, mValue);
+        mValue->analyze(analyzer);
+    } else if (mIdentifier.getSymbol()->getType() != mValue->getType()) {
         throw CompileError(CompileErrorId::TypeError, mIdentifier.getRange(), "Incompatible Types For Assignment");
+    }
 }
 
 void AssignmentStatementNode::translate(Translator& translator)

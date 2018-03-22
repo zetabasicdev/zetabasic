@@ -155,6 +155,40 @@ ResultIndex Translator::binaryOperator(uint64_t baseOpcode, const ResultIndex& l
     return ResultIndex(ResultIndexType::Local, temporaryIndex);
 }
 
+ResultIndex Translator::intToReal(const ResultIndex& rhs)
+{
+    uint64_t op = Op_int_to_real0;
+    if (rhs.getType() == ResultIndexType::Local)
+        op = Op_int_to_real1;
+
+    int temporaryIndex = getTemporary();
+
+    auto ops = mCodeBuffer.alloc(2);
+    ops[0] = op;
+
+    // target index is stored in first operand
+    // rhs index is stored in second operand
+    ops[1] = ((uint64_t)rhs.getValue() << Operand2Shift) | (uint64_t)temporaryIndex;
+
+    return ResultIndex(ResultIndexType::Local, temporaryIndex);
+}
+
+ResultIndex Translator::realToInt(const ResultIndex& rhs)
+{
+    assert(rhs.getType() == ResultIndexType::Local);
+
+    int temporaryIndex = getTemporary();
+
+    auto ops = mCodeBuffer.alloc(2);
+    ops[0] = Op_real_to_int1;
+
+    // target index is stored in first operand
+    // rhs index is stored in second operand
+    ops[1] = ((uint64_t)rhs.getValue() << Operand2Shift) | (uint64_t)temporaryIndex;
+
+    return ResultIndex(ResultIndexType::Local, temporaryIndex);
+}
+
 void Translator::jump(const StringPiece& name)
 {
     auto label = getLabelByName(name);
@@ -391,6 +425,8 @@ void Translator::dumpCode()
         "eq_string", "eq_string", "eq_string", "eq_string",
         "gr_integers", "gr_integers", "gr_integers", "gr_integers",
         "or_integers", "or_integers", "or_integers", "or_integers",
+        "int_to_real", "int_to_real",
+        "real_to_int",
         "move", "move",
         "print_boolean", "print_boolean",
         "print_boolean_newline", "print_boolean_newline",

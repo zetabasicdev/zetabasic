@@ -28,62 +28,40 @@
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include <cassert>
-
-#include "Analyzer.h"
-#include "IdentifierNode.h"
-#include "Parser.h"
-#include "Symbol.h"
-#include "SymbolTable.h"
+#include "TypeConversionExpressionNode.h"
 #include "Translator.h"
 
-IdentifierNode::IdentifierNode()
+TypeConversionExpressionNode::TypeConversionExpressionNode(Typename type, ExpressionNode* rhs)
     :
-    mName(),
-    mSymbol(nullptr)
+    ExpressionNode(),
+    mRhs(rhs)
+{
+    assert(rhs);
+    mType = type;
+}
+
+TypeConversionExpressionNode::~TypeConversionExpressionNode()
 {
     // intentionally left blank
 }
 
-IdentifierNode::~IdentifierNode()
+void TypeConversionExpressionNode::parse(Parser& parser)
 {
     // intentionally left blank
 }
 
-void IdentifierNode::parse(Parser& parser)
+void TypeConversionExpressionNode::analyze(Analyzer& analyzer)
 {
-    if (parser.getToken().getId() != TokenId::Name || parser.getToken().getTag() != TokenTag::None)
-        parser.raiseError(CompileErrorId::SyntaxError, "Expected Identifier");
-    mName = parser.getToken().getText();
-    mRange = parser.getToken().getRange();
-    parser.eatToken();
+    auto subType = mRhs->getType();
+    assert((mType == Typename::Integer && subType == Typename::Real) ||
+           (mType == Typename::Real && subType == Typename::Integer));
 }
 
-void IdentifierNode::analyze(Analyzer& analyzer)
+void TypeConversionExpressionNode::translate(Translator& translator)
 {
-    Typename type = Typename::Integer;
-
-    switch (mName.getText()[mName.getLength() - 1]) {
-    case '?':
-        type = Typename::Boolean;
-        break;
-    case '%':
-        type = Typename::Integer;
-        break;
-    case '!':
-        type = Typename::Real;
-        break;
-    case '$':
-        type = Typename::String;
-        break;
-    default:
-        break;
-    }
-
-    mSymbol = analyzer.getSymbolTable().getSymbol(mRange, mName, type);
-}
-
-void IdentifierNode::translate(Translator& translator)
-{
-    // intentionally left blank
+    mRhs->translate(translator);
+    if (mType == Typename::Real && mRhs->getType() == Typename::Integer)
+        mResultIndex = translator.intToReal(mRhs->getResultIndex());
+    else if (mType == Typename::Integer && mRhs->getType() == Typename::Real)
+        mResultIndex = translator.realToInt(mRhs->getResultIndex());
 }

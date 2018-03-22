@@ -28,62 +28,22 @@
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include <cassert>
+#pragma once
 
-#include "Analyzer.h"
-#include "IdentifierNode.h"
-#include "Parser.h"
-#include "Symbol.h"
-#include "SymbolTable.h"
-#include "Translator.h"
+#include "ExpressionNode.h"
 
-IdentifierNode::IdentifierNode()
+class TypeConversionExpressionNode
     :
-    mName(),
-    mSymbol(nullptr)
+    public ExpressionNode
 {
-    // intentionally left blank
-}
+public:
+    TypeConversionExpressionNode(Typename type, ExpressionNode* rhs);
+    virtual ~TypeConversionExpressionNode();
 
-IdentifierNode::~IdentifierNode()
-{
-    // intentionally left blank
-}
+    void parse(Parser& parser);
+    void analyze(Analyzer& analyzer);
+    void translate(Translator& translator);
 
-void IdentifierNode::parse(Parser& parser)
-{
-    if (parser.getToken().getId() != TokenId::Name || parser.getToken().getTag() != TokenTag::None)
-        parser.raiseError(CompileErrorId::SyntaxError, "Expected Identifier");
-    mName = parser.getToken().getText();
-    mRange = parser.getToken().getRange();
-    parser.eatToken();
-}
-
-void IdentifierNode::analyze(Analyzer& analyzer)
-{
-    Typename type = Typename::Integer;
-
-    switch (mName.getText()[mName.getLength() - 1]) {
-    case '?':
-        type = Typename::Boolean;
-        break;
-    case '%':
-        type = Typename::Integer;
-        break;
-    case '!':
-        type = Typename::Real;
-        break;
-    case '$':
-        type = Typename::String;
-        break;
-    default:
-        break;
-    }
-
-    mSymbol = analyzer.getSymbolTable().getSymbol(mRange, mName, type);
-}
-
-void IdentifierNode::translate(Translator& translator)
-{
-    // intentionally left blank
-}
+private:
+    ExpressionNode* mRhs;
+};
