@@ -70,6 +70,9 @@ void IdentifierNode::analyze(Analyzer& analyzer)
     case '%':
         type = Typename::Integer;
         break;
+    case '!':
+        type = Typename::Real;
+        break;
     case '$':
         type = Typename::String;
         break;

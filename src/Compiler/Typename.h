@@ -35,5 +35,6 @@ enum class Typename
     Unknown,
     Boolean,
     Integer,
+    Real,
     String
 };

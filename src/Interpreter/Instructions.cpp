@@ -128,6 +128,18 @@ VmWord* ExecuteAddIntegers3(ExecutionContext* context, VmWord* ip)
     return ip + 2;
 }
 
+VmWord* ExecuteAddReals3(ExecutionContext* context, VmWord* ip)
+{
+    int64_t ilhs = context->stack->getLocal((ip[1] >> Operand2Shift) & OperandSizeMask);
+    double lhs = *(double*)&ilhs;
+    int64_t irhs = context->stack->getLocal((ip[1] >> Operand3Shift) & OperandSizeMask);
+    double rhs = *(double*)&irhs;
+    double value = lhs + rhs;
+    int64_t ivalue = *(int64_t*)&value;
+    context->stack->setLocal((int)(ip[1] & OperandSizeMask), ivalue);
+    return ip + 2;
+}
+
 VmWord* ExecuteAddStrings0(ExecutionContext* context, VmWord* ip)
 {
     auto& left = context->program->getString((int)((ip[1] >> Operand2Shift) & OperandSizeMask));
@@ -232,6 +244,16 @@ VmWord* ExecuteEqIntegers3(ExecutionContext* context, VmWord* ip)
 {
     int64_t lhs = context->stack->getLocal((ip[1] >> Operand2Shift) & OperandSizeMask);
     int64_t rhs = context->stack->getLocal((ip[1] >> Operand3Shift) & OperandSizeMask);
+    context->stack->setLocal((int)(ip[1] & OperandSizeMask), lhs == rhs);
+    return ip + 2;
+}
+
+VmWord* ExecuteEqReals3(ExecutionContext* context, VmWord* ip)
+{
+    int64_t ilhs = context->stack->getLocal((ip[1] >> Operand2Shift) & OperandSizeMask);
+    double lhs = *(double*)&ilhs;
+    int64_t irhs = context->stack->getLocal((ip[1] >> Operand3Shift) & OperandSizeMask);
+    double rhs = *(double*)&irhs;
     context->stack->setLocal((int)(ip[1] & OperandSizeMask), lhs == rhs);
     return ip + 2;
 }
@@ -374,6 +396,40 @@ VmWord* ExecutePrintInteger1Newline(ExecutionContext* context, VmWord* ip)
 {
     int index = ip[1] & OperandSizeMask;
     context->window->printf("%lld\n", context->stack->getLocal(index));
+    return ip + 2;
+}
+
+VmWord* ExecutePrintReal0(ExecutionContext* context, VmWord* ip)
+{
+    int64_t ivalue = (int64_t)(ip[1] & OperandSizeMask);
+    double value = *(double*)&ivalue;
+    context->window->printf("%f", value);
+    return ip + 2;
+}
+
+VmWord* ExecutePrintReal1(ExecutionContext* context, VmWord* ip)
+{
+    int index = ip[1] & OperandSizeMask;
+    int64_t ivalue = context->stack->getLocal(index);
+    double value = *(double*)&ivalue;
+    context->window->printf("%f", value);
+    return ip + 2;
+}
+
+VmWord* ExecutePrintReal0Newline(ExecutionContext* context, VmWord* ip)
+{
+    int64_t ivalue = (int64_t)(ip[1] & OperandSizeMask);
+    double value = *(double*)&ivalue;
+    context->window->printf("%f\n", value);
+    return ip + 2;
+}
+
+VmWord* ExecutePrintReal1Newline(ExecutionContext* context, VmWord* ip)
+{
+    int index = ip[1] & OperandSizeMask;
+    int64_t ivalue = context->stack->getLocal(index);
+    double value = *(double*)&ivalue;
+    context->window->printf("%f\n", value);
     return ip + 2;
 }
 

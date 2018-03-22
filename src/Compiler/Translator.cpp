@@ -83,7 +83,7 @@ void Translator::endCodeBody()
     mCodeBuffer[mReserveIndex + 1] += mMaxTemporaries;
 }
 
-ResultIndex Translator::loadConstant(int64_t value)
+ResultIndex Translator::loadConstant(int64_t value, bool allowLiterals)
 {
     // for an integer constant, it can either be loaded directly into
     // a result index, or it must be loaded from the constant table
@@ -129,16 +129,18 @@ ResultIndex Translator::loadIdentifier(Symbol* symbol)
     return ResultIndex(ResultIndexType::Local, symbol->getLocation());
 }
 
-ResultIndex Translator::binaryOperator(uint64_t baseOpcode, const ResultIndex& lhs, const ResultIndex& rhs)
+ResultIndex Translator::binaryOperator(uint64_t baseOpcode, const ResultIndex& lhs, const ResultIndex& rhs, bool autoAdjust)
 {
     uint64_t op = baseOpcode;
-    uint64_t opBase = op >> 8;
-    if (lhs.getType() == ResultIndexType::Local && rhs.getType() == ResultIndexType::Literal)
-        op = (op & 0xff) | ((opBase + 1) << 8);
-    else if (lhs.getType() == ResultIndexType::Literal && rhs.getType() == ResultIndexType::Local)
-        op = (op & 0xff) | ((opBase + 2) << 8);
-    else if (lhs.getType() == ResultIndexType::Local && rhs.getType() == ResultIndexType::Local)
-        op = (op & 0xff) | ((opBase + 3) << 8);
+    if (autoAdjust) {
+        uint64_t opBase = op >> 8;
+        if (lhs.getType() == ResultIndexType::Local && rhs.getType() == ResultIndexType::Literal)
+            op = (op & 0xff) | ((opBase + 1) << 8);
+        else if (lhs.getType() == ResultIndexType::Literal && rhs.getType() == ResultIndexType::Local)
+            op = (op & 0xff) | ((opBase + 2) << 8);
+        else if (lhs.getType() == ResultIndexType::Local && rhs.getType() == ResultIndexType::Local)
+            op = (op & 0xff) | ((opBase + 3) << 8);
+    }
 
     int temporaryIndex = getTemporary();
 
@@ -238,6 +240,12 @@ void Translator::print(Typename type, const ResultIndex& index, bool trailingSem
             ops[0] = trailingSemicolon ? Op_print_integer0 : Op_print_integer0_newline;
         else if (index.getType() == ResultIndexType::Local)
             ops[0] = trailingSemicolon ? Op_print_integer1 : Op_print_integer1_newline;
+        break;
+    case Typename::Real:
+        if (index.getType() == ResultIndexType::Literal)
+            ops[0] = trailingSemicolon ? Op_print_real0 : Op_print_real0_newline;
+        else if (index.getType() == ResultIndexType::Local)
+            ops[0] = trailingSemicolon ? Op_print_real1 : Op_print_real1_newline;
         break;
     case Typename::String:
         if (index.getType() == ResultIndexType::Literal)
@@ -376,8 +384,10 @@ void Translator::dumpCode()
         "jump", "jump_zero", "jump_not_zero",
         "load_constant", "load_string",
         "add_integers", "add_integers", "add_integers", "add_integers",
+        "add_reals",
         "add_string", "add_string", "add_string", "add_string",
         "eq_integers", "eq_integers", "eq_integers", "eq_integers",
+        "eq_reals",
         "eq_string", "eq_string", "eq_string", "eq_string",
         "gr_integers", "gr_integers", "gr_integers", "gr_integers",
         "or_integers", "or_integers", "or_integers", "or_integers",
@@ -386,6 +396,8 @@ void Translator::dumpCode()
         "print_boolean_newline", "print_boolean_newline",
         "print_integer", "print_integer",
         "print_integer_newline", "print_integer_newline",
+        "print_real", "print_real",
+        "print_real_newline", "print_real_newline",
         "print_string", "print_string",
         "print_string_newline", "print_string_newline",
         "input_integer", "input_string",

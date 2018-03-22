@@ -59,7 +59,8 @@ private:
         StringPiece,
         Whitespace,
         Symbol,
-        Integer
+        Integer,
+        Real
     };
     State mState;
 
@@ -79,4 +80,5 @@ private:
     bool runWhitespaceState();
     bool runSymbolState();
     bool runIntegerState();
+    bool runRealState();
 };

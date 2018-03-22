@@ -86,6 +86,9 @@ void Lexer::run()
         case State::Integer:
             advanceChar = runIntegerState();
             break;
+        case State::Real:
+            advanceChar = runRealState();
+            break;
         default:
             break;
         }
@@ -145,6 +148,9 @@ bool Lexer::runStartState()
         return true;
     } else if (mChar >= '0' && mChar <= '9') {
         mState = State::Integer;
+        return true;
+    } else if (mChar == '.') {
+        mState = State::Real;
         return true;
     }
 
@@ -229,7 +235,7 @@ bool Lexer::runNameState()
 {
     if ((mChar >= 'a' && mChar <= 'z') || (mChar >= 'A' && mChar <= 'Z') || (mChar >= '0' && mChar <= '9')) {
         return true;
-    } else if (mChar == '$' || mChar == '?' || mChar == '%') {
+    } else if (mChar == '$' || mChar == '?' || mChar == '%' || mChar == '!') {
         mId = TokenId::Name;
         mState = State::End;
         return true;
@@ -276,8 +282,21 @@ bool Lexer::runSymbolState()
 
 bool Lexer::runIntegerState()
 {
-    if (!(mChar >= '0' && mChar <= '9')) {
+    if (mChar == '.') {
+        mState = State::Real;
+    } else if (!(mChar >= '0' && mChar <= '9')) {
         mId = TokenId::Integer;
+        mState = State::End;
+        return false;
+    }
+
+    return true;
+}
+
+bool Lexer::runRealState()
+{
+    if (!(mChar >= '0' && mChar <= '9')) {
+        mId = TokenId::Real;
         mState = State::End;
         return false;
     }

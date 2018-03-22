@@ -28,93 +28,40 @@
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#pragma once
+#include <cstdlib>
 
-#include "Range.h"
-#include "StringPiece.h"
+#include "Parser.h"
+#include "RealLiteralExpressionNode.h"
+#include "Translator.h"
 
-enum class TokenId
+RealLiteralExpressionNode::RealLiteralExpressionNode()
+    :
+    mValue(0.0)
 {
-    Unknown,
-    EndOfSource,
-    EndOfLine,
-    Name,
-    Integer,
-    Real,
-    StringPiece,
-    Symbol,
-    Label
-};
-const char* ToString(TokenId id);
+    // intentionally left blank
+}
 
-enum class TokenTag
+RealLiteralExpressionNode::~RealLiteralExpressionNode()
 {
-    None,
-    Key_End,
-    Key_False,
-    Key_For,
-    Key_Goto,
-    Key_If,
-    Key_Input,
-    Key_Len,
-    Key_LeftS,
-    Key_Let,
-    Key_Next,
-    Key_Or,
-    Key_Print,
-    Key_Then,
-    Key_To,
-    Key_True,
-    Sym_Add,
-    Sym_Equals,
-    Sym_OpenParen,
-    Sym_CloseParen,
-    Sym_Comma,
-    Sym_Semicolon
-};
-const char* ToString(TokenTag tag);
+    // intentionally left blank
+}
 
-class Token
+void RealLiteralExpressionNode::parse(Parser& parser)
 {
-public:
-    Token(TokenId id, TokenTag tag, const StringPiece& text, const Range& range)
-        :
-        mId(id),
-        mTag(tag),
-        mText(text),
-        mRange(range)
-    {
-        // intentionally left blank
-    }
+    assert(parser.getToken().getId() == TokenId::Real);
+    mValue = strtod(parser.getToken().getText().getText(), nullptr);
+    if ((mValue == HUGE_VAL || mValue == -HUGE_VAL) && errno == ERANGE)
+        parser.raiseError(CompileErrorId::SyntaxError, "Real Value Out Of Range");
+    parser.eatToken();
+}
 
-    ~Token()
-    {
-        // intentionally left blank
-    }
+void RealLiteralExpressionNode::analyze(Analyzer& analyzer)
+{
+    mType = Typename::Real;
+}
 
-    TokenId getId() const
-    {
-        return mId;
-    }
-
-    TokenTag getTag() const
-    {
-        return mTag;
-    }
-
-    const StringPiece& getText() const
-    {
-        return mText;
-    }
-
-    const Range& getRange() const
-    {
-        return mRange;
-    }
-
-private:
-    TokenId mId;
-    TokenTag mTag;
-    StringPiece mText;
-    Range mRange;
-};
+void RealLiteralExpressionNode::translate(Translator& translator)
+{
+    int64_t value = *(int64_t*)(&mValue);
+    mResultIndex = translator.loadConstant(value, false);       // always load into temporary
+}

@@ -64,10 +64,10 @@ public:
     void startCodeBody();
     void endCodeBody();
 
-    ResultIndex loadConstant(int64_t value);
+    ResultIndex loadConstant(int64_t value, bool allowLiterals=true);
     ResultIndex loadStringConstant(const StringPiece& value);
     ResultIndex loadIdentifier(Symbol* symbol);
-    ResultIndex binaryOperator(uint64_t baseOpcode, const ResultIndex& lhs, const ResultIndex& rhs);
+    ResultIndex binaryOperator(uint64_t baseOpcode, const ResultIndex& lhs, const ResultIndex& rhs, bool autoAdjust=true);
 
     void jump(const StringPiece& name);
     void jump(Label label);
