@@ -50,8 +50,9 @@ void IntegerLiteralExpressionNode::parse(Parser& parser)
 {
     assert(parser.getToken().getId() == TokenId::Integer);
 
-    // todo : verify value of integer is not out-of-bounds
     mValue = strtoll(parser.getToken().getText().getText(), nullptr, 10);
+    if ((mValue == LLONG_MAX || mValue == LLONG_MIN) && errno == ERANGE)
+        parser.raiseError(CompileErrorId::SyntaxError, "Literal Too Large For Integer");
     mRange = parser.getToken().getRange();
 
     parser.eatToken();
