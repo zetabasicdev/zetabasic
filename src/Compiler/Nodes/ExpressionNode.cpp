@@ -37,6 +37,7 @@
 #include "Parser.h"
 #include "RealLiteralExpressionNode.h"
 #include "StringLiteralExpressionNode.h"
+#include "UnaryExpressionNode.h"
 
 ExpressionNode::ExpressionNode()
     :
@@ -83,6 +84,8 @@ ExpressionNode* ExpressionNode::parseExpression(Parser& parser, int precedence)
             expr = parser.getNodePool().alloc<IdentifierExpressionNode>();
         else if (parser.getToken().getTag() != TokenTag::None && FunctionCallExpressionNode::isBuiltin(parser.getToken().getTag()))
             expr = parser.getNodePool().alloc<FunctionCallExpressionNode>();
+        else if (parser.getToken().getTag() == TokenTag::Sym_Add || parser.getToken().getTag() == TokenTag::Sym_Subtract || parser.getToken().getTag() == TokenTag::Key_Not)
+            expr = parser.getNodePool().alloc<UnaryExpressionNode>();
         if (expr)
             expr->parse(parser);
     }

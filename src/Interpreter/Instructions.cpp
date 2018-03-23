@@ -334,6 +334,43 @@ VmWord* ExecuteOrIntegers3(ExecutionContext* context, VmWord* ip)
     return ip + 2;
 }
 
+VmWord* ExecuteNegInteger0(ExecutionContext* context, VmWord* ip)
+{
+    int64_t rhs = (int64_t)((ip[1] >> Operand2Shift) & OperandSizeMask);
+    context->stack->setLocal((int)(ip[1] & OperandSizeMask), -rhs);
+    return ip + 2;
+}
+
+VmWord* ExecuteNegInteger1(ExecutionContext* context, VmWord* ip)
+{
+    int64_t rhs = context->stack->getLocal((ip[1] >> Operand2Shift) & OperandSizeMask);
+    context->stack->setLocal((int)(ip[1] & OperandSizeMask), -rhs);
+    return ip + 2;
+}
+
+VmWord* ExecuteNegReal1(ExecutionContext* context, VmWord* ip)
+{
+    int64_t rhs = context->stack->getLocal((ip[1] >> Operand2Shift) & OperandSizeMask);
+    double value = -*(double*)&rhs;
+    int64_t ivalue = *(int64_t*)&value;
+    context->stack->setLocal((int)(ip[1] & OperandSizeMask), ivalue);
+    return ip + 2;
+}
+
+VmWord* ExecuteNotInteger0(ExecutionContext* context, VmWord* ip)
+{
+    int64_t rhs = (int64_t)((ip[1] >> Operand2Shift) & OperandSizeMask);
+    context->stack->setLocal((int)(ip[1] & OperandSizeMask), ~rhs);
+    return ip + 2;
+}
+
+VmWord* ExecuteNotInteger1(ExecutionContext* context, VmWord* ip)
+{
+    int64_t rhs = context->stack->getLocal((ip[1] >> Operand2Shift) & OperandSizeMask);
+    context->stack->setLocal((int)(ip[1] & OperandSizeMask), !rhs);
+    return ip + 2;
+}
+
 VmWord* ExecuteIntToReal0(ExecutionContext* context, VmWord* ip)
 {
     int64_t original = (int64_t)((ip[1] >> Operand2Shift) & OperandSizeMask);

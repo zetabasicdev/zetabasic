@@ -67,6 +67,7 @@ public:
     ResultIndex loadConstant(int64_t value, bool allowLiterals=true);
     ResultIndex loadStringConstant(const StringPiece& value);
     ResultIndex loadIdentifier(Symbol* symbol);
+    ResultIndex unaryOperator(uint64_t baseOpcode, const ResultIndex& rhs, bool autoAdjust=true);
     ResultIndex binaryOperator(uint64_t baseOpcode, const ResultIndex& lhs, const ResultIndex& rhs, bool autoAdjust=true);
     ResultIndex intToReal(const ResultIndex& rhs);
     ResultIndex realToInt(const ResultIndex& rhs);

@@ -129,6 +129,27 @@ ResultIndex Translator::loadIdentifier(Symbol* symbol)
     return ResultIndex(ResultIndexType::Local, symbol->getLocation());
 }
 
+ResultIndex Translator::unaryOperator(uint64_t baseOpcode, const ResultIndex& rhs, bool autoAdjust)
+{
+    uint64_t op = baseOpcode;
+    if (autoAdjust) {
+        uint64_t opBase = op >> 8;
+        if (rhs.getType() == ResultIndexType::Local)
+            op = (op & 0xff) | ((opBase + 1) << 8);
+    }
+
+    int temporaryIndex = getTemporary();
+
+    auto ops = mCodeBuffer.alloc(2);
+    ops[0] = op;
+
+    // target index is stored in first operand
+    // rhs index is stored in second operand
+    ops[1] = ((uint64_t)rhs.getValue() << Operand2Shift) | (uint64_t)temporaryIndex;
+
+    return ResultIndex(ResultIndexType::Local, temporaryIndex);
+}
+
 ResultIndex Translator::binaryOperator(uint64_t baseOpcode, const ResultIndex& lhs, const ResultIndex& rhs, bool autoAdjust)
 {
     uint64_t op = baseOpcode;
@@ -425,6 +446,9 @@ void Translator::dumpCode()
         "eq_string", "eq_string", "eq_string", "eq_string",
         "gr_integers", "gr_integers", "gr_integers", "gr_integers",
         "or_integers", "or_integers", "or_integers", "or_integers",
+        "neg_integer", "neg_integer",
+        "nog_real",
+        "not_integer", "not_integer",
         "int_to_real", "int_to_real",
         "real_to_int",
         "move", "move",

@@ -30,93 +30,30 @@
 
 #pragma once
 
-#include "Range.h"
-#include "StringPiece.h"
+#include "ExpressionNode.h"
 
-enum class TokenId
-{
-    Unknown,
-    EndOfSource,
-    EndOfLine,
-    Name,
-    Integer,
-    Real,
-    StringPiece,
-    Symbol,
-    Label
-};
-const char* ToString(TokenId id);
-
-enum class TokenTag
-{
-    None,
-    Key_End,
-    Key_False,
-    Key_For,
-    Key_Goto,
-    Key_If,
-    Key_Input,
-    Key_Len,
-    Key_LeftS,
-    Key_Let,
-    Key_Next,
-    Key_Not,
-    Key_Or,
-    Key_Print,
-    Key_Then,
-    Key_To,
-    Key_True,
-    Sym_Add,
-    Sym_Subtract,
-    Sym_Equals,
-    Sym_OpenParen,
-    Sym_CloseParen,
-    Sym_Comma,
-    Sym_Semicolon
-};
-const char* ToString(TokenTag tag);
-
-class Token
+class UnaryExpressionNode
+    :
+    public ExpressionNode
 {
 public:
-    Token(TokenId id, TokenTag tag, const StringPiece& text, const Range& range)
-        :
-        mId(id),
-        mTag(tag),
-        mText(text),
-        mRange(range)
+    enum class Operator
     {
-        // intentionally left blank
-    }
+        Unknown,
+        Plus,
+        Negate,
+        BitwiseNot
+    };
 
-    ~Token()
-    {
-        // intentionally left blank
-    }
+    UnaryExpressionNode();
+    virtual ~UnaryExpressionNode();
 
-    TokenId getId() const
-    {
-        return mId;
-    }
-
-    TokenTag getTag() const
-    {
-        return mTag;
-    }
-
-    const StringPiece& getText() const
-    {
-        return mText;
-    }
-
-    const Range& getRange() const
-    {
-        return mRange;
-    }
+    void parse(Parser& parser);
+    void analyze(Analyzer& analyzer);
+    void translate(Translator& translator);
 
 private:
-    TokenId mId;
-    TokenTag mTag;
-    StringPiece mText;
-    Range mRange;
+    Operator mOp;
+    Range mOpRange;
+    ExpressionNode* mRhs;
 };

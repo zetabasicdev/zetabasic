@@ -90,6 +90,12 @@ VmWord* ExecuteOrIntegers1(ExecutionContext* context, VmWord* ip);
 VmWord* ExecuteOrIntegers2(ExecutionContext* context, VmWord* ip);
 VmWord* ExecuteOrIntegers3(ExecutionContext* context, VmWord* ip);
 
+VmWord* ExecuteNegInteger0(ExecutionContext* context, VmWord* ip);
+VmWord* ExecuteNegInteger1(ExecutionContext* context, VmWord* ip);
+VmWord* ExecuteNegReal1(ExecutionContext* context, VmWord* ip);
+VmWord* ExecuteNotInteger0(ExecutionContext* context, VmWord* ip);
+VmWord* ExecuteNotInteger1(ExecutionContext* context, VmWord* ip);
+
 VmWord* ExecuteIntToReal0(ExecutionContext* context, VmWord* ip);
 VmWord* ExecuteIntToReal1(ExecutionContext* context, VmWord* ip);
 VmWord* ExecuteRealToInt1(ExecutionContext* context, VmWord* ip);

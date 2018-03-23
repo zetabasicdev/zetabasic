@@ -56,6 +56,9 @@ enum class Instruction
     EqStrings0, EqStrings1, EqStrings2, EqStrings3,
     GrIntegers0, GrIntegers1, GrIntegers2, GrIntegers3,
     OrIntegers0, OrIntegers1, OrIntegers2, OrIntegers3,
+    NegInteger0, NegInteger1,
+    NegReal1,
+    NotInteger0, NotInteger1,
     IntToReal0,
     IntToReal1,
     RealToInt1,
@@ -79,11 +82,11 @@ enum Opcode : VmWord
     Op_end = OP_NOARG(Instruction::End),
 
     Op_reserve = OP_ONEINT(Instruction::Reserve),
-    
+
     Op_jmp = OP_JMP(Instruction::Jmp),
     Op_jmp_zero = OP_JMPARG(Instruction::JmpZero),
     Op_jmp_not_zero = OP_JMPARG(Instruction::JmpNotZero),
-    
+
     Op_load_constant = OP_2ARGS(Instruction::LoadConstant),
     Op_load_string = OP_2ARGS(Instruction::LoadString),
 
@@ -113,6 +116,12 @@ enum Opcode : VmWord
     Op_or_integers1 = OP_3ARGS(Instruction::OrIntegers1),
     Op_or_integers2 = OP_3ARGS(Instruction::OrIntegers2),
     Op_or_integers3 = OP_3ARGS(Instruction::OrIntegers3),
+
+    Op_neg_integer0 = OP_2ARGS(Instruction::NegInteger0),
+    Op_neg_integer1 = OP_2ARGS(Instruction::NegInteger1),
+    Op_neg_real1 = OP_2ARGS(Instruction::NegReal1),
+    Op_not_integer0 = OP_2ARGS(Instruction::NotInteger0),
+    Op_not_integer1 = OP_2ARGS(Instruction::NotInteger1),
 
     Op_int_to_real0 = OP_2ARGS(Instruction::IntToReal0),
     Op_int_to_real1 = OP_2ARGS(Instruction::IntToReal1),
