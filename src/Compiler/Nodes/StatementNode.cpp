@@ -76,6 +76,8 @@ StatementNode* StatementNode::parseStatement(Parser& parser)
             node = parser.getNodePool().alloc<GotoStatementNode>();
             break;
         case TokenTag::Key_Let:
+        case TokenTag::None:
+            // assume variable assignment
             node = parser.getNodePool().alloc<AssignmentStatementNode>();
             break;
         case TokenTag::Key_Print:

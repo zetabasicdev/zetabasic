@@ -52,19 +52,20 @@ AssignmentStatementNode::~AssignmentStatementNode()
 
 void AssignmentStatementNode::parse(Parser& parser)
 {
-    assert(parser.getToken().getTag() == TokenTag::Key_Let);
-    parser.eatToken();
+    if (parser.getToken().getTag() == TokenTag::Key_Let)
+        parser.eatToken();
 
     mIdentifier.parse(parser);
 
     if (parser.getToken().getTag() != TokenTag::Sym_Equals)
         parser.raiseError(CompileErrorId::SyntaxError, "Expected =");
-    mRange = parser.getToken().getRange();
     parser.eatToken();
 
     mValue = ExpressionNode::parseExpression(parser);
     if (!mValue)
         parser.raiseError(CompileErrorId::SyntaxError, "Expected Expression");
+
+    mRange = Range(mIdentifier.getRange(), mValue->getRange());
 
     parser.eatEndOfLine();
 }
