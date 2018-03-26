@@ -35,6 +35,34 @@
 #include "Symbol.h"
 #include "Translator.h"
 
+inline int64_t MakeOperand(int64_t type, int64_t value)
+{
+    assert(type >= 0 && type < 4);
+    assert(value >= 0 && value < MaxOperandValue);
+    return type | (value << 2);
+}
+
+inline VmWord Make1Arg(const ResultIndex& target)
+{
+    int64_t operand0 = MakeOperand((int64_t)target.getType() - 1, target.getValue());
+    return operand0;
+}
+
+inline VmWord Make2Args(const ResultIndex& target, const ResultIndex& arg1)
+{
+    int64_t operand0 = MakeOperand((int64_t)target.getType() - 1, target.getValue());
+    int64_t operand1 = MakeOperand((int64_t)arg1.getType() - 1, arg1.getValue());
+    return operand0 | (operand1 << Operand1Shift);
+}
+
+inline VmWord Make3Args(const ResultIndex& target, const ResultIndex& arg1, const ResultIndex& arg2)
+{
+    int64_t operand0 = MakeOperand((int64_t)target.getType() - 1, target.getValue());
+    int64_t operand1 = MakeOperand((int64_t)arg1.getType() - 1, arg1.getValue());
+    int64_t operand2 = MakeOperand((int64_t)arg2.getType() - 1, arg2.getValue());
+    return operand0 | (operand1 << Operand1Shift) | (operand2 << Operand2Shift);
+}
+
 Translator::Translator(TItemBuffer<VmWord>& codeBuffer,
                        StringTable& stringTable,
                        ConstantTable& constantTable,
@@ -80,48 +108,35 @@ void Translator::startCodeBody()
 void Translator::endCodeBody()
 {
     assert(mReserveIndex != -1);
-    mCodeBuffer[mReserveIndex + 1] += mMaxTemporaries;
+    mCodeBuffer[mReserveIndex + 1] |= mMaxTemporaries << Operand1Shift;
 }
 
-ResultIndex Translator::loadConstant(int64_t value, bool allowLiterals)
+ResultIndex Translator::loadConstant(int64_t value)
 {
-    // for an integer constant, it can either be loaded directly into
-    // a result index, or it must be loaded from the constant table
-    // if the size is too large (or it is negative -- todo fix this?)
-    if ((value & OperandSizeMask) == value)
-        return ResultIndex(ResultIndexType::Literal, (int)value);
-
     int constantIndex = mConstantTable.addInteger(value);
-    assert(constantIndex <= MaxOperandValue);
+    assert(constantIndex <= MaxOperandSize);
 
-    int temporaryIndex = getTemporary();
+    ResultIndex target(ResultIndexType::Temporary, getTemporary());
+
     auto ops = mCodeBuffer.alloc(2);
-    ops[0] = Op_load_constant;
+    ops[0] = Op_load_c;
+    ops[1] = Make1Arg(target) | (constantIndex << Operand1Shift);
 
-    // temporary index is stored in first operand
-    // constant index is stored in second operand
-    ops[1] = ((uint64_t)constantIndex << Operand2Shift) | (uint64_t)temporaryIndex;
-
-    return ResultIndex(ResultIndexType::Local, temporaryIndex);
+    return target;
 }
 
 ResultIndex Translator::loadStringConstant(const StringPiece& value)
 {
     int constantIndex = mStringTable.addString(value);
-    assert(constantIndex <= MaxOperandValue);
+    assert(constantIndex <= MaxOperandSize);
 
-    if ((constantIndex & OperandSizeMask) == constantIndex)
-        return ResultIndex(ResultIndexType::Literal, constantIndex);
+    ResultIndex target(ResultIndexType::Temporary, getTemporary());
 
-    int temporaryIndex = getTemporary();
     auto ops = mCodeBuffer.alloc(2);
-    ops[0] = Op_load_string;
+    ops[0] = Op_load_st;
+    ops[1] = Make1Arg(target) | (constantIndex << Operand1Shift);
 
-    // temporary index is stored in first operand
-    // constant index is stored in second operand
-    ops[1] = ((uint64_t)constantIndex << Operand2Shift) | (uint64_t)temporaryIndex;
-
-    return ResultIndex(ResultIndexType::Local, temporaryIndex);
+    return target;
 }
 
 ResultIndex Translator::loadIdentifier(Symbol* symbol)
@@ -129,85 +144,96 @@ ResultIndex Translator::loadIdentifier(Symbol* symbol)
     return ResultIndex(ResultIndexType::Local, symbol->getLocation());
 }
 
-ResultIndex Translator::unaryOperator(uint64_t baseOpcode, const ResultIndex& rhs, bool autoAdjust)
+ResultIndex Translator::unaryOperator(UnaryExpressionNode::Operator op, Typename type, const ResultIndex& rhs)
 {
-    uint64_t op = baseOpcode;
-    if (autoAdjust) {
-        uint64_t opBase = op >> 8;
-        if (rhs.getType() == ResultIndexType::Local)
-            op = (op & 0xff) | ((opBase + 1) << 8);
-    }
+    if (op == UnaryExpressionNode::Operator::Plus)
+        // nothing needs to be done here...
+        return rhs;
 
-    int temporaryIndex = getTemporary();
+    ResultIndex target(ResultIndexType::Temporary, getTemporary());
 
     auto ops = mCodeBuffer.alloc(2);
-    ops[0] = op;
+    ops[0] = 0;
+    switch (op) {
+    case UnaryExpressionNode::Operator::Negate:
+        if (type == Typename::Integer)
+            ops[0] = Op_neg_i;
+        else if (type == Typename::Real)
+            ops[0] = Op_neg_r;
+        break;
+    case UnaryExpressionNode::Operator::BitwiseNot:
+        if (type == Typename::Boolean || type == Typename::Integer)
+            ops[0] = Op_not_i;
+        break;
+    default:
+        break;
+    }
+    assert(ops[0] != 0);
+    ops[1] = Make2Args(target, rhs);
 
-    // target index is stored in first operand
-    // rhs index is stored in second operand
-    ops[1] = ((uint64_t)rhs.getValue() << Operand2Shift) | (uint64_t)temporaryIndex;
-
-    return ResultIndex(ResultIndexType::Local, temporaryIndex);
+    return target;
 }
 
-ResultIndex Translator::binaryOperator(uint64_t baseOpcode, const ResultIndex& lhs, const ResultIndex& rhs, bool autoAdjust)
+ResultIndex Translator::binaryOperator(BinaryExpressionNode::Operator op, Typename type, const ResultIndex& lhs, const ResultIndex& rhs)
 {
-    uint64_t op = baseOpcode;
-    if (autoAdjust) {
-        uint64_t opBase = op >> 8;
-        if (lhs.getType() == ResultIndexType::Local && rhs.getType() == ResultIndexType::Literal)
-            op = (op & 0xff) | ((opBase + 1) << 8);
-        else if (lhs.getType() == ResultIndexType::Literal && rhs.getType() == ResultIndexType::Local)
-            op = (op & 0xff) | ((opBase + 2) << 8);
-        else if (lhs.getType() == ResultIndexType::Local && rhs.getType() == ResultIndexType::Local)
-            op = (op & 0xff) | ((opBase + 3) << 8);
-    }
-
-    int temporaryIndex = getTemporary();
+    ResultIndex target(ResultIndexType::Temporary, getTemporary());
 
     auto ops = mCodeBuffer.alloc(2);
-    ops[0] = op;
+    ops[0] = 0;
+    switch (op) {
+    case BinaryExpressionNode::Operator::Addition:
+        if (type == Typename::Integer)
+            ops[0] = Op_add_i;
+        else if (type == Typename::Real)
+            ops[0] = Op_add_r;
+        else if (type == Typename::String)
+            ops[0] = Op_add_st;
+        break;
+    case BinaryExpressionNode::Operator::Equals:
+        if (type == Typename::Boolean || type == Typename::Integer)
+            ops[0] = Op_eq_i;
+        else if (type == Typename::Real)
+            ops[0] = Op_eq_r;
+        else if (type == Typename::String)
+            ops[0] = Op_eq_st;
+        break;
+    case BinaryExpressionNode::Operator::Greater:
+        if (type == Typename::Integer)
+            ops[0] = Op_gr_i;
+        break;
+    case BinaryExpressionNode::Operator::BitwiseOr:
+        if (type == Typename::Boolean || type == Typename::Integer)
+            ops[0] = Op_or_i;
+        break;
+    default:
+        break;
+    }
+    assert(ops[0] != 0);
+    ops[1] = Make3Args(target, lhs, rhs);
 
-    // target index is stored in first operand
-    // lhs index is stored in second operand
-    // rhs index is stored in third operand
-    ops[1] = ((uint64_t)rhs.getValue() << Operand3Shift) | ((uint64_t)lhs.getValue() << Operand2Shift) | (uint64_t)temporaryIndex;
-
-    return ResultIndex(ResultIndexType::Local, temporaryIndex);
+    return target;
 }
 
 ResultIndex Translator::intToReal(const ResultIndex& rhs)
 {
-    uint64_t op = Op_int_to_real0;
-    if (rhs.getType() == ResultIndexType::Local)
-        op = Op_int_to_real1;
-
-    int temporaryIndex = getTemporary();
+    ResultIndex target(ResultIndexType::Temporary, getTemporary());
 
     auto ops = mCodeBuffer.alloc(2);
-    ops[0] = op;
+    ops[0] = Op_i2r;
+    ops[1] = Make2Args(target, rhs);
 
-    // target index is stored in first operand
-    // rhs index is stored in second operand
-    ops[1] = ((uint64_t)rhs.getValue() << Operand2Shift) | (uint64_t)temporaryIndex;
-
-    return ResultIndex(ResultIndexType::Local, temporaryIndex);
+    return target;
 }
 
 ResultIndex Translator::realToInt(const ResultIndex& rhs)
 {
-    assert(rhs.getType() == ResultIndexType::Local);
-
-    int temporaryIndex = getTemporary();
+    ResultIndex target(ResultIndexType::Temporary, getTemporary());
 
     auto ops = mCodeBuffer.alloc(2);
-    ops[0] = Op_real_to_int1;
+    ops[0] = Op_r2i;
+    ops[1] = Make2Args(target, rhs);
 
-    // target index is stored in first operand
-    // rhs index is stored in second operand
-    ops[1] = ((uint64_t)rhs.getValue() << Operand2Shift) | (uint64_t)temporaryIndex;
-
-    return ResultIndex(ResultIndexType::Local, temporaryIndex);
+    return target;
 }
 
 void Translator::jump(const StringPiece& name)
@@ -225,93 +251,61 @@ void Translator::jump(Label label)
     ops[1] = (uint64_t)label << JumpShift;
 }
 
-void Translator::jump(uint64_t opcode, Label label, const ResultIndex& result)
+void Translator::jumpZero(Label label, const ResultIndex& result)
 {
-    assert(opcode >= Op_jmp && opcode <= Op_jmp_not_zero);
     assert(label >= 0 && label < (int)mLabelTargets.size());
 
     auto ops = mCodeBuffer.alloc(2);
-    ops[0] = opcode;
-    ops[1] = ((uint64_t)label << JumpShift) | (uint64_t)result.getValue();
+    ops[0] = Op_jmpz;
+    ops[1] = Make1Arg(result) | ((uint64_t)label << JumpShift);
 }
 
-void Translator::assign(Symbol* target, const ResultIndex& index)
+void Translator::jumpNotZero(Label label, const ResultIndex& result)
 {
-    if (target->getType() == Typename::String && index.getType() == ResultIndexType::Literal) {
-        // special case for string literal (i.e., S$ = "Test")
-        auto ops = mCodeBuffer.alloc(2);
-        ops[0] = Op_load_string;
-        ops[1] = ((uint64_t)index.getValue() << Operand2Shift) | (uint64_t)target->getLocation();
-        return;
-    }
+    assert(label >= 0 && label < (int)mLabelTargets.size());
 
     auto ops = mCodeBuffer.alloc(2);
-    ops[0] = (index.getType() == ResultIndexType::Literal) ? Op_move0 : Op_move1;
-
-    // target index is stored in first operand
-    // source index is stored in second operand
-    ops[1] = ((uint64_t)index.getValue() << Operand2Shift) | (uint64_t)target->getLocation();
+    ops[0] = Op_jmpnz;
+    ops[1] = Make1Arg(result) | ((uint64_t)label << JumpShift);
 }
 
-ResultIndex Translator::ensureLocal(Typename type, const ResultIndex& index)
+void Translator::assign(Symbol* symbol, const ResultIndex& result)
 {
-    // only do something if it is a literal
-    if (index.getType() == ResultIndexType::Local)
-        return index;
-
-    int temporaryIndex = getTemporary();
-    if (type == Typename::String) {
-        // special case for string literal (i.e., S$ = "TEST")
-        auto ops = mCodeBuffer.alloc(2);
-        ops[0] = Op_load_string;
-        ops[1] = ((uint64_t)index.getValue() << Operand2Shift) | (uint64_t)temporaryIndex;
-        return ResultIndex(ResultIndexType::Local, temporaryIndex);
-    }
+    ResultIndex target(ResultIndexType::Local, symbol->getLocation());
 
     auto ops = mCodeBuffer.alloc(2);
-    ops[0] = Op_move0;
-
-    // target index is stored in first operand
-    // source index is stored in second operand
-    ops[1] = ((uint64_t)index.getValue() << Operand2Shift) | (uint64_t)temporaryIndex;
-    return ResultIndex(ResultIndexType::Local, temporaryIndex);
+    ops[0] = Op_mov;
+    ops[1] = Make2Args(target, result);
 }
 
-void Translator::print(Typename type, const ResultIndex& index, bool trailingSemicolon)
+void Translator::print(Typename type, const ResultIndex& index)
 {
     auto ops = mCodeBuffer.alloc(2);
 
-    // target index/value is stored in first operand
-    ops[1] = (uint64_t)index.getValue();
     switch (type) {
     case Typename::Boolean:
-        if (index.getType() == ResultIndexType::Literal)
-            ops[0] = trailingSemicolon ? Op_print_boolean0 : Op_print_boolean0_newline;
-        else if (index.getType() == ResultIndexType::Local)
-            ops[0] = trailingSemicolon ? Op_print_boolean1 : Op_print_boolean1_newline;
+        ops[0] = Op_print_b;
         break;
     case Typename::Integer:
-        if (index.getType() == ResultIndexType::Literal)
-            ops[0] = trailingSemicolon ? Op_print_integer0 : Op_print_integer0_newline;
-        else if (index.getType() == ResultIndexType::Local)
-            ops[0] = trailingSemicolon ? Op_print_integer1 : Op_print_integer1_newline;
+        ops[0] = Op_print_i;
         break;
     case Typename::Real:
-        if (index.getType() == ResultIndexType::Literal)
-            ops[0] = trailingSemicolon ? Op_print_real0 : Op_print_real0_newline;
-        else if (index.getType() == ResultIndexType::Local)
-            ops[0] = trailingSemicolon ? Op_print_real1 : Op_print_real1_newline;
+        ops[0] = Op_print_r;
         break;
     case Typename::String:
-        if (index.getType() == ResultIndexType::Literal)
-            ops[0] = trailingSemicolon ? Op_print_string0 : Op_print_string0_newline;
-        else if (index.getType() == ResultIndexType::Local)
-            ops[0] = trailingSemicolon ? Op_print_string1 : Op_print_string1_newline;
+        ops[0] = Op_print_st;
         break;
     default:
         assert(false);
         break;
     }
+
+    ops[1] = Make1Arg(index);
+}
+
+void Translator::printNewline()
+{
+    *mCodeBuffer.alloc(1) = Op_print_nl;
 }
 
 void Translator::input(Symbol* target)
@@ -320,17 +314,17 @@ void Translator::input(Symbol* target)
 
     switch (target->getType()) {
     case Typename::Integer:
-        ops[0] = Op_input_integer;
+        ops[0] = Op_input_i;
         break;
     case Typename::String:
-        ops[0] = Op_input_string;
+        ops[0] = Op_input_st;
         break;
     default:
         assert(false);
         break;
     }
 
-    ops[1] = (uint64_t)target->getLocation();
+    ops[1] = Make1Arg(ResultIndex(ResultIndexType::Local, target->getLocation()));
 }
 
 void Translator::end()
@@ -338,33 +332,48 @@ void Translator::end()
     *mCodeBuffer.alloc(1) = Op_end;
 }
 
-ResultIndex Translator::builtInFunction(uint64_t opcode, TNodeList<ExpressionNode>& arguments)
+ResultIndex Translator::builtInFunction(const StringPiece& name, TNodeList<ExpressionNode>& arguments)
 {
     static std::vector<ResultIndex> indices;
 
-    // ensure all argument indices are within temporaries (as opposed to literals)
     indices.clear();
     for (auto& arg : arguments)
-        indices.push_back(ensureLocal(arg.getType(), arg.getResultIndex()));
+        indices.push_back(arg.getResultIndex());
 
     auto ops = mCodeBuffer.alloc(2);
-    ops[0] = opcode;
-    int temporaryIndex = getTemporary();
+
+    static struct
+    {
+        const char* name;
+        VmWord opcode;
+    } builtinFunctions[] = {
+        { "LEN", Op_fn_len },
+        { "LEFT$", Op_fn_left },
+        { nullptr, 0 }
+    };
+    ops[0] = 0;
+    for (int i = 0; builtinFunctions[i].name; ++i) {
+        if (name == builtinFunctions[i].name) {
+            ops[0] = builtinFunctions[i].opcode;
+            break;
+        }
+    }
+    assert(ops[0] != 0);
+
+    ResultIndex target(ResultIndexType::Temporary, getTemporary());
     switch (indices.size()) {
     case 1:
-        ops[1] = ((uint64_t)indices[0].getValue() << Operand2Shift) | (uint64_t)temporaryIndex;
+        ops[1] = Make2Args(target, indices[0]);
         break;
     case 2:
-        ops[1] = ((uint64_t)indices[0].getValue() << Operand2Shift) |
-            ((uint64_t)indices[1].getValue() << Operand3Shift) |
-            (uint64_t)temporaryIndex;
+        ops[1] = Make3Args(target, indices[0], indices[1]);
         break;
     default:
         assert(false);
         break;
     }
 
-    return ResultIndex(ResultIndexType::Local, temporaryIndex);
+    return target;
 }
 
 void Translator::placeLabel(const StringPiece& name)
@@ -395,8 +404,8 @@ void Translator::fixupLabels()
 {
     // loop through instructions, looking for jump statements and fix the targets accordingly.
     for (int ix = 0; ix < mCodeBuffer.getSize(); ) {
-        uint8_t type = mCodeBuffer[ix] & 0xff;
-        if (type == 0x02 || type == 0x03) {
+        auto opcode = mCodeBuffer[ix];
+        if (opcode == Op_jmp || opcode == Op_jmpz || opcode == Op_jmpnz) {
             VmWord word = mCodeBuffer[ix + 1];
             Label label = (Label)((word >> JumpShift) & JumpSizeMask);
             assert(label >= 0 && label < (Label)mLabelTargets.size());
@@ -413,7 +422,7 @@ int Translator::getTemporary()
     int temporary = mNextTemporary++;
     if (mNextTemporary > mMaxTemporaries)
         mMaxTemporaries = mNextTemporary;
-    return mSymbolTable.getSize() + temporary;
+    return temporary;
 }
 
 Label Translator::getLabelByName(const StringPiece& name)
@@ -433,69 +442,104 @@ Label Translator::getLabelByName(const StringPiece& name)
 
 void Translator::dumpCode()
 {
-    static const char* instructions[] = {
-        "nop", "end",
-        "reserve",
-        "jump", "jump_zero", "jump_not_zero",
-        "load_constant", "load_string",
-        "add_integers", "add_integers", "add_integers", "add_integers",
-        "add_reals",
-        "add_string", "add_string", "add_string", "add_string",
-        "eq_integers", "eq_integers", "eq_integers", "eq_integers",
-        "eq_reals",
-        "eq_string", "eq_string", "eq_string", "eq_string",
-        "gr_integers", "gr_integers", "gr_integers", "gr_integers",
-        "or_integers", "or_integers", "or_integers", "or_integers",
-        "neg_integer", "neg_integer",
-        "nog_real",
-        "not_integer", "not_integer",
-        "int_to_real", "int_to_real",
-        "real_to_int",
-        "move", "move",
-        "print_boolean", "print_boolean",
-        "print_boolean_newline", "print_boolean_newline",
-        "print_integer", "print_integer",
-        "print_integer_newline", "print_integer_newline",
-        "print_real", "print_real",
-        "print_real_newline", "print_real_newline",
-        "print_string", "print_string",
-        "print_string_newline", "print_string_newline",
-        "input_integer", "input_string",
-        "fn_len", "fn_left"
+    enum class InstructionType
+    {
+        NoArgs,
+        Reserve,
+        Jmp0,
+        Jmp1,
+        LoadConst,
+        LoadString,
+        Args3,
+        Args2,
+        Args1
     };
+    static struct Instruction
+    {
+        const char* name;
+        InstructionType type;
+    } instructions[] = {
+        { "nop", InstructionType::NoArgs },
+        { "end", InstructionType::NoArgs },
+        { "reserve", InstructionType::Reserve },
+        { "jmp", InstructionType::Jmp0 },
+        { "jmpz", InstructionType::Jmp1 },
+        { "jmpnz", InstructionType::Jmp1 },
+        { "load_c", InstructionType::LoadConst },
+        { "load_st", InstructionType::LoadString },
+        { "add_i", InstructionType::Args3 },
+        { "add_r", InstructionType::Args3 },
+        { "add_st", InstructionType::Args3 },
+        { "eq_i", InstructionType::Args3 },
+        { "eq_r", InstructionType::Args3 },
+        { "eq_st", InstructionType::Args3 },
+        { "gr_i", InstructionType::Args3 },
+        { "or_i", InstructionType::Args3 },
+        { "neg_i", InstructionType::Args2 },
+        { "neg_r", InstructionType::Args2 },
+        { "not_i", InstructionType::Args2 },
+        { "i2r", InstructionType::Args2 },
+        { "r2i", InstructionType::Args2 },
+        { "mov", InstructionType::Args2 },
+        { "print_b", InstructionType::Args1 },
+        { "print_i", InstructionType::Args1 },
+        { "print_r", InstructionType::Args1 },
+        { "print_st", InstructionType::Args1 },
+        { "print_nl", InstructionType::NoArgs },
+        { "input_i", InstructionType::Args1 },
+        { "input_st", InstructionType::Args1 },
+        { "fn_len", InstructionType::Args2 },
+        { "fn_left", InstructionType::Args3 }
+    };
+    static const char* names[] = { "local", "temporary", "parameter", "global" };
 
     for (int ix = 0; ix < mCodeBuffer.getSize(); ) {
-        printf("%06X: [%03lld/%02llX] %s ", ix, mCodeBuffer[ix] >> 8, mCodeBuffer[ix] & 0xff, instructions[mCodeBuffer[ix] >> 8]);
-        switch (mCodeBuffer[ix] & 0xff) {
-        case 0x00:
+        printf("%06X: %s ", ix, instructions[mCodeBuffer[ix]].name);
+        switch (instructions[mCodeBuffer[ix]].type) {
+        case InstructionType::NoArgs:
             printf("\n");
             break;
-        case 0x01:
-            printf("%lld\n", mCodeBuffer[ix + 1]);
+        case InstructionType::Reserve:
+            printf("%lld locals, %lld temporaries\n", mCodeBuffer[ix + 1] & OperandSizeMask, mCodeBuffer[ix + 1] >> Operand1Shift);
             break;
-        case 0x02:
+        case InstructionType::Jmp0:
             printf("[%06llX]\n", mCodeBuffer[ix + 1] >> JumpShift);
             break;
-        case 0x03:
-            printf("#%lld, [%06llX]\n",
-                   mCodeBuffer[ix + 1] & OperandSizeMask,
-                   mCodeBuffer[ix + 1] >> JumpShift);
+        case InstructionType::Jmp1:
+            printf("#%lld, [%06llX]\n", mCodeBuffer[ix + 1] & OperandSizeMask, mCodeBuffer[ix + 1] >> JumpShift);
             break;
-        case 0x04:
-            printf("%lld\n", mCodeBuffer[ix + 1] & OperandSizeMask);
+        case InstructionType::LoadConst:
+            printf("[%s] #%lld, #%lld\n",
+                   names[mCodeBuffer[ix + 1] & 0x3],
+                   (mCodeBuffer[ix + 1] & OperandSizeMask) >> 2,
+                   (mCodeBuffer[ix + 1] >> Operand1Shift) & OperandSizeMask);
             break;
-        case 0x05:
-            printf("%lld, %lld\n",
-                    mCodeBuffer[ix + 1] & OperandSizeMask,
-                   (mCodeBuffer[ix + 1] >> Operand2Shift) & OperandSizeMask);
+        case InstructionType::LoadString:
+            printf("[%s] #%lld, #%lld\n",
+                   names[mCodeBuffer[ix + 1] & 0x3],
+                   (mCodeBuffer[ix + 1] & OperandSizeMask) >> 2,
+                   (mCodeBuffer[ix + 1] >> Operand1Shift) & OperandSizeMask);
             break;
-        case 0x06:
-            printf("%lld, %lld, %lld\n",
-                    mCodeBuffer[ix + 1] & OperandSizeMask,
-                   (mCodeBuffer[ix + 1] >> Operand2Shift) & OperandSizeMask,
-                   (mCodeBuffer[ix + 1] >> Operand3Shift) & OperandSizeMask);
+        case InstructionType::Args3:
+            printf("[%s] #%lld, [%s] #%lld, [%s] #%lld\n",
+                   names[mCodeBuffer[ix + 1] & 0x3],
+                   (mCodeBuffer[ix + 1] & OperandSizeMask) >> 2,
+                   names[(mCodeBuffer[ix + 1] >> Operand1Shift) & 0x3],
+                   ((mCodeBuffer[ix + 1] >> Operand1Shift) & OperandSizeMask) >> 2,
+                   names[(mCodeBuffer[ix + 1] >> Operand2Shift) & 0x3],
+                   ((mCodeBuffer[ix + 1] >> Operand2Shift) & OperandSizeMask) >> 2);
             break;
-        case 0x07:
+        case InstructionType::Args2:
+            printf("[%s] #%lld, [%s] #%lld\n",
+                   names[mCodeBuffer[ix + 1] & 0x3],
+                   (mCodeBuffer[ix + 1] & OperandSizeMask) >> 2,
+                   names[(mCodeBuffer[ix + 1] >> Operand1Shift) & 0x3],
+                   ((mCodeBuffer[ix + 1] >> Operand1Shift) & OperandSizeMask) >> 2);
+            break;
+        case InstructionType::Args1:
+            printf("[%s] #%lld\n", 
+                   names[mCodeBuffer[ix + 1] & 0x3],
+                   (mCodeBuffer[ix + 1] & OperandSizeMask) >> 2);
             break;
         default:
             assert(false);

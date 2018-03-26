@@ -31,10 +31,8 @@
 #include "Analyzer.h"
 #include "ExpressionNode.h"
 #include "InputStatementNode.h"
-#include "Opcodes.h"
 #include "Parser.h"
 #include "Symbol.h"
-#include "SymbolTable.h"
 #include "Translator.h"
 
 InputStatementNode::InputStatementNode()
@@ -79,6 +77,6 @@ void InputStatementNode::translate(Translator& translator)
 {
     mPromptExpression->translate(translator);
 
-    translator.print(mPromptExpression->getType(), mPromptExpression->getResultIndex(), true);
+    translator.print(mPromptExpression->getType(), mPromptExpression->getResultIndex());
     translator.input(mIdentifier.getSymbol());
 }

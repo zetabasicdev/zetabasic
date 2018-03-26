@@ -33,123 +33,37 @@
 #include <cstdint>
 #include "VirtualMachine.h"
 
-#define OP_NOARG(id)  (int(id) << 8) | 0x00
-#define OP_ONEINT(id) (int(id) << 8) | 0x01
-#define OP_JMP(id)    (int(id) << 8) | 0x02
-#define OP_JMPARG(id) (int(id) << 8) | 0x03
-#define OP_1ARG(id)   (int(id) << 8) | 0x04
-#define OP_2ARGS(id)  (int(id) << 8) | 0x05
-#define OP_3ARGS(id)  (int(id) << 8) | 0x06
-#define OP_4ARGS(id)  (int(id) << 8) | 0x07
-
-enum class Instruction
-{
-    Nop, End,
-    Reserve,
-    Jmp, JmpZero, JmpNotZero,
-    LoadConstant, LoadString,
-    AddIntegers0, AddIntegers1, AddIntegers2, AddIntegers3,
-    AddReals3,
-    AddStrings0, AddStrings1, AddStrings2, AddStrings3,
-    EqIntegers0, EqIntegers1, EqIntegers2, EqIntegers3,
-    EqReals3,
-    EqStrings0, EqStrings1, EqStrings2, EqStrings3,
-    GrIntegers0, GrIntegers1, GrIntegers2, GrIntegers3,
-    OrIntegers0, OrIntegers1, OrIntegers2, OrIntegers3,
-    NegInteger0, NegInteger1,
-    NegReal1,
-    NotInteger0, NotInteger1,
-    IntToReal0,
-    IntToReal1,
-    RealToInt1,
-    Move0, Move1,
-    PrintBoolean0, PrintBoolean1,
-    PrintBooleanNewline0, PrintBooleanNewline1,
-    PrintInteger0, PrintInteger1,
-    PrintIntegerNewline0, PrintIntegerNewline1,
-    PrintReal0, PrintReal1,
-    PrintRealNewline0, PrintRealNewline1,
-    PrintString0, PrintString1,
-    PrintStringNewline0, PrintStringNewline1,
-    InputInteger,
-    InputString,
-    FnLen, FnLeft
-};
-
 enum Opcode : VmWord
 {
-    Op_nop = OP_NOARG(Instruction::Nop),
-    Op_end = OP_NOARG(Instruction::End),
-
-    Op_reserve = OP_ONEINT(Instruction::Reserve),
-
-    Op_jmp = OP_JMP(Instruction::Jmp),
-    Op_jmp_zero = OP_JMPARG(Instruction::JmpZero),
-    Op_jmp_not_zero = OP_JMPARG(Instruction::JmpNotZero),
-
-    Op_load_constant = OP_2ARGS(Instruction::LoadConstant),
-    Op_load_string = OP_2ARGS(Instruction::LoadString),
-
-    Op_add_integers0 = OP_3ARGS(Instruction::AddIntegers0),
-    Op_add_integers1 = OP_3ARGS(Instruction::AddIntegers1),
-    Op_add_integers2 = OP_3ARGS(Instruction::AddIntegers2),
-    Op_add_integers3 = OP_3ARGS(Instruction::AddIntegers3),
-    Op_add_reals3 = OP_3ARGS(Instruction::AddReals3),
-    Op_add_strings0 = OP_3ARGS(Instruction::AddStrings0),
-    Op_add_strings1 = OP_3ARGS(Instruction::AddStrings1),
-    Op_add_strings2 = OP_3ARGS(Instruction::AddStrings2),
-    Op_add_strings3 = OP_3ARGS(Instruction::AddStrings3),
-    Op_eq_integers0 = OP_3ARGS(Instruction::EqIntegers0),
-    Op_eq_integers1 = OP_3ARGS(Instruction::EqIntegers1),
-    Op_eq_integers2 = OP_3ARGS(Instruction::EqIntegers2),
-    Op_eq_integers3 = OP_3ARGS(Instruction::EqIntegers3),
-    Op_eq_reals3 = OP_3ARGS(Instruction::EqReals3),
-    Op_eq_strings0 = OP_3ARGS(Instruction::EqStrings0),
-    Op_eq_strings1 = OP_3ARGS(Instruction::EqStrings1),
-    Op_eq_strings2 = OP_3ARGS(Instruction::EqStrings2),
-    Op_eq_strings3 = OP_3ARGS(Instruction::EqStrings3),
-    Op_gr_integers0 = OP_3ARGS(Instruction::GrIntegers0),
-    Op_gr_integers1 = OP_3ARGS(Instruction::GrIntegers1),
-    Op_gr_integers2 = OP_3ARGS(Instruction::GrIntegers2),
-    Op_gr_integers3 = OP_3ARGS(Instruction::GrIntegers3),
-    Op_or_integers0 = OP_3ARGS(Instruction::OrIntegers0),
-    Op_or_integers1 = OP_3ARGS(Instruction::OrIntegers1),
-    Op_or_integers2 = OP_3ARGS(Instruction::OrIntegers2),
-    Op_or_integers3 = OP_3ARGS(Instruction::OrIntegers3),
-
-    Op_neg_integer0 = OP_2ARGS(Instruction::NegInteger0),
-    Op_neg_integer1 = OP_2ARGS(Instruction::NegInteger1),
-    Op_neg_real1 = OP_2ARGS(Instruction::NegReal1),
-    Op_not_integer0 = OP_2ARGS(Instruction::NotInteger0),
-    Op_not_integer1 = OP_2ARGS(Instruction::NotInteger1),
-
-    Op_int_to_real0 = OP_2ARGS(Instruction::IntToReal0),
-    Op_int_to_real1 = OP_2ARGS(Instruction::IntToReal1),
-    Op_real_to_int1 = OP_2ARGS(Instruction::RealToInt1),
-
-    Op_move0 = OP_2ARGS(Instruction::Move0),
-    Op_move1 = OP_2ARGS(Instruction::Move1),
-
-    Op_print_boolean0 = OP_1ARG(Instruction::PrintBoolean0),
-    Op_print_boolean1 = OP_1ARG(Instruction::PrintBoolean1),
-    Op_print_boolean0_newline = OP_1ARG(Instruction::PrintBooleanNewline0),
-    Op_print_boolean1_newline = OP_1ARG(Instruction::PrintBooleanNewline1),
-    Op_print_integer0 = OP_1ARG(Instruction::PrintInteger0),
-    Op_print_integer1 = OP_1ARG(Instruction::PrintInteger1),
-    Op_print_integer0_newline = OP_1ARG(Instruction::PrintIntegerNewline0),
-    Op_print_integer1_newline = OP_1ARG(Instruction::PrintIntegerNewline1),
-    Op_print_real0 = OP_1ARG(Instruction::PrintReal0),
-    Op_print_real1 = OP_1ARG(Instruction::PrintReal1),
-    Op_print_real0_newline = OP_1ARG(Instruction::PrintRealNewline0),
-    Op_print_real1_newline = OP_1ARG(Instruction::PrintRealNewline1),
-    Op_print_string0 = OP_1ARG(Instruction::PrintString0),
-    Op_print_string1 = OP_1ARG(Instruction::PrintString1),
-    Op_print_string0_newline = OP_1ARG(Instruction::PrintStringNewline0),
-    Op_print_string1_newline = OP_1ARG(Instruction::PrintStringNewline1),
-
-    Op_input_integer = OP_1ARG(Instruction::InputInteger),
-    Op_input_string = OP_1ARG(Instruction::InputString),
-
-    Op_fn_len = OP_2ARGS(Instruction::FnLen),
-    Op_fn_left = OP_3ARGS(Instruction::FnLeft)
+    Op_nop,
+    Op_end,
+    Op_reserve,
+    Op_jmp,
+    Op_jmpz,
+    Op_jmpnz,
+    Op_load_c,
+    Op_load_st,
+    Op_add_i,
+    Op_add_r,
+    Op_add_st,
+    Op_eq_i,
+    Op_eq_r,
+    Op_eq_st,
+    Op_gr_i,
+    Op_or_i,
+    Op_neg_i,
+    Op_neg_r,
+    Op_not_i,
+    Op_i2r,
+    Op_r2i,
+    Op_mov,
+    Op_print_b,
+    Op_print_i,
+    Op_print_r,
+    Op_print_st,
+    Op_print_nl,
+    Op_input_i,
+    Op_input_st,
+    Op_fn_len,
+    Op_fn_left
 };

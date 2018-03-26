@@ -29,7 +29,6 @@
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "ExpressionNode.h"
-#include "Opcodes.h"
 #include "Parser.h"
 #include "PrintStatementNode.h"
 #include "Translator.h"
@@ -82,7 +81,8 @@ void PrintStatementNode::translate(Translator& translator)
     int ix = 0;
     for (auto& expression : mExpressions) {
         expression.translate(translator);
-        translator.print(expression.getType(), expression.getResultIndex(), ix++ < count - 1);
+        translator.print(expression.getType(), expression.getResultIndex());
         translator.clearTemporaries();
     }
+    translator.printNewline();
 }

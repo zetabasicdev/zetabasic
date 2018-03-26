@@ -30,7 +30,6 @@
 
 #include "Analyzer.h"
 #include "BinaryExpressionNode.h"
-#include "Opcodes.h"
 #include "Parser.h"
 #include "Translator.h"
 #include "TypeConversionExpressionNode.h"
@@ -134,35 +133,5 @@ void BinaryExpressionNode::translate(Translator& translator)
     // need to base this on operand type, not result type
     auto opType = mLhs->getType();
 
-    // currently binary operators using reals assume reals are always stored in locals/temporaries
-    assert(mType != Typename::Real || (mLhs->getResultIndex().getType() == ResultIndexType::Local && mRhs->getResultIndex().getType() == ResultIndexType::Local));
-
-    uint64_t opcode = 0;
-    switch (mOp) {
-    case Operator::Addition:
-        if (opType == Typename::Integer)
-            opcode = Op_add_integers0;
-        else if (opType == Typename::Real)
-            opcode = Op_add_reals3;
-        else if (opType == Typename::String)
-            opcode = Op_add_strings0;
-        break;
-    case Operator::Equals:
-        if (opType == Typename::Boolean || opType == Typename::Integer)
-            opcode = Op_eq_integers0;
-        else if (opType == Typename::Real)
-            opcode = Op_eq_reals3;
-        else if (opType == Typename::String)
-            opcode = Op_eq_strings0;
-        break;
-    case Operator::BitwiseOr:
-        if (opType == Typename::Boolean || opType == Typename::Integer)
-            opcode = Op_or_integers0;
-        break;
-    default:
-        break;
-    }
-
-    assert(opcode != 0);
-    mResultIndex = translator.binaryOperator(opcode, mLhs->getResultIndex(), mRhs->getResultIndex(), mType != Typename::Real);
+    mResultIndex = translator.binaryOperator(mOp, opType, mLhs->getResultIndex(), mRhs->getResultIndex());
 }

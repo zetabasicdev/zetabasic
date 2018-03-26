@@ -33,7 +33,7 @@
 
 int getInstructionSize(VmWord word)
 {
-    if ((word & 0xff) == 0)
+    if (word == Op_nop || word == Op_end || word == Op_print_nl)
         return 1;
     return 2;
 }

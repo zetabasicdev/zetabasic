@@ -32,7 +32,6 @@
 #include "CompileError.h"
 #include "ExpressionNode.h"
 #include "IfStatementNode.h"
-#include "Opcodes.h"
 #include "Parser.h"
 #include "Translator.h"
 
@@ -84,7 +83,7 @@ void IfStatementNode::translate(Translator& translator)
 
     auto label = translator.generateLabel();
 
-    translator.jump(Op_jmp_zero, label, mExpression->getResultIndex());
+    translator.jumpZero(label, mExpression->getResultIndex());
     mStatement->translate(translator);
     translator.placeLabel(label);
     translator.clearTemporaries();

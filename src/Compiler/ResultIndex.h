@@ -35,8 +35,10 @@
 enum class ResultIndexType
 {
     Unknown,
-    Literal,
-    Local
+    Local,
+    Temporary,
+    Parameter,
+    Global
 };
 
 class ResultIndex

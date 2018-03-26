@@ -30,7 +30,6 @@
 
 #include <cassert>
 
-#include "Opcodes.h"
 #include "Parser.h"
 #include "StringLiteralExpressionNode.h"
 #include "StringTable.h"

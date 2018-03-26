@@ -40,7 +40,7 @@ Interpreter::Interpreter(Window& window, const Program& program)
     :
     mWindow(window),
     mProgram(program),
-    mStack(),
+    mStacks(new Stack[4]),
     mStringStack(),
     mStringManager(mStringStack),
     mCodeSize(mProgram.getCodeSize()),
@@ -57,58 +57,25 @@ Interpreter::Interpreter(Window& window, const Program& program)
         ExecuteJmpNotZero,
         ExecuteLoadConstant,
         ExecuteLoadString,
-        ExecuteAddIntegers0,
-        ExecuteAddIntegers1,
-        ExecuteAddIntegers2,
-        ExecuteAddIntegers3,
-        ExecuteAddReals3,
-        ExecuteAddStrings0,
-        ExecuteAddStrings1,
-        ExecuteAddStrings2,
-        ExecuteAddStrings3,
-        ExecuteEqIntegers0,
-        ExecuteEqIntegers1,
-        ExecuteEqIntegers2,
-        ExecuteEqIntegers3,
-        ExecuteEqReals3,
-        ExecuteEqStrings0,
-        ExecuteEqStrings1,
-        ExecuteEqStrings2,
-        ExecuteEqStrings3,
-        ExecuteGrIntegers0,
-        ExecuteGrIntegers1,
-        ExecuteGrIntegers2,
-        ExecuteGrIntegers3,
-        ExecuteOrIntegers0,
-        ExecuteOrIntegers1,
-        ExecuteOrIntegers2,
-        ExecuteOrIntegers3,
-        ExecuteNegInteger0,
-        ExecuteNegInteger1,
-        ExecuteNegReal1,
-        ExecuteNotInteger0,
-        ExecuteNotInteger1,
-        ExecuteIntToReal0,
-        ExecuteIntToReal1,
-        ExecuteRealToInt1,
-        ExecuteMove0,
-        ExecuteMove1,
-        ExecutePrintBoolean0,
-        ExecutePrintBoolean1,
-        ExecutePrintBoolean0Newline,
-        ExecutePrintBoolean1Newline,
-        ExecutePrintInteger0,
-        ExecutePrintInteger1,
-        ExecutePrintInteger0Newline,
-        ExecutePrintInteger1Newline,
-        ExecutePrintReal0,
-        ExecutePrintReal1,
-        ExecutePrintReal0Newline,
-        ExecutePrintReal1Newline,
-        ExecutePrintString0,
-        ExecutePrintString1,
-        ExecutePrintString0Newline,
-        ExecutePrintString1Newline,
+        ExecuteAddIntegers,
+        ExecuteAddReals,
+        ExecuteAddStrings,
+        ExecuteEqualIntegers,
+        ExecuteEqualReals,
+        ExecuteEqualStrings,
+        ExecuteGreaterIntegers,
+        ExecuteOrIntegers,
+        ExecuteNegateInteger,
+        ExecuteNegateReal,
+        ExecuteNotInteger,
+        ExecuteIntegerToReal,
+        ExecuteRealToInteger,
+        ExecuteMove,
+        ExecutePrintBoolean,
+        ExecutePrintInteger,
+        ExecutePrintReal,
+        ExecutePrintString,
+        ExecutePrintNewline,
         ExecuteInputInteger,
         ExecuteInputString,
         ExecuteFnLen,
@@ -117,7 +84,7 @@ Interpreter::Interpreter(Window& window, const Program& program)
     // translate code into applicable function calls
     for (int ix = 0; ix < mCodeSize; ) {
         int count = getInstructionSize(mCode[ix]);
-        mCode[ix] = (VmWord)translationTable[mCode[ix] >> 8];
+        mCode[ix] = (VmWord)translationTable[mCode[ix]];
         ix += count;
         assert(ix <= mCodeSize);
     }
@@ -125,6 +92,7 @@ Interpreter::Interpreter(Window& window, const Program& program)
 
 Interpreter::~Interpreter()
 {
+    delete[] mStacks;
     delete[] mCode;
 }
 
@@ -132,7 +100,7 @@ InterpreterResult Interpreter::run()
 {
     ExecutionContext context;
     context.code = mCode;
-    context.stack = &mStack;
+    context.stacks = mStacks;
     context.stringManager = &mStringManager;
     context.stringStack = &mStringStack;
     context.program = &mProgram;
@@ -141,7 +109,6 @@ InterpreterResult Interpreter::run()
     VmWord* ip = &mCode[0];
 
     do {
-        //printf("%06llX\n", (uint64_t)(ip - mCode));
         ip = ((InstructionExecutor)*ip)(&context, ip);
     } while (ip != nullptr);
 

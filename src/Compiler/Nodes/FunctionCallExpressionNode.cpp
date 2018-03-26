@@ -30,7 +30,6 @@
 
 #include "Analyzer.h"
 #include "FunctionCallExpressionNode.h"
-#include "Opcodes.h"
 #include "Parser.h"
 #include "Translator.h"
 
@@ -38,12 +37,11 @@ static struct {
     TokenTag tag;
     StringPiece name;
     StringPiece arguments;
-    uint64_t opcode;
     Typename returnType;
 } builtinFunctions[] = {
-    { TokenTag::Key_Len, "LEN", "S", Op_fn_len, Typename::Integer },
-    { TokenTag::Key_LeftS, "LEFT$", "SI", Op_fn_left, Typename::String },
-    { TokenTag::None, "", "", 0, Typename::Unknown }
+    { TokenTag::Key_Len, "LEN", "S", Typename::Integer },
+    { TokenTag::Key_LeftS, "LEFT$", "SI", Typename::String },
+    { TokenTag::None, "", "", Typename::Unknown }
 };
 
 FunctionCallExpressionNode::FunctionCallExpressionNode()
@@ -135,12 +133,13 @@ void FunctionCallExpressionNode::translate(Translator& translator)
 {
     for (auto& arg : mArguments)
         arg.translate(translator);
-    
-    uint64_t op = 0;
-    for (int ix = 0; builtinFunctions[ix].tag != TokenTag::None && op == 0; ++ix)
-        if (builtinFunctions[ix].name == mName)
-            op = builtinFunctions[ix].opcode;
-    assert(op != 0);
 
-    mResultIndex = translator.builtInFunction(op, mArguments);
+    uint64_t op = 0;
+    for (int ix = 0; builtinFunctions[ix].tag != TokenTag::None && op == 0; ++ix) {
+        if (builtinFunctions[ix].name == mName) {
+            mResultIndex = translator.builtInFunction(builtinFunctions[ix].name, mArguments);
+            return;
+        }
+    }
+    assert(false);
 }

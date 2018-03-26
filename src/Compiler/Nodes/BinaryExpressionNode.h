@@ -42,6 +42,7 @@ public:
         Unknown,
         Addition,
         Equals,
+        Greater,
         BitwiseOr
     };
 

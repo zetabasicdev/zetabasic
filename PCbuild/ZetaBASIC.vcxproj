@@ -50,6 +50,7 @@
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>$(SDL_INC_PATH);..\src;..\src\Compiler;..\src\Compiler\Nodes;..\src\Interpreter;..\src\Ide</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>DUMP_INTERNALS;_MBCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>$(SDL_LIB_PATH)</AdditionalLibraryDirectories>

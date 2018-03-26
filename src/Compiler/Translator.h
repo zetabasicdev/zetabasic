@@ -33,6 +33,7 @@
 #include <cstdint>
 #include <vector>
 #include <unordered_map>
+#include "BinaryExpressionNode.h"
 #include "ResultIndex.h"
 #include "Node.h"
 #include "StringPiece.h"
@@ -40,6 +41,7 @@
 #include "TItemBuffer.h"
 #include "TNodeList.h"
 #include "Typename.h"
+#include "UnaryExpressionNode.h"
 #include "VirtualMachine.h"
 
 typedef int Label;
@@ -64,27 +66,28 @@ public:
     void startCodeBody();
     void endCodeBody();
 
-    ResultIndex loadConstant(int64_t value, bool allowLiterals=true);
+    ResultIndex loadConstant(int64_t value);
     ResultIndex loadStringConstant(const StringPiece& value);
     ResultIndex loadIdentifier(Symbol* symbol);
-    ResultIndex unaryOperator(uint64_t baseOpcode, const ResultIndex& rhs, bool autoAdjust=true);
-    ResultIndex binaryOperator(uint64_t baseOpcode, const ResultIndex& lhs, const ResultIndex& rhs, bool autoAdjust=true);
+    ResultIndex unaryOperator(UnaryExpressionNode::Operator op, Typename type, const ResultIndex& rhs);
+    ResultIndex binaryOperator(BinaryExpressionNode::Operator op, Typename type, const ResultIndex& lhs, const ResultIndex& rhs);
     ResultIndex intToReal(const ResultIndex& rhs);
     ResultIndex realToInt(const ResultIndex& rhs);
 
     void jump(const StringPiece& name);
     void jump(Label label);
-    void jump(uint64_t opcode, Label label, const ResultIndex& result);
+    void jumpZero(Label label, const ResultIndex& result);
+    void jumpNotZero(Label label, const ResultIndex& result);
 
-    void assign(Symbol* target, const ResultIndex& index);
-    ResultIndex ensureLocal(Typename type, const ResultIndex& index);
+    void assign(Symbol* symbol, const ResultIndex& result);
 
-    void print(Typename type, const ResultIndex& index, bool trailingSemicolon);
+    void print(Typename type, const ResultIndex& index);
+    void printNewline();
     void input(Symbol* target);
 
     void end();
 
-    ResultIndex builtInFunction(uint64_t opcode, TNodeList<ExpressionNode>& arguments);
+    ResultIndex builtInFunction(const StringPiece& name, TNodeList<ExpressionNode>& arguments);
 
     void placeLabel(const StringPiece& name);
     void placeLabel(Label label);

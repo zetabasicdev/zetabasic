@@ -29,7 +29,6 @@
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "GotoStatementNode.h"
-#include "Opcodes.h"
 #include "Parser.h"
 #include "Translator.h"
 

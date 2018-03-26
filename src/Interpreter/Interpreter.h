@@ -57,7 +57,7 @@ private:
     Window& mWindow;
     const Program& mProgram;
 
-    Stack mStack;
+    Stack* mStacks;
     StringStack mStringStack;
     StringManager mStringManager;
 

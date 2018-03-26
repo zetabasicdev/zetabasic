@@ -28,7 +28,6 @@
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "Opcodes.h"
 #include "Parser.h"
 #include "Translator.h"
 #include "UnaryExpressionNode.h"
@@ -108,29 +107,5 @@ void UnaryExpressionNode::translate(Translator& translator)
     // need to base this on operand type, not result type
     auto opType = mRhs->getType();
 
-    // currently unary operators using reals assume reals are always stored in locals/temporaries
-    assert(mType != Typename::Real || mRhs->getResultIndex().getType() == ResultIndexType::Local);
-
-    uint64_t opcode = 0;
-    switch (mOp) {
-    case Operator::Plus:
-        // effectively do nothing, pass value through
-        mResultIndex = mRhs->getResultIndex();
-        return;
-    case Operator::Negate:
-        if (opType == Typename::Integer)
-            opcode = Op_neg_integer0;
-        else if (opType == Typename::Real)
-            opcode = Op_neg_real1;
-        break;
-    case Operator::BitwiseNot:
-        if (opType == Typename::Boolean || opType == Typename::Integer)
-            opcode = Op_not_integer0;
-        break;
-    default:
-        break;
-    }
-
-    assert(opcode != 0);
-    mResultIndex = translator.unaryOperator(opcode, mRhs->getResultIndex(), mType != Typename::Real);
+    mResultIndex = translator.unaryOperator(mOp, opType, mRhs->getResultIndex());
 }

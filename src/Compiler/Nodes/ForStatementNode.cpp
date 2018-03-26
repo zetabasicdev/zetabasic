@@ -32,10 +32,8 @@
 
 #include "Analyzer.h"
 #include "CompileError.h"
-#include "ConstantTable.h"
 #include "ExpressionNode.h"
 #include "ForStatementNode.h"
-#include "Opcodes.h"
 #include "Parser.h"
 #include "Symbol.h"
 #include "SymbolTable.h"
@@ -159,19 +157,22 @@ void ForStatementNode::translate(Translator& translator)
 
     // do initial check if loop should be skipped
     mStopExpression->translate(translator);
-    auto result = translator.binaryOperator(Op_gr_integers0,
+    auto result = translator.binaryOperator(BinaryExpressionNode::Operator::Greater,
+                                            Typename::Integer,
                                             ResultIndex(ResultIndexType::Local, mIdentifier.getSymbol()->getLocation()),
                                             mStopExpression->getResultIndex());
-    translator.jump(Op_jmp_not_zero, jump3, result);
+    translator.jumpNotZero(jump3, result);
 
     translator.jump(jump1);
     translator.placeLabel(jump2);
     translator.clearTemporaries();
 
     // perform increment of counter
-    result = translator.binaryOperator(Op_add_integers0,
+    result = translator.loadConstant(1);
+    result = translator.binaryOperator(BinaryExpressionNode::Operator::Addition,
+                                       Typename::Integer,
                                        ResultIndex(ResultIndexType::Local, mIdentifier.getSymbol()->getLocation()),
-                                       ResultIndex(ResultIndexType::Literal, 1));
+                                       result);
     translator.assign(mIdentifier.getSymbol(), result);
 
     translator.placeLabel(jump1);
@@ -183,10 +184,11 @@ void ForStatementNode::translate(Translator& translator)
 
     // perform exit check
     mStopExpression->translate(translator);
-    result = translator.binaryOperator(Op_eq_integers0,
+    result = translator.binaryOperator(BinaryExpressionNode::Operator::Equals,
+                                       Typename::Integer,
                                        ResultIndex(ResultIndexType::Local, mIdentifier.getSymbol()->getLocation()),
                                        mStopExpression->getResultIndex());
-    translator.jump(Op_jmp_zero, jump2, result);
+    translator.jumpZero(jump2, result);
 
     translator.placeLabel(jump3);
     translator.clearTemporaries();

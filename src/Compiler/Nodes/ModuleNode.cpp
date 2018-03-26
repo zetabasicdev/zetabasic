@@ -29,9 +29,7 @@
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "ModuleNode.h"
-#include "Opcodes.h"
 #include "Parser.h"
-#include "SymbolTable.h"
 #include "StatementNode.h"
 #include "Translator.h"
 

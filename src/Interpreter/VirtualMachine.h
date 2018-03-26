@@ -36,13 +36,23 @@ typedef uint64_t VmWord;
 
 int getInstructionSize(VmWord word);
 
-// various instructions can take up to 3 operands, which all fit into a 64-bit
-// word--this means maximum operand size is 20 bits
-const int64_t OperandSizeMask = 0xfffff;
-const int64_t MaxOperandValue = 0xfffff;
+// instructions can take up to 4 stack-based operands, which all fit into a 64-bit
+// word--this means maximum operand size is 16 bits (or 14 bits due to stack
+// descriptor)
+const int64_t OperandSizeMask = 0xffff;
+const int64_t MaxOperandSize  = 0xffff;
+const int64_t MaxOperandValue = 0x3fff;
 
-const int64_t Operand2Shift = 20;
-const int64_t Operand3Shift = 40;
+const int64_t StackLocals = 0;
+const int64_t StackTemporaries = 1;
+const int64_t StackParmeters = 2;
+const int64_t StackGlobals = 3;
 
-const int64_t JumpSizeMask = 0xfffffffffff;
-const int64_t JumpShift = 20;
+const int64_t Operand0Shift = 0;
+const int64_t Operand1Shift = 16;
+const int64_t Operand2Shift = 32;
+const int64_t Operand3Shift = 48;
+
+// jump addresses always follow operand 0.
+const int64_t JumpSizeMask = 0xffffffffffff;
+const int64_t JumpShift = 16;

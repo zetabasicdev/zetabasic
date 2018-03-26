@@ -32,10 +32,8 @@
 
 #include "Analyzer.h"
 #include "IdentifierExpressionNode.h"
-#include "Opcodes.h"
 #include "Parser.h"
 #include "Symbol.h"
-#include "SymbolTable.h"
 #include "Translator.h"
 
 IdentifierExpressionNode::IdentifierExpressionNode()

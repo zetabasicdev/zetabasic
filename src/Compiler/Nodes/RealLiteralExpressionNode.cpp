@@ -63,5 +63,5 @@ void RealLiteralExpressionNode::analyze(Analyzer& analyzer)
 void RealLiteralExpressionNode::translate(Translator& translator)
 {
     int64_t value = *(int64_t*)(&mValue);
-    mResultIndex = translator.loadConstant(value, false);       // always load into temporary
+    mResultIndex = translator.loadConstant(value);
 }
