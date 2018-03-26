@@ -29,6 +29,7 @@
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "AssignmentStatementNode.h"
+#include "DimStatementNode.h"
 #include "EndStatementNode.h"
 #include "ForStatementNode.h"
 #include "IfStatementNode.h"
@@ -60,6 +61,9 @@ StatementNode* StatementNode::parseStatement(Parser& parser)
     StatementNode* node = nullptr;
     if (token.getId() == TokenId::Name) {
         switch (token.getTag()) {
+        case TokenTag::Key_Dim:
+            node = parser.getNodePool().alloc<DimStatementNode>();
+            break;
         case TokenTag::Key_End:
             node = parser.getNodePool().alloc<EndStatementNode>();
             break;

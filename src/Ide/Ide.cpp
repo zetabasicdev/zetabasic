@@ -203,5 +203,6 @@ void Ide::runProgram()
         mStatusBar.draw();
         mWindow.locate(row, col);
         mWindow.showCursor();
+        mWindow.color(7, 1);
     }
 }

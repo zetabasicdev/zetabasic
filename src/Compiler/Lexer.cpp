@@ -172,11 +172,15 @@ bool Lexer::runEndState()
                 StringPiece text;
                 TokenTag tag;
             } keywords[] = {
+                { "AS", TokenTag::Key_As },
+                { "BOOLEAN", TokenTag::Key_Boolean },
+                { "DIM", TokenTag::Key_Dim },
                 { "END", TokenTag::Key_End },
                 { "FALSE", TokenTag::Key_False },
                 { "FOR", TokenTag::Key_For },
                 { "IF", TokenTag::Key_If },
                 { "INPUT", TokenTag::Key_Input },
+                { "INTEGER", TokenTag::Key_Integer },
                 { "GOTO", TokenTag::Key_Goto },
                 { "LEN", TokenTag::Key_Len },
                 { "LEFT$", TokenTag::Key_LeftS },
@@ -185,6 +189,8 @@ bool Lexer::runEndState()
                 { "NOT", TokenTag::Key_Not },
                 { "OR", TokenTag::Key_Or },
                 { "PRINT", TokenTag::Key_Print },
+                { "REAL", TokenTag::Key_Real },
+                { "STRING", TokenTag::Key_String },
                 { "THEN", TokenTag::Key_Then },
                 { "TO", TokenTag::Key_To },
                 { "TRUE", TokenTag::Key_True },

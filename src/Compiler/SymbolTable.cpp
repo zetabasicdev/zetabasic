@@ -50,6 +50,14 @@ void SymbolTable::reset()
     mSymbols.reset();
 }
 
+bool SymbolTable::doesSymbolExist(const StringPiece& name) const
+{
+    for (auto ix = 0; ix < mSymbols.getSize(); ++ix)
+        if (mSymbols[ix].getName() == name)
+            return true;
+    return false;
+}
+
 Symbol* SymbolTable::getSymbol(const Range& range, const StringPiece& name, Typename type)
 {
     // first determine if symbol by this name already exists

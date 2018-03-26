@@ -73,6 +73,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="..\src\Compiler\Nodes\BooleanLiteralExpressionNode.h" />
+    <ClInclude Include="..\src\Compiler\Nodes\DimStatementNode.h" />
     <ClInclude Include="..\src\Compiler\Nodes\IdentifierNode.h" />
     <ClInclude Include="..\src\Compiler\Nodes\RealLiteralExpressionNode.h" />
     <ClInclude Include="..\src\Compiler\Nodes\TypeConversionExpressionNode.h" />
@@ -145,6 +146,7 @@
     <ClCompile Include="..\src\Compiler\Lexer.cpp" />
     <ClCompile Include="..\src\Compiler\Nodes\AssignmentStatementNode.cpp" />
     <ClCompile Include="..\src\Compiler\Nodes\BinaryExpressionNode.cpp" />
+    <ClCompile Include="..\src\Compiler\Nodes\DimStatementNode.cpp" />
     <ClCompile Include="..\src\Compiler\Nodes\EndStatementNode.cpp" />
     <ClCompile Include="..\src\Compiler\Nodes\ExpressionNode.cpp" />
     <ClCompile Include="..\src\Compiler\Nodes\ForStatementNode.cpp" />

@@ -30,99 +30,40 @@
 
 #pragma once
 
-#include "Range.h"
+#include "StatementNode.h"
 #include "StringPiece.h"
+#include "TNodeList.h"
+#include "Typename.h"
 
-enum class TokenId
-{
-    Unknown,
-    EndOfSource,
-    EndOfLine,
-    Name,
-    Integer,
-    Real,
-    StringPiece,
-    Symbol,
-    Label
-};
-const char* ToString(TokenId id);
-
-enum class TokenTag
-{
-    None,
-    Key_As,
-    Key_Boolean,
-    Key_Dim,
-    Key_End,
-    Key_False,
-    Key_For,
-    Key_Goto,
-    Key_If,
-    Key_Input,
-    Key_Integer,
-    Key_Len,
-    Key_LeftS,
-    Key_Let,
-    Key_Next,
-    Key_Not,
-    Key_Or,
-    Key_Print,
-    Key_Real,
-    Key_String,
-    Key_Then,
-    Key_To,
-    Key_True,
-    Sym_Add,
-    Sym_Subtract,
-    Sym_Equals,
-    Sym_OpenParen,
-    Sym_CloseParen,
-    Sym_Comma,
-    Sym_Semicolon
-};
-const char* ToString(TokenTag tag);
-
-class Token
+class DimNode
 {
 public:
-    Token(TokenId id, TokenTag tag, const StringPiece& text, const Range& range)
-        :
-        mId(id),
-        mTag(tag),
-        mText(text),
-        mRange(range)
-    {
-        // intentionally left blank
-    }
+    DimNode();
+    ~DimNode();
 
-    ~Token()
-    {
-        // intentionally left blank
-    }
+    void parse(Parser& parser);
+    void analyze(Analyzer& analyzer);
 
-    TokenId getId() const
-    {
-        return mId;
-    }
+    friend class TNodeList<DimNode>;
+private:
+    DimNode* mNext;
+    Range mRange;
+    StringPiece mName;
+    Typename mType;
+};
 
-    TokenTag getTag() const
-    {
-        return mTag;
-    }
+class DimStatementNode
+    :
+    public StatementNode
+{
+public:
+    DimStatementNode();
+    virtual ~DimStatementNode();
 
-    const StringPiece& getText() const
-    {
-        return mText;
-    }
-
-    const Range& getRange() const
-    {
-        return mRange;
-    }
+    void parse(Parser& parser);
+    void analyze(Analyzer& analyzer);
+    void translate(Translator& translator);
 
 private:
-    TokenId mId;
-    TokenTag mTag;
-    StringPiece mText;
-    Range mRange;
+    TNodeList<DimNode> mIds;
 };

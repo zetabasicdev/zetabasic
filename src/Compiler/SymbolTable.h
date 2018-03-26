@@ -52,6 +52,7 @@ public:
         return mSymbols.getSize();
     }
 
+    bool doesSymbolExist(const StringPiece& name) const;
     Symbol* getSymbol(const Range& range, const StringPiece& name, Typename type);
 
 private:
