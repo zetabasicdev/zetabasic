@@ -41,9 +41,18 @@ public:
     {
         Unknown,
         Addition,
+        Subtraction,
+        Multiplication,
+        Division,
+        Modulus,
         Equals,
+        NotEquals,
+        Less,
         Greater,
-        BitwiseOr
+        LessEquals,
+        GreaterEquals,
+        BitwiseOr,
+        BitwiseAnd
     };
 
     BinaryExpressionNode(ExpressionNode* lhs);

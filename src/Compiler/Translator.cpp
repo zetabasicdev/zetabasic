@@ -189,6 +189,30 @@ ResultIndex Translator::binaryOperator(BinaryExpressionNode::Operator op, Typena
         else if (type == Typename::String)
             ops[0] = Op_add_st;
         break;
+    case BinaryExpressionNode::Operator::Subtraction:
+        if (type == Typename::Integer)
+            ops[0] = Op_sub_i;
+        else if (type == Typename::Real)
+            ops[0] = Op_sub_r;
+        break;
+    case BinaryExpressionNode::Operator::Multiplication:
+        if (type == Typename::Integer)
+            ops[0] = Op_mul_i;
+        else if (type == Typename::Real)
+            ops[0] = Op_mul_r;
+        break;
+    case BinaryExpressionNode::Operator::Division:
+        if (type == Typename::Integer)
+            ops[0] = Op_div_i;
+        else if (type == Typename::Real)
+            ops[0] = Op_div_r;
+        break;
+    case BinaryExpressionNode::Operator::Modulus:
+        if (type == Typename::Integer)
+            ops[0] = Op_mod_i;
+        else if (type == Typename::Real)
+            ops[0] = Op_mod_r;
+        break;
     case BinaryExpressionNode::Operator::Equals:
         if (type == Typename::Boolean || type == Typename::Integer)
             ops[0] = Op_eq_i;
@@ -197,13 +221,53 @@ ResultIndex Translator::binaryOperator(BinaryExpressionNode::Operator op, Typena
         else if (type == Typename::String)
             ops[0] = Op_eq_st;
         break;
+    case BinaryExpressionNode::Operator::NotEquals:
+        if (type == Typename::Boolean || type == Typename::Integer)
+            ops[0] = Op_neq_i;
+        else if (type == Typename::Real)
+            ops[0] = Op_neq_r;
+        else if (type == Typename::String)
+            ops[0] = Op_neq_st;
+        break;
+    case BinaryExpressionNode::Operator::Less:
+        if (type == Typename::Integer)
+            ops[0] = Op_lt_i;
+        else if (type == Typename::Real)
+            ops[0] = Op_lt_r;
+        else if (type == Typename::String)
+            ops[0] = Op_lt_st;
+        break;
     case BinaryExpressionNode::Operator::Greater:
         if (type == Typename::Integer)
-            ops[0] = Op_gr_i;
+            ops[0] = Op_gt_i;
+        else if (type == Typename::Real)
+            ops[0] = Op_gt_r;
+        else if (type == Typename::String)
+            ops[0] = Op_gt_st;
+        break;
+    case BinaryExpressionNode::Operator::LessEquals:
+        if (type == Typename::Integer)
+            ops[0] = Op_lte_i;
+        else if (type == Typename::Real)
+            ops[0] = Op_lte_r;
+        else if (type == Typename::String)
+            ops[0] = Op_lte_st;
+        break;
+    case BinaryExpressionNode::Operator::GreaterEquals:
+        if (type == Typename::Integer)
+            ops[0] = Op_gte_i;
+        else if (type == Typename::Real)
+            ops[0] = Op_gte_r;
+        else if (type == Typename::String)
+            ops[0] = Op_gte_st;
         break;
     case BinaryExpressionNode::Operator::BitwiseOr:
         if (type == Typename::Boolean || type == Typename::Integer)
             ops[0] = Op_or_i;
+        break;
+    case BinaryExpressionNode::Operator::BitwiseAnd:
+        if (type == Typename::Boolean || type == Typename::Integer)
+            ops[0] = Op_and_i;
         break;
     default:
         break;
@@ -470,11 +534,34 @@ void Translator::dumpCode()
         { "add_i", InstructionType::Args3 },
         { "add_r", InstructionType::Args3 },
         { "add_st", InstructionType::Args3 },
+        { "sub_i", InstructionType::Args3 },
+        { "sub_r", InstructionType::Args3 },
+        { "mul_i", InstructionType::Args3 },
+        { "mul_r", InstructionType::Args3 },
+        { "div_i", InstructionType::Args3 },
+        { "div_r", InstructionType::Args3 },
+        { "mod_i", InstructionType::Args3 },
+        { "mod_r", InstructionType::Args3 },
         { "eq_i", InstructionType::Args3 },
         { "eq_r", InstructionType::Args3 },
         { "eq_st", InstructionType::Args3 },
-        { "gr_i", InstructionType::Args3 },
+        { "neq_i", InstructionType::Args3 },
+        { "neq_r", InstructionType::Args3 },
+        { "neq_st", InstructionType::Args3 },
+        { "lt_i", InstructionType::Args3 },
+        { "lt_r", InstructionType::Args3 },
+        { "lt_st", InstructionType::Args3 },
+        { "gt_i", InstructionType::Args3 },
+        { "gt_r", InstructionType::Args3 },
+        { "gt_st", InstructionType::Args3 },
+        { "lte_i", InstructionType::Args3 },
+        { "lte_r", InstructionType::Args3 },
+        { "lte_st", InstructionType::Args3 },
+        { "gte_i", InstructionType::Args3 },
+        { "gte_r", InstructionType::Args3 },
+        { "gte_st", InstructionType::Args3 },
         { "or_i", InstructionType::Args3 },
+        { "and_i", InstructionType::Args3 },
         { "neg_i", InstructionType::Args2 },
         { "neg_r", InstructionType::Args2 },
         { "not_i", InstructionType::Args2 },

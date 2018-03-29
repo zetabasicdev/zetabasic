@@ -55,8 +55,18 @@ ExpressionNode::~ExpressionNode()
 
 int ExpressionNode::getPrecedence(TokenTag tag)
 {
+    if (tag == TokenTag::Sym_Multiply) return 7;
+    if (tag == TokenTag::Sym_Divide) return 7;
+    if (tag == TokenTag::Key_Mod) return 7;
     if (tag == TokenTag::Sym_Add) return 6;
+    if (tag == TokenTag::Sym_Subtract) return 6;
+    if (tag == TokenTag::Sym_Less) return 5;
+    if (tag == TokenTag::Sym_Greater) return 5;
+    if (tag == TokenTag::Sym_LessEquals) return 5;
+    if (tag == TokenTag::Sym_GreaterEquals) return 5;
     if (tag == TokenTag::Sym_Equals) return 3;
+    if (tag == TokenTag::Sym_NotEquals) return 3;
+    if (tag == TokenTag::Key_And) return 2;
     if (tag == TokenTag::Key_Or) return 1;
     return 0;
 }

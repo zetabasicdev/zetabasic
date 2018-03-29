@@ -89,11 +89,14 @@ public:
     bool operator==(const char* text) const
     {
         assert(text);
+        int len = int(strlen(text));
+        if (mLength == len)
 #ifdef _WIN32
-        return _strnicmp(mText, text, mLength) == 0;
+            return _strnicmp(mText, text, mLength) == 0;
 #else
-        return strncasecmp(mText, text, mLength) == 0;
+            return strncasecmp(mText, text, mLength) == 0;
 #endif
+        return false;
     }
 
     bool operator==(const StringPiece& str) const
@@ -136,6 +139,16 @@ public:
         if (str.mLength == mLength)
             return strncmp(mText, str.mText, mLength) == 0;
         return false;
+    }
+
+    int exactCompareWithCaseInt(const StringPiece& str) const
+    {
+        int result = compareWithCase(str);
+        if (mLength < str.mLength && result == 0)
+            return -1;
+        else if (mLength > str.mLength && result == 0)
+            return 1;
+        return result;
     }
 
 private:

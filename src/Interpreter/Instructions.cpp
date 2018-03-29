@@ -164,6 +164,86 @@ VmWord* ExecuteAddStrings(ExecutionContext* context, VmWord* ip)
     return ip + 2;
 }
 
+VmWord* ExecuteSubIntegers(ExecutionContext* context, VmWord* ip)
+{
+    int64_t lhs = getStackValue1(context, ip);
+    int64_t rhs = getStackValue2(context, ip);
+    setStackValue0(context, ip, lhs - rhs);
+    return ip + 2;
+}
+
+VmWord* ExecuteSubReals(ExecutionContext* context, VmWord* ip)
+{
+    int64_t ilhs = getStackValue1(context, ip);
+    int64_t irhs = getStackValue2(context, ip);
+    double lhs = *(double*)&ilhs;
+    double rhs = *(double*)&irhs;
+    double value = lhs - rhs;
+    int64_t ivalue = *(int64_t*)&value;
+    setStackValue0(context, ip, ivalue);
+    return ip + 2;
+}
+
+VmWord* ExecuteMulIntegers(ExecutionContext* context, VmWord* ip)
+{
+    int64_t lhs = getStackValue1(context, ip);
+    int64_t rhs = getStackValue2(context, ip);
+    setStackValue0(context, ip, lhs * rhs);
+    return ip + 2;
+}
+
+VmWord* ExecuteMulReals(ExecutionContext* context, VmWord* ip)
+{
+    int64_t ilhs = getStackValue1(context, ip);
+    int64_t irhs = getStackValue2(context, ip);
+    double lhs = *(double*)&ilhs;
+    double rhs = *(double*)&irhs;
+    double value = lhs * rhs;
+    int64_t ivalue = *(int64_t*)&value;
+    setStackValue0(context, ip, ivalue);
+    return ip + 2;
+}
+
+VmWord* ExecuteDivIntegers(ExecutionContext* context, VmWord* ip)
+{
+    int64_t lhs = getStackValue1(context, ip);
+    int64_t rhs = getStackValue2(context, ip);
+    setStackValue0(context, ip, lhs / rhs);
+    return ip + 2;
+}
+
+VmWord* ExecuteDivReals(ExecutionContext* context, VmWord* ip)
+{
+    int64_t ilhs = getStackValue1(context, ip);
+    int64_t irhs = getStackValue2(context, ip);
+    double lhs = *(double*)&ilhs;
+    double rhs = *(double*)&irhs;
+    double value = lhs / rhs;
+    int64_t ivalue = *(int64_t*)&value;
+    setStackValue0(context, ip, ivalue);
+    return ip + 2;
+}
+
+VmWord* ExecuteModIntegers(ExecutionContext* context, VmWord* ip)
+{
+    int64_t lhs = getStackValue1(context, ip);
+    int64_t rhs = getStackValue2(context, ip);
+    setStackValue0(context, ip, lhs % rhs);
+    return ip + 2;
+}
+
+VmWord* ExecuteModReals(ExecutionContext* context, VmWord* ip)
+{
+    int64_t ilhs = getStackValue1(context, ip);
+    int64_t irhs = getStackValue2(context, ip);
+    double lhs = *(double*)&ilhs;
+    double rhs = *(double*)&irhs;
+    double value = fmod(lhs, rhs);
+    int64_t ivalue = *(int64_t*)&value;
+    setStackValue0(context, ip, ivalue);
+    return ip + 2;
+}
+
 VmWord* ExecuteEqualIntegers(ExecutionContext* context, VmWord* ip)
 {
     int64_t lhs = getStackValue1(context, ip);
@@ -197,6 +277,72 @@ VmWord* ExecuteEqualStrings(ExecutionContext* context, VmWord* ip)
     return ip + 2;
 }
 
+VmWord* ExecuteNotEqualIntegers(ExecutionContext* context, VmWord* ip)
+{
+    int64_t lhs = getStackValue1(context, ip);
+    int64_t rhs = getStackValue2(context, ip);
+    setStackValue0(context, ip, lhs != rhs ? 1 : 0);
+    return ip + 2;
+}
+
+VmWord* ExecuteNotEqualReals(ExecutionContext* context, VmWord* ip)
+{
+    int64_t ilhs = getStackValue1(context, ip);
+    int64_t irhs = getStackValue2(context, ip);
+    double lhs = *(double*)&ilhs;
+    double rhs = *(double*)&irhs;
+    setStackValue0(context, ip, lhs != rhs ? 1 : 0);
+    return ip + 2;
+}
+
+VmWord* ExecuteNotEqualStrings(ExecutionContext* context, VmWord* ip)
+{
+    int64_t lhs = getStackValue1(context, ip);
+    int64_t rhs = getStackValue2(context, ip);
+    const char* left = nullptr;
+    const char* right = nullptr;
+    int leftLen = 0;
+    int rightLen = 0;
+    context->stringManager->getString(lhs, left, leftLen);
+    context->stringManager->getString(rhs, right, rightLen);
+    int result = StringPiece(left, leftLen).exactCompareWithCaseInt(StringPiece(right, rightLen));
+    setStackValue0(context, ip, result != 0 ? 1 : 0);
+    return ip + 2;
+}
+
+VmWord* ExecuteLessIntegers(ExecutionContext* context, VmWord* ip)
+{
+    int64_t lhs = getStackValue1(context, ip);
+    int64_t rhs = getStackValue2(context, ip);
+    setStackValue0(context, ip, lhs < rhs ? 1 : 0);
+    return ip + 2;
+}
+
+VmWord* ExecuteLessReals(ExecutionContext* context, VmWord* ip)
+{
+    int64_t ilhs = getStackValue1(context, ip);
+    int64_t irhs = getStackValue2(context, ip);
+    double lhs = *(double*)&ilhs;
+    double rhs = *(double*)&irhs;
+    setStackValue0(context, ip, lhs < rhs ? 1 : 0);
+    return ip + 2;
+}
+
+VmWord* ExecuteLessStrings(ExecutionContext* context, VmWord* ip)
+{
+    int64_t lhs = getStackValue1(context, ip);
+    int64_t rhs = getStackValue2(context, ip);
+    const char* left = nullptr;
+    const char* right = nullptr;
+    int leftLen = 0;
+    int rightLen = 0;
+    context->stringManager->getString(lhs, left, leftLen);
+    context->stringManager->getString(rhs, right, rightLen);
+    int result = StringPiece(left, leftLen).exactCompareWithCaseInt(StringPiece(right, rightLen));
+    setStackValue0(context, ip, result < 0 ? 1 : 0);
+    return ip + 2;
+}
+
 VmWord* ExecuteGreaterIntegers(ExecutionContext* context, VmWord* ip)
 {
     int64_t lhs = getStackValue1(context, ip);
@@ -205,11 +351,110 @@ VmWord* ExecuteGreaterIntegers(ExecutionContext* context, VmWord* ip)
     return ip + 2;
 }
 
+VmWord* ExecuteGreaterReals(ExecutionContext* context, VmWord* ip)
+{
+    int64_t ilhs = getStackValue1(context, ip);
+    int64_t irhs = getStackValue2(context, ip);
+    double lhs = *(double*)&ilhs;
+    double rhs = *(double*)&irhs;
+    setStackValue0(context, ip, lhs > rhs ? 1 : 0);
+    return ip + 2;
+}
+
+VmWord* ExecuteGreaterStrings(ExecutionContext* context, VmWord* ip)
+{
+    int64_t lhs = getStackValue1(context, ip);
+    int64_t rhs = getStackValue2(context, ip);
+    const char* left = nullptr;
+    const char* right = nullptr;
+    int leftLen = 0;
+    int rightLen = 0;
+    context->stringManager->getString(lhs, left, leftLen);
+    context->stringManager->getString(rhs, right, rightLen);
+    int result = StringPiece(left, leftLen).exactCompareWithCaseInt(StringPiece(right, rightLen));
+    setStackValue0(context, ip, result > 0 ? 1 : 0);
+    return ip + 2;
+}
+
+VmWord* ExecuteLessEqualsIntegers(ExecutionContext* context, VmWord* ip)
+{
+    int64_t lhs = getStackValue1(context, ip);
+    int64_t rhs = getStackValue2(context, ip);
+    setStackValue0(context, ip, lhs <= rhs ? 1 : 0);
+    return ip + 2;
+}
+
+VmWord* ExecuteLessEqualsReals(ExecutionContext* context, VmWord* ip)
+{
+    int64_t ilhs = getStackValue1(context, ip);
+    int64_t irhs = getStackValue2(context, ip);
+    double lhs = *(double*)&ilhs;
+    double rhs = *(double*)&irhs;
+    setStackValue0(context, ip, lhs <= rhs ? 1 : 0);
+    return ip + 2;
+}
+
+VmWord* ExecuteLessEqualsStrings(ExecutionContext* context, VmWord* ip)
+{
+    int64_t lhs = getStackValue1(context, ip);
+    int64_t rhs = getStackValue2(context, ip);
+    const char* left = nullptr;
+    const char* right = nullptr;
+    int leftLen = 0;
+    int rightLen = 0;
+    context->stringManager->getString(lhs, left, leftLen);
+    context->stringManager->getString(rhs, right, rightLen);
+    int result = StringPiece(left, leftLen).exactCompareWithCaseInt(StringPiece(right, rightLen));
+    setStackValue0(context, ip, result <= 0 ? 1 : 0);
+    return ip + 2;
+}
+
+VmWord* ExecuteGreaterEqualsIntegers(ExecutionContext* context, VmWord* ip)
+{
+    int64_t lhs = getStackValue1(context, ip);
+    int64_t rhs = getStackValue2(context, ip);
+    setStackValue0(context, ip, lhs >= rhs ? 1 : 0);
+    return ip + 2;
+}
+
+VmWord* ExecuteGreaterEqualsReals(ExecutionContext* context, VmWord* ip)
+{
+    int64_t ilhs = getStackValue1(context, ip);
+    int64_t irhs = getStackValue2(context, ip);
+    double lhs = *(double*)&ilhs;
+    double rhs = *(double*)&irhs;
+    setStackValue0(context, ip, lhs >= rhs ? 1 : 0);
+    return ip + 2;
+}
+
+VmWord* ExecuteGreaterEqualsStrings(ExecutionContext* context, VmWord* ip)
+{
+    int64_t lhs = getStackValue1(context, ip);
+    int64_t rhs = getStackValue2(context, ip);
+    const char* left = nullptr;
+    const char* right = nullptr;
+    int leftLen = 0;
+    int rightLen = 0;
+    context->stringManager->getString(lhs, left, leftLen);
+    context->stringManager->getString(rhs, right, rightLen);
+    int result = StringPiece(left, leftLen).exactCompareWithCaseInt(StringPiece(right, rightLen));
+    setStackValue0(context, ip, result >= 0 ? 1 : 0);
+    return ip + 2;
+}
+
 VmWord* ExecuteOrIntegers(ExecutionContext* context, VmWord* ip)
 {
     int64_t lhs = getStackValue1(context, ip);
     int64_t rhs = getStackValue2(context, ip);
     setStackValue0(context, ip, lhs | rhs);
+    return ip + 2;
+}
+
+VmWord* ExecuteAndIntegers(ExecutionContext* context, VmWord* ip)
+{
+    int64_t lhs = getStackValue1(context, ip);
+    int64_t rhs = getStackValue2(context, ip);
+    setStackValue0(context, ip, lhs & rhs);
     return ip + 2;
 }
 

@@ -56,11 +56,41 @@ void BinaryExpressionNode::parse(Parser& parser)
     case TokenTag::Sym_Add:
         mOp = Operator::Addition;
         break;
+    case TokenTag::Sym_Subtract:
+        mOp = Operator::Subtraction;
+        break;
+    case TokenTag::Sym_Multiply:
+        mOp = Operator::Multiplication;
+        break;
+    case TokenTag::Sym_Divide:
+        mOp = Operator::Division;
+        break;
+    case TokenTag::Key_Mod:
+        mOp = Operator::Modulus;
+        break;
     case TokenTag::Sym_Equals:
         mOp = Operator::Equals;
         break;
+    case TokenTag::Sym_NotEquals:
+        mOp = Operator::NotEquals;
+        break;
+    case TokenTag::Sym_Less:
+        mOp = Operator::Less;
+        break;
+    case TokenTag::Sym_Greater:
+        mOp = Operator::Greater;
+        break;
+    case TokenTag::Sym_LessEquals:
+        mOp = Operator::LessEquals;
+        break;
+    case TokenTag::Sym_GreaterEquals:
+        mOp = Operator::GreaterEquals;
+        break;
     case TokenTag::Key_Or:
         mOp = Operator::BitwiseOr;
+        break;
+    case TokenTag::Key_And:
+        mOp = Operator::BitwiseAnd;
         break;
     default:
         assert(false);
@@ -109,12 +139,26 @@ void BinaryExpressionNode::analyze(Analyzer& analyzer)
             throw CompileError(CompileErrorId::TypeError, mOpRange, "Unknown Operation For Types");
         mType = leftType;
         break;
+    case Operator::Subtraction:
+    case Operator::Multiplication:
+    case Operator::Division:
+    case Operator::Modulus:
+        if (leftType != Typename::Integer && leftType != Typename::Real)
+            throw CompileError(CompileErrorId::TypeError, mOpRange, "Unknown Operation For Types");
+        mType = leftType;
+        break;
     case Operator::Equals:
+    case Operator::NotEquals:
+    case Operator::Less:
+    case Operator::Greater:
+    case Operator::LessEquals:
+    case Operator::GreaterEquals:
         if (leftType != Typename::Integer && leftType != Typename::Real && leftType != Typename::String)
             throw CompileError(CompileErrorId::TypeError, mOpRange, "Unknown Operation For Types");
         mType = Typename::Boolean;
         break;
     case Operator::BitwiseOr:
+    case Operator::BitwiseAnd:
         if (leftType != Typename::Boolean && leftType != Typename::Integer)
             throw CompileError(CompileErrorId::TypeError, mOpRange, "Unknown Operation For Types");
         mType = leftType;

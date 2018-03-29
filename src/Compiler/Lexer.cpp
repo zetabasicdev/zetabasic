@@ -119,7 +119,7 @@ void Lexer::run()
 
 static bool isSymbolStart(char ch)
 {
-    const char* chars = "+=(),;-";
+    const char* chars = "+=(),;-<>*/";
     for (auto ix = 0; chars[ix]; ++ix)
         if (chars[ix] == ch)
             return true;
@@ -173,6 +173,7 @@ bool Lexer::runEndState()
                 TokenTag tag;
             } keywords[] = {
                 { "AS", TokenTag::Key_As },
+                { "AND", TokenTag::Key_And },
                 { "BOOLEAN", TokenTag::Key_Boolean },
                 { "DIM", TokenTag::Key_Dim },
                 { "END", TokenTag::Key_End },
@@ -185,6 +186,7 @@ bool Lexer::runEndState()
                 { "LEN", TokenTag::Key_Len },
                 { "LEFT$", TokenTag::Key_LeftS },
                 { "LET", TokenTag::Key_Let },
+                { "MOD", TokenTag::Key_Mod },
                 { "NEXT", TokenTag::Key_Next },
                 { "NOT", TokenTag::Key_Not },
                 { "OR", TokenTag::Key_Or },
@@ -216,6 +218,13 @@ bool Lexer::runEndState()
                 { ",", TokenTag::Sym_Comma },
                 { ";", TokenTag::Sym_Semicolon },
                 { "-", TokenTag::Sym_Subtract },
+                { "*", TokenTag::Sym_Multiply },
+                { "/", TokenTag::Sym_Divide },
+                { "<>", TokenTag::Sym_NotEquals },
+                { "<=", TokenTag::Sym_LessEquals },
+                { ">=", TokenTag::Sym_GreaterEquals },
+                { "<", TokenTag::Sym_Less },
+                { ">", TokenTag::Sym_Greater },
                 { nullptr, TokenTag::None }
             };
             for (int i = 0; symbols[i].tag != TokenTag::None; ++i) {
@@ -285,6 +294,8 @@ bool Lexer::runSymbolState()
 {
     mId = TokenId::Symbol;
     mState = State::End;
+    if ((mText[0] == '<' && mChar == '>') || (mText[0] == '<' && mChar == '=') || (mText[0] == '>' && mChar == '='))
+        return true;
     return false;
 }
 
