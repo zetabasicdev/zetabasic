@@ -75,11 +75,11 @@ void AssignmentStatementNode::analyze(Analyzer& analyzer)
     mValue->analyze(analyzer);
 
     // try to cast ints/reals as needed
-    if (mIdentifier.getSymbol()->getType() == Typename::Integer && mValue->getType() == Typename::Real) {
-        mValue = analyzer.getNodePool().alloc<TypeConversionExpressionNode>(Typename::Integer, mValue);
+    if (mIdentifier.getSymbol()->getType() == Type_Integer && mValue->getType() == Type_Real) {
+        mValue = analyzer.getNodePool().alloc<TypeConversionExpressionNode>(Type_Integer, mValue);
         mValue->analyze(analyzer);
-    } else if (mIdentifier.getSymbol()->getType() == Typename::Real && mValue->getType() == Typename::Integer) {
-        mValue = analyzer.getNodePool().alloc<TypeConversionExpressionNode>(Typename::Real, mValue);
+    } else if (mIdentifier.getSymbol()->getType() == Type_Real && mValue->getType() == Type_Integer) {
+        mValue = analyzer.getNodePool().alloc<TypeConversionExpressionNode>(Type_Real, mValue);
         mValue->analyze(analyzer);
     } else if (mIdentifier.getSymbol()->getType() != mValue->getType()) {
         throw CompileError(CompileErrorId::TypeError, mIdentifier.getRange(), "Incompatible Types For Assignment");

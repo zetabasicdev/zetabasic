@@ -79,18 +79,18 @@ void UnaryExpressionNode::analyze(Analyzer& analyzer)
 
     Typename rightType = mRhs->getType();
 
-    assert(rightType != Typename::Unknown);
+    assert(rightType != Type_Unknown);
 
     // check type based on operator
     switch (mOp) {
     case Operator::Plus:
     case Operator::Negate:
-        if (rightType != Typename::Integer && rightType != Typename::Real)
+        if (rightType != Type_Integer && rightType != Type_Real)
             throw CompileError(CompileErrorId::TypeError, mOpRange, "Unknown Operation For Types");
         mType = rightType;
         break;
     case Operator::BitwiseNot:
-        if (rightType != Typename::Boolean && rightType != Typename::Integer)
+        if (rightType != Type_Boolean && rightType != Type_Integer)
             throw CompileError(CompileErrorId::TypeError, mOpRange, "Unknown Operation For Types");
         mType = rightType;
         break;

@@ -196,6 +196,7 @@ bool Lexer::runEndState()
                 { "THEN", TokenTag::Key_Then },
                 { "TO", TokenTag::Key_To },
                 { "TRUE", TokenTag::Key_True },
+                { "TYPE", TokenTag::Key_Type },
                 { "", TokenTag::None }
             };
             for (int i = 0; keywords[i].tag != TokenTag::None; ++i) {

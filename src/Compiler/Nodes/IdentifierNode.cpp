@@ -61,20 +61,20 @@ void IdentifierNode::parse(Parser& parser)
 
 void IdentifierNode::analyze(Analyzer& analyzer)
 {
-    Typename type = Typename::Integer;
+    Typename type = Type_Integer;
 
     switch (mName.getText()[mName.getLength() - 1]) {
     case '?':
-        type = Typename::Boolean;
+        type = Type_Boolean;
         break;
     case '%':
-        type = Typename::Integer;
+        type = Type_Integer;
         break;
     case '!':
-        type = Typename::Real;
+        type = Type_Real;
         break;
     case '$':
-        type = Typename::String;
+        type = Type_String;
         break;
     default:
         break;

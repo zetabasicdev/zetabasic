@@ -115,16 +115,16 @@ void BinaryExpressionNode::analyze(Analyzer& analyzer)
     Typename leftType = mLhs->getType();
     Typename rightType = mRhs->getType();
 
-    assert(leftType != Typename::Unknown);
-    assert(rightType != Typename::Unknown);
+    assert(leftType != Type_Unknown);
+    assert(rightType != Type_Unknown);
 
     // try converting up to real if one side is int and the other is real
-    if (leftType == Typename::Integer && rightType == Typename::Real) {
-        mLhs = analyzer.getNodePool().alloc<TypeConversionExpressionNode>(Typename::Real, mLhs);
+    if (leftType == Type_Integer && rightType == Type_Real) {
+        mLhs = analyzer.getNodePool().alloc<TypeConversionExpressionNode>(Type_Real, mLhs);
         mLhs->analyze(analyzer);
         leftType = mLhs->getType();
-    } else if (leftType == Typename::Real && rightType == Typename::Integer) {
-        mRhs = analyzer.getNodePool().alloc<TypeConversionExpressionNode>(Typename::Real, mRhs);
+    } else if (leftType == Type_Real && rightType == Type_Integer) {
+        mRhs = analyzer.getNodePool().alloc<TypeConversionExpressionNode>(Type_Real, mRhs);
         mRhs->analyze(analyzer);
         rightType = mRhs->getType();
     }
@@ -135,7 +135,7 @@ void BinaryExpressionNode::analyze(Analyzer& analyzer)
     // check type based on operator
     switch (mOp) {
     case Operator::Addition:
-        if (leftType != Typename::Integer && leftType != Typename::Real && leftType != Typename::String)
+        if (leftType != Type_Integer && leftType != Type_Real && leftType != Type_String)
             throw CompileError(CompileErrorId::TypeError, mOpRange, "Unknown Operation For Types");
         mType = leftType;
         break;
@@ -143,7 +143,7 @@ void BinaryExpressionNode::analyze(Analyzer& analyzer)
     case Operator::Multiplication:
     case Operator::Division:
     case Operator::Modulus:
-        if (leftType != Typename::Integer && leftType != Typename::Real)
+        if (leftType != Type_Integer && leftType != Type_Real)
             throw CompileError(CompileErrorId::TypeError, mOpRange, "Unknown Operation For Types");
         mType = leftType;
         break;
@@ -153,13 +153,13 @@ void BinaryExpressionNode::analyze(Analyzer& analyzer)
     case Operator::Greater:
     case Operator::LessEquals:
     case Operator::GreaterEquals:
-        if (leftType != Typename::Integer && leftType != Typename::Real && leftType != Typename::String)
+        if (leftType != Type_Integer && leftType != Type_Real && leftType != Type_String)
             throw CompileError(CompileErrorId::TypeError, mOpRange, "Unknown Operation For Types");
-        mType = Typename::Boolean;
+        mType = Type_Boolean;
         break;
     case Operator::BitwiseOr:
     case Operator::BitwiseAnd:
-        if (leftType != Typename::Boolean && leftType != Typename::Integer)
+        if (leftType != Type_Boolean && leftType != Type_Integer)
             throw CompileError(CompileErrorId::TypeError, mOpRange, "Unknown Operation For Types");
         mType = leftType;
         break;

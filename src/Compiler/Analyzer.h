@@ -33,11 +33,12 @@
 class NodePool;
 class Node;
 class SymbolTable;
+class UserDefinedTypeTable;
 
 class Analyzer
 {
 public:
-    Analyzer(NodePool& nodePool, SymbolTable& symbolTable, Node& root);
+    Analyzer(NodePool& nodePool, SymbolTable& symbolTable, UserDefinedTypeTable& userDefinedTypeTable, Node& root);
     ~Analyzer();
 
     void run();
@@ -52,8 +53,14 @@ public:
         return mSymbolTable;
     }
 
+    UserDefinedTypeTable& getUserDefinedTypeTable()
+    {
+        return mUserDefinedTypeTable;
+    }
+
 private:
     NodePool& mNodePool;
     SymbolTable& mSymbolTable;
+    UserDefinedTypeTable& mUserDefinedTypeTable;
     Node& mRoot;
 };

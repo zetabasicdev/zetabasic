@@ -57,7 +57,7 @@ void RealLiteralExpressionNode::parse(Parser& parser)
 
 void RealLiteralExpressionNode::analyze(Analyzer& analyzer)
 {
-    mType = Typename::Real;
+    mType = Type_Real;
 }
 
 void RealLiteralExpressionNode::translate(Translator& translator)

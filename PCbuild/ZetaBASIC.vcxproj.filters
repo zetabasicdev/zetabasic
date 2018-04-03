@@ -237,6 +237,12 @@
     <ClInclude Include="..\src\Compiler\Nodes\DimStatementNode.h">
       <Filter>Header Files\Compiler\Nodes</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\Compiler\Nodes\TypeStatementNode.h">
+      <Filter>Header Files\Compiler\Nodes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Compiler\UserDefinedTypeTable.h">
+      <Filter>Header Files\Compiler</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\main.cpp">
@@ -376,6 +382,12 @@
     </ClCompile>
     <ClCompile Include="..\src\Compiler\Nodes\DimStatementNode.cpp">
       <Filter>Source Files\Compiler\Nodes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Compiler\Nodes\TypeStatementNode.cpp">
+      <Filter>Source Files\Compiler\Nodes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Compiler\UserDefinedTypeTable.cpp">
+      <Filter>Source Files\Compiler</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

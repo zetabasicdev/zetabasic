@@ -30,11 +30,14 @@
 
 #pragma once
 
-enum class Typename
+typedef int Typename;
+
+enum
 {
-    Unknown,
-    Boolean,
-    Integer,
-    Real,
-    String
+    Type_Unknown,
+    Type_Boolean,
+    Type_Integer,
+    Type_Real,
+    Type_String,
+    Type_Udt
 };

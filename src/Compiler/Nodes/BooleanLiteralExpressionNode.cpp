@@ -54,7 +54,7 @@ void BooleanLiteralExpressionNode::parse(Parser& parser)
 
 void BooleanLiteralExpressionNode::analyze(Analyzer& analyzer)
 {
-    mType = Typename::Boolean;
+    mType = Type_Boolean;
 }
 
 void BooleanLiteralExpressionNode::translate(Translator& translator)

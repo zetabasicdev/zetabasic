@@ -74,11 +74,13 @@
   <ItemGroup>
     <ClInclude Include="..\src\Compiler\Nodes\BooleanLiteralExpressionNode.h" />
     <ClInclude Include="..\src\Compiler\Nodes\DimStatementNode.h" />
+    <ClInclude Include="..\src\Compiler\Nodes\TypeStatementNode.h" />
     <ClInclude Include="..\src\Compiler\Nodes\IdentifierNode.h" />
     <ClInclude Include="..\src\Compiler\Nodes\RealLiteralExpressionNode.h" />
     <ClInclude Include="..\src\Compiler\Nodes\TypeConversionExpressionNode.h" />
     <ClInclude Include="..\src\Compiler\Nodes\UnaryExpressionNode.h" />
     <ClInclude Include="..\src\Compiler\ResultIndex.h" />
+    <ClInclude Include="..\src\Compiler\UserDefinedTypeTable.h" />
     <ClInclude Include="..\src\Interpreter\Instructions.h" />
     <ClInclude Include="..\src\Interpreter\VirtualMachine.h" />
     <ClInclude Include="..\src\Color.h" />
@@ -166,6 +168,7 @@
     <ClCompile Include="..\src\Compiler\Nodes\StatementNode.cpp" />
     <ClCompile Include="..\src\Compiler\Nodes\StringLiteralExpressionNode.cpp" />
     <ClCompile Include="..\src\Compiler\Nodes\TypeConversionExpressionNode.cpp" />
+    <ClCompile Include="..\src\Compiler\Nodes\TypeStatementNode.cpp" />
     <ClCompile Include="..\src\Compiler\Nodes\UnaryExpressionOperator.cpp" />
     <ClCompile Include="..\src\Compiler\Parser.cpp" />
     <ClCompile Include="..\src\Compiler\StringTable.cpp" />
@@ -173,6 +176,7 @@
     <ClCompile Include="..\src\Compiler\TextSourceStream.cpp" />
     <ClCompile Include="..\src\Compiler\Token.cpp" />
     <ClCompile Include="..\src\Compiler\Translator.cpp" />
+    <ClCompile Include="..\src\Compiler\UserDefinedTypeTable.cpp" />
     <ClCompile Include="..\src\Ide\EditBuffer.cpp" />
     <ClCompile Include="..\src\Ide\Editor.cpp" />
     <ClCompile Include="..\src\Ide\EditView.cpp" />

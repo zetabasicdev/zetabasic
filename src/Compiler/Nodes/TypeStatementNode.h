@@ -28,42 +28,70 @@
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include <stdlib.h>
+#pragma once
 
-#include "IntegerLiteralExpressionNode.h"
-#include "Parser.h"
-#include "Translator.h"
+#include "StatementNode.h"
+#include "StringPiece.h"
+#include "TNodeList.h"
+#include "Typename.h"
 
-IntegerLiteralExpressionNode::IntegerLiteralExpressionNode()
+class TypeStatementNode
     :
-    mValue(0)
+    public StatementNode
 {
-    // intentionally left blank
-}
+public:
+    TypeStatementNode();
+    virtual ~TypeStatementNode();
 
-IntegerLiteralExpressionNode::~IntegerLiteralExpressionNode()
-{
-    // intentionally left blank
-}
+    void parse(Parser& parser);
+    void analyze(Analyzer& analyzer);
+    void translate(Translator& translator);
 
-void IntegerLiteralExpressionNode::parse(Parser& parser)
-{
-    assert(parser.getToken().getId() == TokenId::Integer);
+private:
+    class TypeFieldNode
+    {
+    public:
+        TypeFieldNode();
+        ~TypeFieldNode();
 
-    mValue = strtoll(parser.getToken().getText().getText(), nullptr, 10);
-    if ((mValue == LLONG_MAX || mValue == LLONG_MIN) && errno == ERANGE)
-        parser.raiseError(CompileErrorId::SyntaxError, "Literal Too Large For Integer");
-    mRange = parser.getToken().getRange();
+        void parse(Parser& parser);
 
-    parser.eatToken();
-}
+        const StringPiece& getName() const
+        {
+            return mName;
+        }
 
-void IntegerLiteralExpressionNode::analyze(Analyzer& analyzer)
-{
-    mType = Type_Integer;
-}
+        const Range& getNameRange() const
+        {
+            return mNameRange;
+        }
 
-void IntegerLiteralExpressionNode::translate(Translator& translator)
-{
-    mResultIndex = translator.loadConstant(mValue);
-}
+        Typename getType() const
+        {
+            return mType;
+        }
+
+        const StringPiece& getTypeName() const
+        {
+            return mTypeName;
+        }
+
+        const Range& getTypeRange() const
+        {
+            return mTypeRange;
+        }
+
+        friend class TNodeList<TypeFieldNode>;
+    private:
+        TypeFieldNode* mNext;
+        StringPiece mName;
+        Range mNameRange;
+        Typename mType;
+        StringPiece mTypeName;
+        Range mTypeRange;
+    };
+
+    StringPiece mName;
+    Range mNameRange;
+    TNodeList<TypeFieldNode> mFields;
+};

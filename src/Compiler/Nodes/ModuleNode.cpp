@@ -49,13 +49,13 @@ void ModuleNode::parse(Parser& parser)
 {
     StatementNode* first = nullptr;
     StatementNode* last = nullptr;
-    auto stm = StatementNode::parseStatement(parser);
+    auto stm = StatementNode::parseStatement(parser, StatementNode::StatementType::Module);
     while (stm) {
         if (!first)
             first = stm;
         last = stm;
         mStatements.push(stm);
-        stm = StatementNode::parseStatement(parser);
+        stm = StatementNode::parseStatement(parser, StatementNode::StatementType::Module);
     }
 
     if (first && last)

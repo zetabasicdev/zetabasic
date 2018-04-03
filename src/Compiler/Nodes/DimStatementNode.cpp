@@ -38,7 +38,7 @@ DimNode::DimNode()
     mNext(nullptr),
     mRange(),
     mName(),
-    mType(Typename::Unknown)
+    mType(Type_Unknown)
 {
     // intentionally left blank
 }
@@ -56,21 +56,21 @@ void DimNode::parse(Parser& parser)
     mRange = parser.getToken().getRange();
     parser.eatToken();
 
-    auto specifiedType = Typename::Unknown;
+    auto specifiedType = Type_Unknown;
     if (parser.getToken().getTag() == TokenTag::Key_As) {
         parser.eatToken();
         switch (parser.getToken().getTag()) {
         case TokenTag::Key_Boolean:
-            specifiedType = Typename::Boolean;
+            specifiedType = Type_Boolean;
             break;
         case TokenTag::Key_Integer:
-            specifiedType = Typename::Integer;
+            specifiedType = Type_Integer;
             break;
         case TokenTag::Key_Real:
-            specifiedType = Typename::Real;
+            specifiedType = Type_Real;
             break;
         case TokenTag::Key_String:
-            specifiedType = Typename::String;
+            specifiedType = Type_String;
             break;
         default:
             parser.raiseError(CompileErrorId::SyntaxError, "Expected Typename");
@@ -79,31 +79,31 @@ void DimNode::parse(Parser& parser)
         parser.eatToken();
     }
 
-    auto nameType = Typename::Unknown;
+    auto nameType = Type_Unknown;
     switch (mName.getText()[mName.getLength() - 1]) {
     case '?':
-        nameType = Typename::Boolean;
+        nameType = Type_Boolean;
         break;
     case '%':
-        nameType = Typename::Integer;
+        nameType = Type_Integer;
         break;
     case '!':
-        nameType = Typename::Real;
+        nameType = Type_Real;
         break;
     case '$':
-        nameType = Typename::String;
+        nameType = Type_String;
         break;
     default:
         break;
     }
 
     // can't have a typed identifier name with a specified type
-    if (nameType != Typename::Unknown && specifiedType != Typename::Unknown)
+    if (nameType != Type_Unknown && specifiedType != Type_Unknown)
         parser.raiseError(CompileErrorId::SyntaxError, "Suffixed Identifier Already Has Type");
-    else if (nameType == Typename::Unknown && specifiedType == Typename::Unknown)
-        nameType = Typename::Integer;
+    else if (nameType == Type_Unknown && specifiedType == Type_Unknown)
+        nameType = Type_Integer;
 
-    if (nameType == Typename::Unknown)
+    if (nameType == Type_Unknown)
         mType = specifiedType;
     else
         mType = nameType;

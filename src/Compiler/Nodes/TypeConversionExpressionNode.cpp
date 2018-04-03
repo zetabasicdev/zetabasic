@@ -53,15 +53,15 @@ void TypeConversionExpressionNode::parse(Parser& parser)
 void TypeConversionExpressionNode::analyze(Analyzer& analyzer)
 {
     auto subType = mRhs->getType();
-    assert((mType == Typename::Integer && subType == Typename::Real) ||
-           (mType == Typename::Real && subType == Typename::Integer));
+    assert((mType == Type_Integer && subType == Type_Real) ||
+           (mType == Type_Real && subType == Type_Integer));
 }
 
 void TypeConversionExpressionNode::translate(Translator& translator)
 {
     mRhs->translate(translator);
-    if (mType == Typename::Real && mRhs->getType() == Typename::Integer)
+    if (mType == Type_Real && mRhs->getType() == Type_Integer)
         mResultIndex = translator.intToReal(mRhs->getResultIndex());
-    else if (mType == Typename::Integer && mRhs->getType() == Typename::Real)
+    else if (mType == Type_Integer && mRhs->getType() == Type_Real)
         mResultIndex = translator.realToInt(mRhs->getResultIndex());
 }

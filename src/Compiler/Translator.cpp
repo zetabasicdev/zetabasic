@@ -156,13 +156,13 @@ ResultIndex Translator::unaryOperator(UnaryExpressionNode::Operator op, Typename
     ops[0] = 0;
     switch (op) {
     case UnaryExpressionNode::Operator::Negate:
-        if (type == Typename::Integer)
+        if (type == Type_Integer)
             ops[0] = Op_neg_i;
-        else if (type == Typename::Real)
+        else if (type == Type_Real)
             ops[0] = Op_neg_r;
         break;
     case UnaryExpressionNode::Operator::BitwiseNot:
-        if (type == Typename::Boolean || type == Typename::Integer)
+        if (type == Type_Boolean || type == Type_Integer)
             ops[0] = Op_not_i;
         break;
     default:
@@ -182,91 +182,91 @@ ResultIndex Translator::binaryOperator(BinaryExpressionNode::Operator op, Typena
     ops[0] = 0;
     switch (op) {
     case BinaryExpressionNode::Operator::Addition:
-        if (type == Typename::Integer)
+        if (type == Type_Integer)
             ops[0] = Op_add_i;
-        else if (type == Typename::Real)
+        else if (type == Type_Real)
             ops[0] = Op_add_r;
-        else if (type == Typename::String)
+        else if (type == Type_String)
             ops[0] = Op_add_st;
         break;
     case BinaryExpressionNode::Operator::Subtraction:
-        if (type == Typename::Integer)
+        if (type == Type_Integer)
             ops[0] = Op_sub_i;
-        else if (type == Typename::Real)
+        else if (type == Type_Real)
             ops[0] = Op_sub_r;
         break;
     case BinaryExpressionNode::Operator::Multiplication:
-        if (type == Typename::Integer)
+        if (type == Type_Integer)
             ops[0] = Op_mul_i;
-        else if (type == Typename::Real)
+        else if (type == Type_Real)
             ops[0] = Op_mul_r;
         break;
     case BinaryExpressionNode::Operator::Division:
-        if (type == Typename::Integer)
+        if (type == Type_Integer)
             ops[0] = Op_div_i;
-        else if (type == Typename::Real)
+        else if (type == Type_Real)
             ops[0] = Op_div_r;
         break;
     case BinaryExpressionNode::Operator::Modulus:
-        if (type == Typename::Integer)
+        if (type == Type_Integer)
             ops[0] = Op_mod_i;
-        else if (type == Typename::Real)
+        else if (type == Type_Real)
             ops[0] = Op_mod_r;
         break;
     case BinaryExpressionNode::Operator::Equals:
-        if (type == Typename::Boolean || type == Typename::Integer)
+        if (type == Type_Boolean || type == Type_Integer)
             ops[0] = Op_eq_i;
-        else if (type == Typename::Real)
+        else if (type == Type_Real)
             ops[0] = Op_eq_r;
-        else if (type == Typename::String)
+        else if (type == Type_String)
             ops[0] = Op_eq_st;
         break;
     case BinaryExpressionNode::Operator::NotEquals:
-        if (type == Typename::Boolean || type == Typename::Integer)
+        if (type == Type_Boolean || type == Type_Integer)
             ops[0] = Op_neq_i;
-        else if (type == Typename::Real)
+        else if (type == Type_Real)
             ops[0] = Op_neq_r;
-        else if (type == Typename::String)
+        else if (type == Type_String)
             ops[0] = Op_neq_st;
         break;
     case BinaryExpressionNode::Operator::Less:
-        if (type == Typename::Integer)
+        if (type == Type_Integer)
             ops[0] = Op_lt_i;
-        else if (type == Typename::Real)
+        else if (type == Type_Real)
             ops[0] = Op_lt_r;
-        else if (type == Typename::String)
+        else if (type == Type_String)
             ops[0] = Op_lt_st;
         break;
     case BinaryExpressionNode::Operator::Greater:
-        if (type == Typename::Integer)
+        if (type == Type_Integer)
             ops[0] = Op_gt_i;
-        else if (type == Typename::Real)
+        else if (type == Type_Real)
             ops[0] = Op_gt_r;
-        else if (type == Typename::String)
+        else if (type == Type_String)
             ops[0] = Op_gt_st;
         break;
     case BinaryExpressionNode::Operator::LessEquals:
-        if (type == Typename::Integer)
+        if (type == Type_Integer)
             ops[0] = Op_lte_i;
-        else if (type == Typename::Real)
+        else if (type == Type_Real)
             ops[0] = Op_lte_r;
-        else if (type == Typename::String)
+        else if (type == Type_String)
             ops[0] = Op_lte_st;
         break;
     case BinaryExpressionNode::Operator::GreaterEquals:
-        if (type == Typename::Integer)
+        if (type == Type_Integer)
             ops[0] = Op_gte_i;
-        else if (type == Typename::Real)
+        else if (type == Type_Real)
             ops[0] = Op_gte_r;
-        else if (type == Typename::String)
+        else if (type == Type_String)
             ops[0] = Op_gte_st;
         break;
     case BinaryExpressionNode::Operator::BitwiseOr:
-        if (type == Typename::Boolean || type == Typename::Integer)
+        if (type == Type_Boolean || type == Type_Integer)
             ops[0] = Op_or_i;
         break;
     case BinaryExpressionNode::Operator::BitwiseAnd:
-        if (type == Typename::Boolean || type == Typename::Integer)
+        if (type == Type_Boolean || type == Type_Integer)
             ops[0] = Op_and_i;
         break;
     default:
@@ -347,16 +347,16 @@ void Translator::print(Typename type, const ResultIndex& index)
     auto ops = mCodeBuffer.alloc(2);
 
     switch (type) {
-    case Typename::Boolean:
+    case Type_Boolean:
         ops[0] = Op_print_b;
         break;
-    case Typename::Integer:
+    case Type_Integer:
         ops[0] = Op_print_i;
         break;
-    case Typename::Real:
+    case Type_Real:
         ops[0] = Op_print_r;
         break;
-    case Typename::String:
+    case Type_String:
         ops[0] = Op_print_st;
         break;
     default:
@@ -377,10 +377,10 @@ void Translator::input(Symbol* target)
     auto ops = mCodeBuffer.alloc(2);
 
     switch (target->getType()) {
-    case Typename::Integer:
+    case Type_Integer:
         ops[0] = Op_input_i;
         break;
-    case Typename::String:
+    case Type_String:
         ops[0] = Op_input_st;
         break;
     default:

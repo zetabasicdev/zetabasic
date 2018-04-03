@@ -39,6 +39,7 @@
 #include "Parser.h"
 #include "PrintStatementNode.h"
 #include "StatementNode.h"
+#include "TypeStatementNode.h"
 
 StatementNode::StatementNode()
     :
@@ -52,8 +53,10 @@ StatementNode::~StatementNode()
     // intentionally left blank
 }
 
-StatementNode* StatementNode::parseStatement(Parser& parser)
+StatementNode* StatementNode::parseStatement(Parser& parser, StatementType type)
 {
+    assert(type >= StatementType::Simple && type <= StatementType::Module);
+
     while (parser.getToken().getId() == TokenId::EndOfLine)
         parser.eatToken();
 
@@ -87,10 +90,14 @@ StatementNode* StatementNode::parseStatement(Parser& parser)
         case TokenTag::Key_Print:
             node = parser.getNodePool().alloc<PrintStatementNode>();
             break;
+        case TokenTag::Key_Type:
+            if (type == StatementType::Module)
+                node = parser.getNodePool().alloc<TypeStatementNode>();
+            break;
         default:
             break;
         }
-    } else if (token.getId() == TokenId::Label) {
+    } else if (token.getId() == TokenId::Label && type != StatementType::Simple) {
         node = parser.getNodePool().alloc<LabelStatementNode>();
     }
 

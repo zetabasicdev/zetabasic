@@ -28,42 +28,48 @@
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include <stdlib.h>
+#pragma once
 
-#include "IntegerLiteralExpressionNode.h"
-#include "Parser.h"
-#include "Translator.h"
+#include <vector>
+#include "StringPiece.h"
+#include "Typename.h"
+#include "TItemPool.h"
 
-IntegerLiteralExpressionNode::IntegerLiteralExpressionNode()
-    :
-    mValue(0)
+struct UserDefinedTypeField
 {
-    // intentionally left blank
-}
+    StringPiece name;
+    int offset;
+    Typename type;
+    UserDefinedTypeField* next;
+};
 
-IntegerLiteralExpressionNode::~IntegerLiteralExpressionNode()
+struct UserDefinedType
 {
-    // intentionally left blank
-}
+    int id;
+    StringPiece name;
+    int size;
+    int fieldCount;
+    UserDefinedTypeField* fields;
+};
 
-void IntegerLiteralExpressionNode::parse(Parser& parser)
+class UserDefinedTypeTable
 {
-    assert(parser.getToken().getId() == TokenId::Integer);
+public:
+    UserDefinedTypeTable();
+    ~UserDefinedTypeTable();
 
-    mValue = strtoll(parser.getToken().getText().getText(), nullptr, 10);
-    if ((mValue == LLONG_MAX || mValue == LLONG_MIN) && errno == ERANGE)
-        parser.raiseError(CompileErrorId::SyntaxError, "Literal Too Large For Integer");
-    mRange = parser.getToken().getRange();
+    void reset();
 
-    parser.eatToken();
-}
+    const UserDefinedType* findUdt(const StringPiece& name);
 
-void IntegerLiteralExpressionNode::analyze(Analyzer& analyzer)
-{
-    mType = Type_Integer;
-}
+    UserDefinedType* newUdt();
+    UserDefinedTypeField* newUdtField();
 
-void IntegerLiteralExpressionNode::translate(Translator& translator)
-{
-    mResultIndex = translator.loadConstant(mValue);
-}
+private:
+    TItemPool<UserDefinedType, 16> mUdtPool;
+    TItemPool<UserDefinedTypeField, 64> mUdtFieldPool;
+
+    std::vector<UserDefinedType*> mUdts;
+
+    int mNextUdtId;
+};

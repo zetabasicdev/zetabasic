@@ -63,7 +63,7 @@ void IfStatementNode::parse(Parser& parser)
         parser.raiseError(CompileErrorId::SyntaxError, "Expected THEN");
     parser.eatToken();
 
-    mStatement = StatementNode::parseStatement(parser);
+    mStatement = StatementNode::parseStatement(parser, StatementNode::StatementType::Simple);
     if (!mStatement)
         parser.raiseError(CompileErrorId::SyntaxError, "Expected Statement");
 }
@@ -71,7 +71,7 @@ void IfStatementNode::parse(Parser& parser)
 void IfStatementNode::analyze(Analyzer& analyzer)
 {
     mExpression->analyze(analyzer);
-    if (mExpression->getType() != Typename::Boolean)
+    if (mExpression->getType() != Type_Boolean)
         throw CompileError(CompileErrorId::TypeError, mExpression->getRange(), "IF Expression Must Be BOOLEAN");
 
     mStatement->analyze(analyzer);

@@ -82,10 +82,10 @@ void ForStatementNode::parse(Parser& parser)
         parser.raiseError(CompileErrorId::SyntaxError, "Expected Expression");
     parser.eatEndOfLine();
 
-    auto stm = StatementNode::parseStatement(parser);
+    auto stm = StatementNode::parseStatement(parser, StatementNode::StatementType::Module);
     while (stm) {
         mStatements.push(stm);
-        stm = StatementNode::parseStatement(parser);
+        stm = StatementNode::parseStatement(parser, StatementNode::StatementType::Module);
     }
 
     if (parser.getToken().getTag() != TokenTag::Key_Next)
@@ -111,16 +111,16 @@ void ForStatementNode::analyze(Analyzer& analyzer)
     mStopExpression->analyze(analyzer);
 
     // check type of start/stop expressions
-    if (mStartExpression->getType() != Typename::Integer)
+    if (mStartExpression->getType() != Type_Integer)
         throw CompileError(CompileErrorId::TypeError, mStartExpression->getRange(), "Expected Integer Expression");
-    if (mStopExpression->getType() != Typename::Integer)
+    if (mStopExpression->getType() != Type_Integer)
         throw CompileError(CompileErrorId::TypeError, mStopExpression->getRange(), "Expected Integer Expression");
     if (mStartExpression->getType() != mStopExpression->getType())
         throw CompileError(CompileErrorId::TypeError, mRange, "Mismatched Start And Stop Types");
 
     // identifier expression must match
     auto identifierSymbol = mIdentifier.getSymbol();
-    if (identifierSymbol->getType() != Typename::Integer)
+    if (identifierSymbol->getType() != Type_Integer)
         throw CompileError(CompileErrorId::TypeError, mIdentifier.getRange(), "Expected Integer Identifier Type");
 
     for (auto& stm : mStatements)
@@ -158,7 +158,7 @@ void ForStatementNode::translate(Translator& translator)
     // do initial check if loop should be skipped
     mStopExpression->translate(translator);
     auto result = translator.binaryOperator(BinaryExpressionNode::Operator::Greater,
-                                            Typename::Integer,
+                                            Type_Integer,
                                             ResultIndex(ResultIndexType::Local, mIdentifier.getSymbol()->getLocation()),
                                             mStopExpression->getResultIndex());
     translator.jumpNotZero(jump3, result);
@@ -170,7 +170,7 @@ void ForStatementNode::translate(Translator& translator)
     // perform increment of counter
     result = translator.loadConstant(1);
     result = translator.binaryOperator(BinaryExpressionNode::Operator::Addition,
-                                       Typename::Integer,
+                                       Type_Integer,
                                        ResultIndex(ResultIndexType::Local, mIdentifier.getSymbol()->getLocation()),
                                        result);
     translator.assign(mIdentifier.getSymbol(), result);
@@ -185,7 +185,7 @@ void ForStatementNode::translate(Translator& translator)
     // perform exit check
     mStopExpression->translate(translator);
     result = translator.binaryOperator(BinaryExpressionNode::Operator::Equals,
-                                       Typename::Integer,
+                                       Type_Integer,
                                        ResultIndex(ResultIndexType::Local, mIdentifier.getSymbol()->getLocation()),
                                        mStopExpression->getResultIndex());
     translator.jumpZero(jump2, result);

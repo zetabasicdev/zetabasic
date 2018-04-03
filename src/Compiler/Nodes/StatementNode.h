@@ -38,10 +38,16 @@ class StatementNode
     public Node
 {
 public:
+    enum StatementType
+    {
+        Simple,
+        Module
+    };
+
     StatementNode();
     virtual ~StatementNode();
 
-    static StatementNode* parseStatement(Parser& parser);
+    static StatementNode* parseStatement(Parser& parser, StatementType type);
 
     friend class TNodeList<StatementNode>;
 private:

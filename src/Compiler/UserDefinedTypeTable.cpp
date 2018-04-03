@@ -28,42 +28,55 @@
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include <stdlib.h>
+#include "UserDefinedTypeTable.h"
 
-#include "IntegerLiteralExpressionNode.h"
-#include "Parser.h"
-#include "Translator.h"
-
-IntegerLiteralExpressionNode::IntegerLiteralExpressionNode()
+UserDefinedTypeTable::UserDefinedTypeTable()
     :
-    mValue(0)
+    mUdtPool(),
+    mUdtFieldPool(),
+    mUdts(),
+    mNextUdtId(Type_Udt)
 {
     // intentionally left blank
 }
 
-IntegerLiteralExpressionNode::~IntegerLiteralExpressionNode()
+UserDefinedTypeTable::~UserDefinedTypeTable()
 {
     // intentionally left blank
 }
 
-void IntegerLiteralExpressionNode::parse(Parser& parser)
+void UserDefinedTypeTable::reset()
 {
-    assert(parser.getToken().getId() == TokenId::Integer);
-
-    mValue = strtoll(parser.getToken().getText().getText(), nullptr, 10);
-    if ((mValue == LLONG_MAX || mValue == LLONG_MIN) && errno == ERANGE)
-        parser.raiseError(CompileErrorId::SyntaxError, "Literal Too Large For Integer");
-    mRange = parser.getToken().getRange();
-
-    parser.eatToken();
+    mUdtPool.reset();
+    mUdtFieldPool.reset();
+    mUdts.clear();
+    mNextUdtId = Type_Udt;
 }
 
-void IntegerLiteralExpressionNode::analyze(Analyzer& analyzer)
+const UserDefinedType* UserDefinedTypeTable::findUdt(const StringPiece& name)
 {
-    mType = Type_Integer;
+    for (auto udt : mUdts)
+        if (udt->name == name)
+            return udt;
+    return nullptr;
 }
 
-void IntegerLiteralExpressionNode::translate(Translator& translator)
+UserDefinedType* UserDefinedTypeTable::newUdt()
 {
-    mResultIndex = translator.loadConstant(mValue);
+    UserDefinedType* udt = mUdtPool.alloc(1);
+    udt->id = mNextUdtId++;
+    udt->fieldCount = 0;
+    udt->size = 0;
+    udt->fields = nullptr;
+    mUdts.push_back(udt);
+    return udt;
+}
+
+UserDefinedTypeField* UserDefinedTypeTable::newUdtField()
+{
+    UserDefinedTypeField* udtField = mUdtFieldPool.alloc(1);
+    udtField->next = nullptr;
+    udtField->offset = 0;
+    udtField->type = Type_Unknown;
+    return udtField;
 }

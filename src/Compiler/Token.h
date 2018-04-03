@@ -74,6 +74,7 @@ enum class TokenTag
     Key_Then,
     Key_To,
     Key_True,
+    Key_Type,
     Sym_Add,
     Sym_Subtract,
     Sym_Multiply,

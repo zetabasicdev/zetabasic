@@ -39,9 +39,9 @@ static struct {
     StringPiece arguments;
     Typename returnType;
 } builtinFunctions[] = {
-    { TokenTag::Key_Len, "LEN", "S", Typename::Integer },
-    { TokenTag::Key_LeftS, "LEFT$", "SI", Typename::String },
-    { TokenTag::None, "", "", Typename::Unknown }
+    { TokenTag::Key_Len, "LEN", "S", Type_Integer },
+    { TokenTag::Key_LeftS, "LEFT$", "SI", Type_String },
+    { TokenTag::None, "", "", Type_Unknown }
 };
 
 FunctionCallExpressionNode::FunctionCallExpressionNode()
@@ -107,11 +107,11 @@ void FunctionCallExpressionNode::analyze(Analyzer& analyzer)
 
                 switch (builtinFunctions[ix].arguments[i]) {
                 case 'S':
-                    if (arg.getType() != Typename::String)
+                    if (arg.getType() != Type_String)
                         throw CompileError(CompileErrorId::TypeError, arg.getRange(), "Expected StringPiece Expression");
                     break;
                 case 'I':
-                    if (arg.getType() != Typename::Integer)
+                    if (arg.getType() != Type_Integer)
                         throw CompileError(CompileErrorId::TypeError, arg.getRange(), "Expected Integer Expression");
                     break;
                 default:

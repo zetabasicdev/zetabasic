@@ -42,7 +42,7 @@
 ExpressionNode::ExpressionNode()
     :
     Node(),
-    mType(Typename::Unknown),
+    mType(Type_Unknown),
     mResultIndex()
 {
     // intentionally left blank

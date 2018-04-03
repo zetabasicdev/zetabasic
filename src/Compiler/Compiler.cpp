@@ -43,7 +43,8 @@ Compiler::Compiler()
     mBytecode(256),
     mStringTable(mStringPool),
     mConstantTable(),
-    mSymbolTable()
+    mSymbolTable(),
+    mUserDefinedTypeTable()
 {
     // intentionally left blank
 }
@@ -63,6 +64,7 @@ Program Compiler::run(ISourceStream& source)
     mStringTable.reset();
     mConstantTable.reset();
     mSymbolTable.reset();
+    mUserDefinedTypeTable.reset();
 
     Lexer lexer(mTokenPool, mTokens, mStringPool, source);
     lexer.run();
@@ -70,7 +72,7 @@ Program Compiler::run(ISourceStream& source)
     Parser parser(mNodePool, mStringPool, mTokens);
     Node& root = parser.run();
 
-    Analyzer analyzer(mNodePool, mSymbolTable, root);
+    Analyzer analyzer(mNodePool, mSymbolTable, mUserDefinedTypeTable, root);
     analyzer.run();
 
     Translator translator(mBytecode, mStringTable, mConstantTable, mSymbolTable, root);

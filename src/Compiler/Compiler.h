@@ -42,6 +42,7 @@
 #include "Token.h"
 #include "TObjectPool.h"
 #include "TObjectList.h"
+#include "UserDefinedTypeTable.h"
 #include "VirtualMachine.h"
 
 class ISourceStream;
@@ -63,4 +64,5 @@ private:
     StringTable mStringTable;
     ConstantTable mConstantTable;
     SymbolTable mSymbolTable;
+    UserDefinedTypeTable mUserDefinedTypeTable;
 };

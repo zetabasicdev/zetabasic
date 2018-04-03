@@ -62,6 +62,8 @@ public:
         return mStringPool;
     }
 
+
+
     const Token& getToken() const
     {
         return *mToken;
