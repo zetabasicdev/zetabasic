@@ -36,11 +36,14 @@
 #include "Symbol.h"
 #include "SymbolTable.h"
 #include "Translator.h"
+#include "UserDefinedTypeTable.h"
 
 IdentifierNode::IdentifierNode()
     :
     mName(),
-    mSymbol(nullptr)
+    mPieceType(IdentifierPieceType::TopLevel),
+    mSymbol(nullptr),
+    mSubNode(nullptr)
 {
     // intentionally left blank
 }
@@ -57,33 +60,122 @@ void IdentifierNode::parse(Parser& parser)
     mName = parser.getToken().getText();
     mRange = parser.getToken().getRange();
     parser.eatToken();
+
+    // parse any sub-nodes for TYPE structures
+    IdentifierNode* parentNode = this;
+    while (parser.getToken().getTag() == TokenTag::Sym_Period) {
+        parser.eatToken();
+
+        if (parser.getToken().getId() != TokenId::Name || parser.getToken().getTag() != TokenTag::None)
+            parser.raiseError(CompileErrorId::SyntaxError, "Expected Identifier");
+
+        IdentifierNode* subNode = parser.getNodePool().alloc<IdentifierNode>();
+        subNode->mName = parser.getToken().getText();
+        subNode->mRange = parser.getToken().getRange();
+        subNode->mPieceType = IdentifierPieceType::SubField;
+        parser.eatToken();
+
+        parentNode->mSubNode = subNode;
+        parentNode = subNode;
+    }
 }
 
 void IdentifierNode::analyze(Analyzer& analyzer)
 {
-    Typename type = Type_Integer;
+    if (mSubNode) {
+        // must be a top-level TYPE structure
+        mSymbol = analyzer.getSymbolTable().getSymbol(mRange, mName, Type_Unknown, true);
 
-    switch (mName.getText()[mName.getLength() - 1]) {
-    case '?':
-        type = Type_Boolean;
-        break;
-    case '%':
-        type = Type_Integer;
-        break;
-    case '!':
-        type = Type_Real;
-        break;
-    case '$':
-        type = Type_String;
-        break;
-    default:
-        break;
+        IdentifierNode* subNode = mSubNode;
+        Typename typeId = mSymbol->getType();
+        while (subNode) {
+            auto type = analyzer.getUserDefinedTypeTable().findUdt(typeId);
+            assert(type);
+
+            auto field = type->fields;
+            while (field) {
+                if (field->name == subNode->mName)
+                    break;
+                field = field->next;
+            }
+            if (!field)
+                throw CompileError(CompileErrorId::NameError, subNode->mRange, "Bad Field Name For TYPE");
+            subNode->mTypeField = field;
+
+            if (field->type >= Type_Udt)
+                typeId = field->type;
+            subNode = subNode->mSubNode;
+        }
+    } else {
+        Typename type = Type_Integer;
+
+        switch (mName.getText()[mName.getLength() - 1]) {
+        case '?':
+            type = Type_Boolean;
+            break;
+        case '%':
+            type = Type_Integer;
+            break;
+        case '!':
+            type = Type_Real;
+            break;
+        case '$':
+            type = Type_String;
+            break;
+        default:
+            break;
+        }
+
+        mSymbol = analyzer.getSymbolTable().getSymbol(mRange, mName, type);
     }
-
-    mSymbol = analyzer.getSymbolTable().getSymbol(mRange, mName, type);
 }
 
 void IdentifierNode::translate(Translator& translator)
 {
     // intentionally left blank
+}
+
+Typename IdentifierNode::getFinalType()
+{
+    if (!mSubNode) {
+        if (mPieceType == IdentifierPieceType::TopLevel)
+            return mSymbol->getType();
+        else
+            return mTypeField->type;
+    }
+    return mSubNode->getFinalType();
+}
+
+void IdentifierNode::assign(Translator& translator, const ResultIndex& value)
+{
+    if (mSubNode) {
+        ResultIndex target = ResultIndex(ResultIndexType::Local, mSymbol->getLocation());
+        int offset = 0;
+        IdentifierNode* node = mSubNode;
+        while (node) {
+            offset += node->mTypeField->offset;
+            node = node->mSubNode;
+        }
+        translator.writeMem(target, value, offset);
+    } else {
+        // simple variable
+        translator.assign(mSymbol, value);
+    }
+}
+
+ResultIndex IdentifierNode::retrieve(Translator& translator)
+{
+    if (mSubNode) {
+        ResultIndex type = ResultIndex(ResultIndexType::Local, mSymbol->getLocation());
+        int offset = 0;
+        IdentifierNode* node = mSubNode;
+        while (node) {
+            offset += node->mTypeField->offset;
+            node = node->mSubNode;
+        }
+        return translator.readMem(type, offset);
+    }
+    
+    // simple variable
+    return translator.loadIdentifier(mSymbol);
 }

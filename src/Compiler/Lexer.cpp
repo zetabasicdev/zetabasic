@@ -119,7 +119,7 @@ void Lexer::run()
 
 static bool isSymbolStart(char ch)
 {
-    const char* chars = "+=(),;-<>*/";
+    const char* chars = "+=(),;-<>*/.";
     for (auto ix = 0; chars[ix]; ++ix)
         if (chars[ix] == ch)
             return true;
@@ -226,6 +226,7 @@ bool Lexer::runEndState()
                 { ">=", TokenTag::Sym_GreaterEquals },
                 { "<", TokenTag::Sym_Less },
                 { ">", TokenTag::Sym_Greater },
+                { ".", TokenTag::Sym_Period },
                 { nullptr, TokenTag::None }
             };
             for (int i = 0; symbols[i].tag != TokenTag::None; ++i) {

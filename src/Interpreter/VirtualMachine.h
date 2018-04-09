@@ -56,3 +56,7 @@ const int64_t Operand3Shift = 48;
 // jump addresses always follow operand 0.
 const int64_t JumpSizeMask = 0xffffffffffff;
 const int64_t JumpShift = 16;
+
+// memory offset/size always follows operand 0 and 1
+const int64_t MemSizeMask = 0xffffff;
+const int64_t MemShift = 32;

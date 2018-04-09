@@ -243,6 +243,9 @@
     <ClInclude Include="..\src\Compiler\UserDefinedTypeTable.h">
       <Filter>Header Files\Compiler</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\Interpreter\TypeManager.h">
+      <Filter>Header Files\Interpreter</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\main.cpp">
@@ -388,6 +391,9 @@
     </ClCompile>
     <ClCompile Include="..\src\Compiler\UserDefinedTypeTable.cpp">
       <Filter>Source Files\Compiler</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Interpreter\TypeManager.cpp">
+      <Filter>Source Files\Interpreter</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

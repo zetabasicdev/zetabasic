@@ -52,6 +52,10 @@ Interpreter::Interpreter(Window& window, const Program& program)
         ExecuteNop,
         ExecuteEnd,
         ExecuteReserve,
+        ExecuteInitMem,
+        ExecuteFreeMem,
+        ExecuteReadMem,
+        ExecuteWriteMem,
         ExecuteJmp,
         ExecuteJmpZero,
         ExecuteJmpNotZero,
@@ -126,6 +130,7 @@ InterpreterResult Interpreter::run()
     context.stacks = mStacks;
     context.stringManager = &mStringManager;
     context.stringStack = &mStringStack;
+    context.typeManager = &mTypeManager;
     context.program = &mProgram;
     context.window = &mWindow;
 

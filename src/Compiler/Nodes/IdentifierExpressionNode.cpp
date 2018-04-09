@@ -57,10 +57,10 @@ void IdentifierExpressionNode::parse(Parser& parser)
 void IdentifierExpressionNode::analyze(Analyzer& analyzer)
 {
     mIdentifier.analyze(analyzer);
-    mType = mIdentifier.getSymbol()->getType();
+    mType = mIdentifier.getFinalType();
 }
 
 void IdentifierExpressionNode::translate(Translator& translator)
 {
-    mResultIndex = translator.loadIdentifier(mIdentifier.getSymbol());
+    mResultIndex = mIdentifier.retrieve(translator);
 }

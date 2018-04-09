@@ -55,19 +55,12 @@ void fatalError(const std::string& title, const std::string& message)
 
 int main(int argc, char* argv[])
 {
-    try {
-        std::string filename;
-        if (argc == 2)
-            filename = argv[1];
+    std::string filename;
+    if (argc == 2)
+        filename = argv[1];
 
-        Ide ide(filename);
-        ide.run();
-    }
-    catch (const CompileError& err) {
-        std::stringstream msg;
-        msg << "[" << err.getRange().getStartRow() << ":" << err.getRange().getStartCol() << "] " << err.what();
-        fatalError("Compile Error", msg.str());
-    }
+    Ide ide(filename);
+    ide.run();
 
     return 0;
 }

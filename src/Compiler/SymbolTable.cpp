@@ -47,24 +47,26 @@ SymbolTable::~SymbolTable()
 void SymbolTable::reset()
 {
     mSymbolPool.reset();
-    mSymbols.reset();
+    mSymbols.clear();
 }
 
 bool SymbolTable::doesSymbolExist(const StringPiece& name) const
 {
-    for (auto ix = 0; ix < mSymbols.getSize(); ++ix)
-        if (mSymbols[ix].getName() == name)
+    for (auto symbol : mSymbols)
+        if (symbol->getName() == name)
             return true;
     return false;
 }
 
-Symbol* SymbolTable::getSymbol(const Range& range, const StringPiece& name, Typename type)
+Symbol* SymbolTable::getSymbol(const Range& range, const StringPiece& name, Typename type, bool mustExist)
 {
     // first determine if symbol by this name already exists
-    for (auto ix = 0; ix < mSymbols.getSize(); ++ix)
-        if (mSymbols[ix].getName() == name)
+    for (auto symbol : mSymbols)
+        if (symbol->getName() == name)
             // simply use this symbol
-            return &mSymbols[ix];
+            return symbol;
+
+    assert(!mustExist);
 
     // need to instance a new symbol
     if (type == Type_Unknown) {
@@ -73,8 +75,8 @@ Symbol* SymbolTable::getSymbol(const Range& range, const StringPiece& name, Type
         if (name[name.getLength() - 1] == '$')
             type = Type_String;
     }
-    auto symbol = mSymbolPool.alloc(mSymbols.getSize(), range, name, type);
-    mSymbols.push(symbol);
+    auto symbol = mSymbolPool.alloc((int)mSymbols.size(), range, name, type);
+    mSymbols.push_back(symbol);
 
     return symbol;
 }

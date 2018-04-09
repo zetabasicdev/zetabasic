@@ -61,6 +61,7 @@ public:
     void reset();
 
     const UserDefinedType* findUdt(const StringPiece& name);
+    const UserDefinedType* findUdt(int id);
 
     UserDefinedType* newUdt();
     UserDefinedTypeField* newUdtField();

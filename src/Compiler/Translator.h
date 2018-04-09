@@ -49,7 +49,7 @@ typedef int Label;
 class ConstantTable;
 class ExpressionNode;
 class StringTable;
-
+class UserDefinedTypeTable;
 
 class Translator
 {
@@ -58,6 +58,7 @@ public:
                StringTable& stringTable,
                ConstantTable& constantTable,
                SymbolTable& symbolTable,
+               UserDefinedTypeTable& userDefinedTypeTable,
                Node& root);
     ~Translator();
 
@@ -65,6 +66,9 @@ public:
 
     void startCodeBody();
     void endCodeBody();
+
+    ResultIndex readMem(const ResultIndex& source, int offset);
+    void writeMem(const ResultIndex& target, const ResultIndex& value, int offset);
 
     ResultIndex loadConstant(int64_t value);
     ResultIndex loadStringConstant(const StringPiece& value);
@@ -103,6 +107,7 @@ private:
     StringTable& mStringTable;
     ConstantTable& mConstantTable;
     SymbolTable& mSymbolTable;
+    UserDefinedTypeTable& mUserDefinedTypeTable;
     Node& mRoot;
 
     int mReserveIndex;

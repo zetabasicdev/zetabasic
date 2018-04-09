@@ -127,6 +127,8 @@ void TypeStatementNode::analyze(Analyzer& analyzer)
         field->type = type;
         if (!last)
             udt->fields = field;
+        else
+            last->next = field;
         last = field;
         ++udt->fieldCount;
         offset += size;

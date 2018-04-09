@@ -30,6 +30,7 @@
 
 #pragma once
 
+#include <vector>
 #include "TObjectList.h"
 #include "TObjectPool.h"
 #include "Typename.h"
@@ -49,13 +50,18 @@ public:
 
     int getSize() const
     {
-        return mSymbols.getSize();
+        return (int)mSymbols.size();
     }
 
     bool doesSymbolExist(const StringPiece& name) const;
-    Symbol* getSymbol(const Range& range, const StringPiece& name, Typename type);
+    Symbol* getSymbol(const Range& range, const StringPiece& name, Typename type, bool mustExist = false);
+
+    const std::vector<Symbol*>& getSymbols() const
+    {
+        return mSymbols;
+    }
 
 private:
     TObjectPool<Symbol> mSymbolPool;
-    TObjectList<Symbol> mSymbols;
+    std::vector<Symbol*> mSymbols;
 };

@@ -28,53 +28,52 @@
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#pragma once
+#include "TypeManager.h"
 
-#include "Node.h"
-#include "ResultIndex.h"
-#include "StringPiece.h"
-#include "Typename.h"
-
-class Symbol;
-struct UserDefinedTypeField;
-
-class IdentifierNode
+TypeManager::TypeManager()
     :
-    public Node
+    mInstances()
 {
-public:
-    IdentifierNode();
-    virtual ~IdentifierNode();
+    // intentionally left blank
+}
 
-    void parse(Parser& parser);
-    void analyze(Analyzer& analyzer);
-    void translate(Translator& translator);
+TypeManager::~TypeManager()
+{
+    for (auto instance : mInstances) {
+        char* ptr = (char*)instance;
+        delete[] ptr;
+    }
+}
 
-    Symbol* getSymbol()
-    {
-        return mSymbol;
+int64_t TypeManager::newInstance(int size)
+{
+    char* ptr = new char[size];
+    memset(ptr, 0, size);
+    mInstances.push_back((int64_t)ptr);
+    return (int64_t)ptr;
+}
+
+void TypeManager::delInstance(int64_t instance)
+{
+    for (auto iter = mInstances.begin(); iter != mInstances.end(); ++iter) {
+        if (*iter == instance) {
+            mInstances.erase(iter);
+            break;
+        }
     }
 
-    Typename getFinalType();
+    char* ptr = (char*)instance;
+    delete[] ptr;
+}
 
-    void assign(Translator& translator, const ResultIndex& value);
-    ResultIndex retrieve(Translator& translator);
+void TypeManager::writeData(int64_t instance, int64_t value, int offset)
+{
+    char* ptr = (char*)instance;
+    *(int64_t*)(ptr + offset) = value;
+}
 
-private:
-    StringPiece mName;
-
-    enum IdentifierPieceType
-    {
-        TopLevel,
-        SubField
-    };
-
-    IdentifierPieceType mPieceType;
-    union
-    {
-        Symbol* mSymbol;
-        UserDefinedTypeField* mTypeField;
-    };
-
-    IdentifierNode* mSubNode;
-};
+int64_t TypeManager::readData(int64_t instance, int offset)
+{
+    char* ptr = (char*)instance;
+    return *(int64_t*)(ptr + offset);
+}

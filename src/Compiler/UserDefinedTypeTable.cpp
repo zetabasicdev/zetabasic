@@ -61,6 +61,14 @@ const UserDefinedType* UserDefinedTypeTable::findUdt(const StringPiece& name)
     return nullptr;
 }
 
+const UserDefinedType* UserDefinedTypeTable::findUdt(int id)
+{
+    for (auto udt : mUdts)
+        if (udt->id == id)
+            return udt;
+    return nullptr;
+}
+
 UserDefinedType* UserDefinedTypeTable::newUdt()
 {
     UserDefinedType* udt = mUdtPool.alloc(1);

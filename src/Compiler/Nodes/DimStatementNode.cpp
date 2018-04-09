@@ -31,14 +31,19 @@
 #include "Analyzer.h"
 #include "DimStatementNode.h"
 #include "Parser.h"
+#include "Symbol.h"
 #include "SymbolTable.h"
+#include "UserDefinedTypeTable.h"
 
 DimNode::DimNode()
     :
     mNext(nullptr),
     mRange(),
     mName(),
-    mType(Type_Unknown)
+    mType(Type_Unknown),
+    mTypeName(),
+    mTypeRange(),
+    mSymbol(nullptr)
 {
     // intentionally left blank
 }
@@ -59,6 +64,8 @@ void DimNode::parse(Parser& parser)
     auto specifiedType = Type_Unknown;
     if (parser.getToken().getTag() == TokenTag::Key_As) {
         parser.eatToken();
+        mTypeName = parser.getToken().getText();
+        mTypeRange = parser.getToken().getRange();
         switch (parser.getToken().getTag()) {
         case TokenTag::Key_Boolean:
             specifiedType = Type_Boolean;
@@ -73,7 +80,12 @@ void DimNode::parse(Parser& parser)
             specifiedType = Type_String;
             break;
         default:
-            parser.raiseError(CompileErrorId::SyntaxError, "Expected Typename");
+            if (parser.getToken().getId() == TokenId::Name && parser.getToken().getTag() == TokenTag::None) {
+                // assume a UDT for now
+                specifiedType = Type_Udt;
+            } else {
+                parser.raiseError(CompileErrorId::SyntaxError, "Expected Typename");
+            }
             break;
         }
         parser.eatToken();
@@ -114,13 +126,22 @@ void DimNode::analyze(Analyzer& analyzer)
     // ensure a local is not already defined with this name
     if (analyzer.getSymbolTable().doesSymbolExist(mName))
         throw CompileError(CompileErrorId::NameError, mRange, "Identifier Already Defined");
-    (void)analyzer.getSymbolTable().getSymbol(mRange, mName, mType);
+
+    // check for UDT
+    if (mType == Type_Udt) {
+        auto* udt = analyzer.getUserDefinedTypeTable().findUdt(mTypeName);
+        if (!udt)
+            throw CompileError(CompileErrorId::NameError, mTypeRange, "Expected Typename");
+        mType = udt->id;
+    }
+
+    mSymbol = analyzer.getSymbolTable().getSymbol(mRange, mName, mType);
 }
 
 DimStatementNode::DimStatementNode()
     :
     StatementNode(),
-    mIds()
+    mNodes()
 {
     // intentionally left blank
 }
@@ -142,7 +163,7 @@ void DimStatementNode::parse(Parser& parser)
             parser.eatToken();
         DimNode* node = parser.getNodePool().alloc<DimNode>();
         node->parse(parser);
-        mIds.push(node);
+        mNodes.push(node);
         first = false;
     } while (parser.getToken().getTag() == TokenTag::Sym_Comma);
 
@@ -151,7 +172,7 @@ void DimStatementNode::parse(Parser& parser)
 
 void DimStatementNode::analyze(Analyzer& analyzer)
 {
-    for (auto& node : mIds)
+    for (auto& node : mNodes)
         node.analyze(analyzer);
 }
 

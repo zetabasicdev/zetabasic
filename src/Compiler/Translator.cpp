@@ -34,6 +34,7 @@
 #include "StringTable.h"
 #include "Symbol.h"
 #include "Translator.h"
+#include "UserDefinedTypeTable.h"
 
 inline int64_t MakeOperand(int64_t type, int64_t value)
 {
@@ -67,12 +68,14 @@ Translator::Translator(TItemBuffer<VmWord>& codeBuffer,
                        StringTable& stringTable,
                        ConstantTable& constantTable,
                        SymbolTable& symbolTable,
+                       UserDefinedTypeTable& userDefinedTypeTable,
                        Node& root)
     :
     mCodeBuffer(codeBuffer),
     mStringTable(stringTable),
     mConstantTable(constantTable),
     mSymbolTable(symbolTable),
+    mUserDefinedTypeTable(userDefinedTypeTable),
     mRoot(root),
     mReserveIndex(-1),
     mNamedLabels(),
@@ -103,12 +106,56 @@ void Translator::startCodeBody()
     auto code = mCodeBuffer.alloc(2, mReserveIndex);
     code[0] = Op_reserve;
     code[1] = mSymbolTable.getSize();
+
+    // at this point, look through local symbols to find ones that need explicit initialization
+    for (auto symbol : mSymbolTable.getSymbols()) {
+        if (symbol->getType() >= Type_Udt) {
+            // ensure space is reserved for the type instance
+            auto udt = mUserDefinedTypeTable.findUdt(symbol->getType());
+            assert(udt);
+            assert(udt->size < MemSizeMask);
+
+            code = mCodeBuffer.alloc(2);
+            code[0] = Op_init_mem;
+            code[1] = Make1Arg(ResultIndex(ResultIndexType::Local, symbol->getLocation())) | ((uint64_t)udt->size << MemShift);
+        }
+    }
 }
 
 void Translator::endCodeBody()
 {
     assert(mReserveIndex != -1);
     mCodeBuffer[mReserveIndex + 1] |= mMaxTemporaries << Operand1Shift;
+
+    // clean up any locals that require it
+    for (auto symbol : mSymbolTable.getSymbols()) {
+        if (symbol->getType() >= Type_Udt) {
+            auto code = mCodeBuffer.alloc(2);
+            code[0] = Op_free_mem;
+            code[1] = Make1Arg(ResultIndex(ResultIndexType::Local, symbol->getLocation()));
+        }
+    }
+}
+
+ResultIndex Translator::readMem(const ResultIndex& source, int offset)
+{
+    assert(offset <= MemSizeMask);
+
+    ResultIndex target(ResultIndexType::Temporary, getTemporary());
+
+    auto ops = mCodeBuffer.alloc(2);
+    ops[0] = Op_read_mem;
+    ops[1] = Make2Args(target, source) | ((VmWord)offset << MemShift);
+
+    return target;
+}
+
+void Translator::writeMem(const ResultIndex& target, const ResultIndex& value, int offset)
+{
+    assert(offset <= MemSizeMask);
+    auto ops = mCodeBuffer.alloc(2);
+    ops[0] = Op_write_mem;
+    ops[1] = Make2Args(target, value) | ((VmWord)offset << MemShift);
 }
 
 ResultIndex Translator::loadConstant(int64_t value)
@@ -516,7 +563,9 @@ void Translator::dumpCode()
         LoadString,
         Args3,
         Args2,
-        Args1
+        Args1,
+        MemInit,
+        Mem
     };
     static struct Instruction
     {
@@ -526,6 +575,10 @@ void Translator::dumpCode()
         { "nop", InstructionType::NoArgs },
         { "end", InstructionType::NoArgs },
         { "reserve", InstructionType::Reserve },
+        { "init_mem", InstructionType::MemInit },
+        { "free_mem", InstructionType::Args1 },
+        { "read_mem", InstructionType::Mem },
+        { "write_mem", InstructionType::Mem },
         { "jmp", InstructionType::Jmp0 },
         { "jmpz", InstructionType::Jmp1 },
         { "jmpnz", InstructionType::Jmp1 },
@@ -627,6 +680,20 @@ void Translator::dumpCode()
             printf("[%s] #%lld\n", 
                    names[mCodeBuffer[ix + 1] & 0x3],
                    (mCodeBuffer[ix + 1] & OperandSizeMask) >> 2);
+            break;
+        case InstructionType::MemInit:
+            printf("[%s] #%lld, %04llX bytes\n", 
+                   names[mCodeBuffer[ix + 1] & 0x3], 
+                   (mCodeBuffer[ix + 1] & OperandSizeMask) >> 2,
+                   (mCodeBuffer[ix + 1] >> MemShift) & MemSizeMask);
+            break;
+        case InstructionType::Mem:
+            printf("[%s] #%lld, [%s] #%lld, offset %04llX\n",
+                   names[mCodeBuffer[ix + 1] & 0x3],
+                   (mCodeBuffer[ix + 1] & OperandSizeMask) >> 2,
+                   names[(mCodeBuffer[ix + 1] >> Operand1Shift) & 0x3],
+                   ((mCodeBuffer[ix + 1] >> Operand1Shift) & OperandSizeMask) >> 2,
+                   (mCodeBuffer[ix + 1] >> MemShift) & MemSizeMask);
             break;
         default:
             assert(false);

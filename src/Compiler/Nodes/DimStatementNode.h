@@ -35,6 +35,8 @@
 #include "TNodeList.h"
 #include "Typename.h"
 
+class Symbol;
+
 class DimNode
 {
 public:
@@ -44,12 +46,20 @@ public:
     void parse(Parser& parser);
     void analyze(Analyzer& analyzer);
 
+    Symbol& getSymbol()
+    {
+        return *mSymbol;
+    }
+
     friend class TNodeList<DimNode>;
 private:
     DimNode* mNext;
     Range mRange;
     StringPiece mName;
     Typename mType;
+    StringPiece mTypeName;
+    Range mTypeRange;
+    Symbol* mSymbol;
 };
 
 class DimStatementNode
@@ -65,5 +75,5 @@ public:
     void translate(Translator& translator);
 
 private:
-    TNodeList<DimNode> mIds;
+    TNodeList<DimNode> mNodes;
 };

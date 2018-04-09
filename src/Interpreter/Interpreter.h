@@ -35,6 +35,7 @@
 #include "Stack.h"
 #include "StringManager.h"
 #include "StringStack.h"
+#include "TypeManager.h"
 
 class Program;
 class Window;
@@ -60,6 +61,7 @@ private:
     Stack* mStacks;
     StringStack mStringStack;
     StringManager mStringManager;
+    TypeManager mTypeManager;
 
     int mCodeSize;
     VmWord* mCode;

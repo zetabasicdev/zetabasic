@@ -74,14 +74,16 @@ void AssignmentStatementNode::analyze(Analyzer& analyzer)
     mIdentifier.analyze(analyzer);
     mValue->analyze(analyzer);
 
+    auto targetType = mIdentifier.getFinalType();
+
     // try to cast ints/reals as needed
-    if (mIdentifier.getSymbol()->getType() == Type_Integer && mValue->getType() == Type_Real) {
+    if (targetType == Type_Integer && mValue->getType() == Type_Real) {
         mValue = analyzer.getNodePool().alloc<TypeConversionExpressionNode>(Type_Integer, mValue);
         mValue->analyze(analyzer);
-    } else if (mIdentifier.getSymbol()->getType() == Type_Real && mValue->getType() == Type_Integer) {
+    } else if (targetType == Type_Real && mValue->getType() == Type_Integer) {
         mValue = analyzer.getNodePool().alloc<TypeConversionExpressionNode>(Type_Real, mValue);
         mValue->analyze(analyzer);
-    } else if (mIdentifier.getSymbol()->getType() != mValue->getType()) {
+    } else if (targetType != mValue->getType()) {
         throw CompileError(CompileErrorId::TypeError, mIdentifier.getRange(), "Incompatible Types For Assignment");
     }
 }
@@ -89,6 +91,6 @@ void AssignmentStatementNode::analyze(Analyzer& analyzer)
 void AssignmentStatementNode::translate(Translator& translator)
 {
     mValue->translate(translator);
-    translator.assign(mIdentifier.getSymbol(), mValue->getResultIndex());
+    mIdentifier.assign(translator, mValue->getResultIndex());
     translator.clearTemporaries();
 }

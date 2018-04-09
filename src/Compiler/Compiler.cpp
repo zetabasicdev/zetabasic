@@ -75,7 +75,7 @@ Program Compiler::run(ISourceStream& source)
     Analyzer analyzer(mNodePool, mSymbolTable, mUserDefinedTypeTable, root);
     analyzer.run();
 
-    Translator translator(mBytecode, mStringTable, mConstantTable, mSymbolTable, root);
+    Translator translator(mBytecode, mStringTable, mConstantTable, mSymbolTable, mUserDefinedTypeTable, root);
     translator.run();
 
     return Program(&mBytecode[0], mBytecode.getSize(), mStringTable, mConstantTable);

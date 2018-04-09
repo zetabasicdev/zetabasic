@@ -30,51 +30,21 @@
 
 #pragma once
 
-#include "Node.h"
-#include "ResultIndex.h"
-#include "StringPiece.h"
-#include "Typename.h"
+#include <cstdint>
+#include <vector>
 
-class Symbol;
-struct UserDefinedTypeField;
-
-class IdentifierNode
-    :
-    public Node
+class TypeManager
 {
 public:
-    IdentifierNode();
-    virtual ~IdentifierNode();
+    TypeManager();
+    ~TypeManager();
 
-    void parse(Parser& parser);
-    void analyze(Analyzer& analyzer);
-    void translate(Translator& translator);
+    int64_t newInstance(int size);
+    void delInstance(int64_t instance);
 
-    Symbol* getSymbol()
-    {
-        return mSymbol;
-    }
-
-    Typename getFinalType();
-
-    void assign(Translator& translator, const ResultIndex& value);
-    ResultIndex retrieve(Translator& translator);
+    void writeData(int64_t instance, int64_t value, int offset);
+    int64_t readData(int64_t instance, int offset);
 
 private:
-    StringPiece mName;
-
-    enum IdentifierPieceType
-    {
-        TopLevel,
-        SubField
-    };
-
-    IdentifierPieceType mPieceType;
-    union
-    {
-        Symbol* mSymbol;
-        UserDefinedTypeField* mTypeField;
-    };
-
-    IdentifierNode* mSubNode;
+    std::vector<int64_t> mInstances;
 };
