@@ -32,10 +32,8 @@
 
 #include <cstdint>
 #include "Instructions.h"
+#include "MemoryManager.h"
 #include "Stack.h"
-#include "StringManager.h"
-#include "StringStack.h"
-#include "TypeManager.h"
 
 class Program;
 class Window;
@@ -59,9 +57,7 @@ private:
     const Program& mProgram;
 
     Stack* mStacks;
-    StringStack mStringStack;
-    StringManager mStringManager;
-    TypeManager mTypeManager;
+    MemoryManager mMemoryManager;
 
     int mCodeSize;
     VmWord* mCode;

@@ -30,27 +30,41 @@
 
 #pragma once
 
-#include "StringPiece.h"
+#include <cstdint>
+#include <vector>
 
-class StringStack
+enum
+{
+    MemoryType_Unknown,
+    MemoryType_SmallString,
+    MemoryType_String,
+    MemoryType_Udt
+};
+
+// Class that manages all dynamic memory for the interpreter, including strings
+// and user-defined types.
+class MemoryManager
 {
 public:
-    StringStack();
-    ~StringStack();
+    MemoryManager();
+    ~MemoryManager();
 
-    void push(const StringPiece& value);
-    void add();
-    int compare();
-    int len();
-    void left(int count);
+    int64_t newString(const char* text, int length);
+    void delString(int64_t desc);
 
-    StringPiece pop();
+    void getString(int64_t desc, const char*& text, int& length);
+    int64_t addStrings(int64_t lhsDesc, int64_t rhsDesc);
+    int compareStrings(int64_t lhsDesc, int64_t rhsDesc);
+
+    int64_t newType(int size);
+    void delType(int64_t desc);
+
+    int64_t readFromType(int64_t desc, int offset);
+    void writeToType(int64_t desc, int64_t value, int offset);
 
 private:
-    int mCount;
-    int mDataCapacity;
-    int mDataUsed;
-    char* mData;
-    int mLengthCapacity;
-    int* mLengths;
+    int64_t newDesc(int64_t descType);
+    void* getDesc(int64_t desc);
+
+    std::vector<void*> mDescriptors;
 };

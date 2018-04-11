@@ -41,8 +41,7 @@ Interpreter::Interpreter(Window& window, const Program& program)
     mWindow(window),
     mProgram(program),
     mStacks(new Stack[4]),
-    mStringStack(),
-    mStringManager(mStringStack),
+    mMemoryManager(),
     mCodeSize(mProgram.getCodeSize()),
     mCode(new VmWord[mCodeSize])
 {
@@ -129,9 +128,7 @@ InterpreterResult Interpreter::run()
     ExecutionContext context;
     context.code = mCode;
     context.stacks = mStacks;
-    context.stringManager = &mStringManager;
-    context.stringStack = &mStringStack;
-    context.typeManager = &mTypeManager;
+    context.memoryManager = &mMemoryManager;
     context.program = &mProgram;
     context.window = &mWindow;
 

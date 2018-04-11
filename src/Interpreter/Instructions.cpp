@@ -29,11 +29,9 @@
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "Instructions.h"
+#include "MemoryManager.h"
 #include "Program.h"
 #include "Stack.h"
-#include "StringManager.h"
-#include "StringStack.h"
-#include "TypeManager.h"
 #include "Window.h"
 
 static inline int64_t getStackValue0(ExecutionContext* context, VmWord* ip)
@@ -93,32 +91,33 @@ VmWord* ExecuteReserve(ExecutionContext* context, VmWord* ip)
 VmWord* ExecuteInitMem(ExecutionContext* context, VmWord* ip)
 {
     int size = (int)((ip[1] >> MemShift) & MemSizeMask);
-    setStackValue0(context, ip, context->typeManager->newInstance(size));
+    setStackValue0(context, ip, context->memoryManager->newType(size));
     return ip + 2;
 }
 
 VmWord* ExecuteFreeMem(ExecutionContext* context, VmWord* ip)
 {
-    context->typeManager->delInstance(getStackValue0(context, ip));
+    context->memoryManager->delType(getStackValue0(context, ip));
     return ip + 2;
 }
 
 VmWord* ExecuteReadMem(ExecutionContext* context, VmWord* ip)
 {
     int offset = (int)((ip[1] >> MemShift) & MemSizeMask);
-    setStackValue0(context, ip, context->typeManager->readData(getStackValue1(context, ip), offset));
+    setStackValue0(context, ip, context->memoryManager->readFromType(getStackValue1(context, ip), offset));
     return ip + 2;
 }
 
 VmWord* ExecuteWriteMem(ExecutionContext* context, VmWord* ip)
 {
     int offset = (int)((ip[1] >> MemShift) & MemSizeMask);
-    context->typeManager->writeData(getStackValue0(context, ip), getStackValue1(context, ip), offset);
+    context->memoryManager->writeToType(getStackValue0(context, ip), getStackValue1(context, ip), offset);
     return ip + 2;
 }
 
 VmWord* ExecuteDelStr(ExecutionContext* context, VmWord* ip)
 {
+    context->memoryManager->delString(getStackValue0(context, ip));
     return ip + 2;
 }
 
@@ -159,7 +158,8 @@ VmWord* ExecuteLoadConstant(ExecutionContext* context, VmWord* ip)
 
 VmWord* ExecuteLoadString(ExecutionContext* context, VmWord* ip)
 {
-    setStackValue0(context, ip, context->stringManager->newString(context->program->getString((int)((ip[1] >> Operand1Shift) & OperandSizeMask))));
+    auto& string = context->program->getString((int)((ip[1] >> Operand1Shift) & OperandSizeMask));
+    setStackValue0(context, ip, context->memoryManager->newString(string.getText(), string.getLength()));
     return ip + 2;
 }
 
@@ -187,13 +187,7 @@ VmWord* ExecuteAddStrings(ExecutionContext* context, VmWord* ip)
 {
     int64_t lhs = getStackValue1(context, ip);
     int64_t rhs = getStackValue2(context, ip);
-    const char* left = nullptr;
-    const char* right = nullptr;
-    int leftLen = 0;
-    int rightLen = 0;
-    context->stringManager->getString(lhs, left, leftLen);
-    context->stringManager->getString(rhs, right, rightLen);
-    setStackValue0(context, ip, context->stringManager->addStrings(left, leftLen, right, rightLen));
+    setStackValue0(context, ip, context->memoryManager->addStrings(lhs, rhs));
     return ip + 2;
 }
 
@@ -299,14 +293,7 @@ VmWord* ExecuteEqualStrings(ExecutionContext* context, VmWord* ip)
 {
     int64_t lhs = getStackValue1(context, ip);
     int64_t rhs = getStackValue2(context, ip);
-    const char* left = nullptr;
-    const char* right = nullptr;
-    int leftLen = 0;
-    int rightLen = 0;
-    context->stringManager->getString(lhs, left, leftLen);
-    context->stringManager->getString(rhs, right, rightLen);
-    bool result = StringPiece(left, leftLen).exactCompareWithCase(StringPiece(right, rightLen));
-    setStackValue0(context, ip, result ? 1 : 0);
+    setStackValue0(context, ip, context->memoryManager->compareStrings(lhs, rhs) ? 0 : 1);
     return ip + 2;
 }
 
@@ -332,14 +319,7 @@ VmWord* ExecuteNotEqualStrings(ExecutionContext* context, VmWord* ip)
 {
     int64_t lhs = getStackValue1(context, ip);
     int64_t rhs = getStackValue2(context, ip);
-    const char* left = nullptr;
-    const char* right = nullptr;
-    int leftLen = 0;
-    int rightLen = 0;
-    context->stringManager->getString(lhs, left, leftLen);
-    context->stringManager->getString(rhs, right, rightLen);
-    int result = StringPiece(left, leftLen).exactCompareWithCaseInt(StringPiece(right, rightLen));
-    setStackValue0(context, ip, result != 0 ? 1 : 0);
+    setStackValue0(context, ip, context->memoryManager->compareStrings(lhs, rhs) ? 1 : 0);
     return ip + 2;
 }
 
@@ -365,14 +345,7 @@ VmWord* ExecuteLessStrings(ExecutionContext* context, VmWord* ip)
 {
     int64_t lhs = getStackValue1(context, ip);
     int64_t rhs = getStackValue2(context, ip);
-    const char* left = nullptr;
-    const char* right = nullptr;
-    int leftLen = 0;
-    int rightLen = 0;
-    context->stringManager->getString(lhs, left, leftLen);
-    context->stringManager->getString(rhs, right, rightLen);
-    int result = StringPiece(left, leftLen).exactCompareWithCaseInt(StringPiece(right, rightLen));
-    setStackValue0(context, ip, result < 0 ? 1 : 0);
+    setStackValue0(context, ip, context->memoryManager->compareStrings(lhs, rhs) < 0 ? 1 : 0);
     return ip + 2;
 }
 
@@ -398,14 +371,7 @@ VmWord* ExecuteGreaterStrings(ExecutionContext* context, VmWord* ip)
 {
     int64_t lhs = getStackValue1(context, ip);
     int64_t rhs = getStackValue2(context, ip);
-    const char* left = nullptr;
-    const char* right = nullptr;
-    int leftLen = 0;
-    int rightLen = 0;
-    context->stringManager->getString(lhs, left, leftLen);
-    context->stringManager->getString(rhs, right, rightLen);
-    int result = StringPiece(left, leftLen).exactCompareWithCaseInt(StringPiece(right, rightLen));
-    setStackValue0(context, ip, result > 0 ? 1 : 0);
+    setStackValue0(context, ip, context->memoryManager->compareStrings(lhs, rhs) > 0 ? 1 : 0);
     return ip + 2;
 }
 
@@ -431,14 +397,7 @@ VmWord* ExecuteLessEqualsStrings(ExecutionContext* context, VmWord* ip)
 {
     int64_t lhs = getStackValue1(context, ip);
     int64_t rhs = getStackValue2(context, ip);
-    const char* left = nullptr;
-    const char* right = nullptr;
-    int leftLen = 0;
-    int rightLen = 0;
-    context->stringManager->getString(lhs, left, leftLen);
-    context->stringManager->getString(rhs, right, rightLen);
-    int result = StringPiece(left, leftLen).exactCompareWithCaseInt(StringPiece(right, rightLen));
-    setStackValue0(context, ip, result <= 0 ? 1 : 0);
+    setStackValue0(context, ip, context->memoryManager->compareStrings(lhs, rhs) <= 0 ? 1 : 0);
     return ip + 2;
 }
 
@@ -464,14 +423,7 @@ VmWord* ExecuteGreaterEqualsStrings(ExecutionContext* context, VmWord* ip)
 {
     int64_t lhs = getStackValue1(context, ip);
     int64_t rhs = getStackValue2(context, ip);
-    const char* left = nullptr;
-    const char* right = nullptr;
-    int leftLen = 0;
-    int rightLen = 0;
-    context->stringManager->getString(lhs, left, leftLen);
-    context->stringManager->getString(rhs, right, rightLen);
-    int result = StringPiece(left, leftLen).exactCompareWithCaseInt(StringPiece(right, rightLen));
-    setStackValue0(context, ip, result >= 0 ? 1 : 0);
+    setStackValue0(context, ip, context->memoryManager->compareStrings(lhs, rhs) >= 0 ? 1 : 0);
     return ip + 2;
 }
 
@@ -565,7 +517,7 @@ VmWord* ExecutePrintString(ExecutionContext* context, VmWord* ip)
     int64_t value = getStackValue0(context, ip);
     const char* text = nullptr;
     int textLen = 0;
-    context->stringManager->getString(value, text, textLen);
+    context->memoryManager->getString(value, text, textLen);
     context->window->printn(text, textLen);
     return ip + 2;
 }
@@ -586,7 +538,7 @@ VmWord* ExecuteInputInteger(ExecutionContext* context, VmWord* ip)
 VmWord* ExecuteInputString(ExecutionContext* context, VmWord* ip)
 {
     const std::string& text = context->window->input();
-    setStackValue0(context, ip, context->stringManager->newString(StringPiece(text.data(), (int)text.length())));
+    setStackValue0(context, ip, context->memoryManager->newString(text.data(), (int)text.length()));
     return ip + 2;
 }
 
@@ -594,7 +546,7 @@ VmWord* ExecuteFnLen(ExecutionContext* context, VmWord* ip)
 {
     const char* text = nullptr;
     int length = 0;
-    context->stringManager->getString(getStackValue1(context, ip), text, length);
+    context->memoryManager->getString(getStackValue1(context, ip), text, length);
     setStackValue0(context, ip, (int64_t)length);
     return ip + 2;
 }
@@ -603,7 +555,7 @@ VmWord* ExecuteFnLeft(ExecutionContext* context, VmWord* ip)
 {
     const char* text = nullptr;
     int length = 0;
-    context->stringManager->getString(getStackValue1(context, ip), text, length);
+    context->memoryManager->getString(getStackValue1(context, ip), text, length);
     int64_t newLength = getStackValue2(context, ip);
     
     if (newLength > length)
@@ -611,7 +563,7 @@ VmWord* ExecuteFnLeft(ExecutionContext* context, VmWord* ip)
     if (newLength < 0)
         newLength = 0;
 
-    int64_t newString = context->stringManager->newString(StringPiece(text, (int)newLength));
+    int64_t newString = context->memoryManager->newString(text, (int)newLength);
     setStackValue0(context, ip, newString);
 
     return ip + 2;

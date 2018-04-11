@@ -177,12 +177,6 @@
     <ClInclude Include="..\src\Interpreter\Stack.h">
       <Filter>Header Files\Interpreter</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\Interpreter\StringManager.h">
-      <Filter>Header Files\Interpreter</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Interpreter\StringStack.h">
-      <Filter>Header Files\Interpreter</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\StringPiece.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -240,7 +234,7 @@
     <ClInclude Include="..\src\Compiler\UserDefinedTypeTable.h">
       <Filter>Header Files\Compiler</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\Interpreter\TypeManager.h">
+    <ClInclude Include="..\src\Interpreter\MemoryManager.h">
       <Filter>Header Files\Interpreter</Filter>
     </ClInclude>
   </ItemGroup>
@@ -335,12 +329,6 @@
     <ClCompile Include="..\src\Interpreter\Stack.cpp">
       <Filter>Source Files\Interpreter</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\Interpreter\StringManager.cpp">
-      <Filter>Source Files\Interpreter</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\Interpreter\StringStack.cpp">
-      <Filter>Source Files\Interpreter</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\Compiler\Compiler.cpp">
       <Filter>Source Files\Compiler</Filter>
     </ClCompile>
@@ -389,7 +377,7 @@
     <ClCompile Include="..\src\Compiler\UserDefinedTypeTable.cpp">
       <Filter>Source Files\Compiler</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\Interpreter\TypeManager.cpp">
+    <ClCompile Include="..\src\Interpreter\MemoryManager.cpp">
       <Filter>Source Files\Interpreter</Filter>
     </ClCompile>
   </ItemGroup>

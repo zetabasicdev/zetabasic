@@ -82,7 +82,7 @@
     <ClInclude Include="..\src\Compiler\ResultIndex.h" />
     <ClInclude Include="..\src\Compiler\UserDefinedTypeTable.h" />
     <ClInclude Include="..\src\Interpreter\Instructions.h" />
-    <ClInclude Include="..\src\Interpreter\TypeManager.h" />
+    <ClInclude Include="..\src\Interpreter\MemoryManager.h" />
     <ClInclude Include="..\src\Interpreter\VirtualMachine.h" />
     <ClInclude Include="..\src\Color.h" />
     <ClInclude Include="..\src\Compiler\Analyzer.h" />
@@ -129,8 +129,6 @@
     <ClInclude Include="..\src\Interpreter\Opcodes.h" />
     <ClInclude Include="..\src\Interpreter\Program.h" />
     <ClInclude Include="..\src\Interpreter\Stack.h" />
-    <ClInclude Include="..\src\Interpreter\StringManager.h" />
-    <ClInclude Include="..\src\Interpreter\StringStack.h" />
     <ClInclude Include="..\src\MemoryPool.h" />
     <ClInclude Include="..\src\Palette.h" />
     <ClInclude Include="..\src\StringPiece.h" />
@@ -184,10 +182,8 @@
     <ClCompile Include="..\src\Ide\StatusBar.cpp" />
     <ClCompile Include="..\src\Interpreter\Instructions.cpp" />
     <ClCompile Include="..\src\Interpreter\Interpreter.cpp" />
+    <ClCompile Include="..\src\Interpreter\MemoryManager.cpp" />
     <ClCompile Include="..\src\Interpreter\Stack.cpp" />
-    <ClCompile Include="..\src\Interpreter\StringManager.cpp" />
-    <ClCompile Include="..\src\Interpreter\StringStack.cpp" />
-    <ClCompile Include="..\src\Interpreter\TypeManager.cpp" />
     <ClCompile Include="..\src\Interpreter\VirtualMachine.cpp" />
     <ClCompile Include="..\src\main.cpp" />
     <ClCompile Include="..\src\Window.cpp" />

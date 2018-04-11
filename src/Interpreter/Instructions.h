@@ -32,11 +32,9 @@
 
 #include "VirtualMachine.h"
 
+class MemoryManager;
 class Program;
 class Stack;
-class StringManager;
-class StringStack;
-class TypeManager;
 class Window;
 struct ExecutionContext;
 
@@ -46,9 +44,7 @@ struct ExecutionContext
 {
     VmWord* code;
     Stack* stacks;
-    StringManager* stringManager;
-    StringStack* stringStack;
-    TypeManager* typeManager;
+    MemoryManager* memoryManager;
     const Program* program;
     Window* window;
 };
