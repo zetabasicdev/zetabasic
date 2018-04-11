@@ -135,7 +135,6 @@
     <ClInclude Include="..\src\Palette.h" />
     <ClInclude Include="..\src\StringPiece.h" />
     <ClInclude Include="..\src\StringPool.h" />
-    <ClInclude Include="..\src\SystemCalls.h" />
     <ClInclude Include="..\src\TItemBuffer.h" />
     <ClInclude Include="..\src\TObjectList.h" />
     <ClInclude Include="..\src\TItemPool.h" />

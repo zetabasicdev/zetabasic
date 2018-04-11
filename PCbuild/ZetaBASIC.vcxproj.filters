@@ -63,9 +63,6 @@
     <ClInclude Include="..\src\Window.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\SystemCalls.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\Compiler\Analyzer.h">
       <Filter>Header Files\Compiler</Filter>
     </ClInclude>
