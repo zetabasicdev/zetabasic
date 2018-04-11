@@ -56,6 +56,7 @@ Interpreter::Interpreter(Window& window, const Program& program)
         ExecuteFreeMem,
         ExecuteReadMem,
         ExecuteWriteMem,
+        ExecuteDelStr,
         ExecuteJmp,
         ExecuteJmpZero,
         ExecuteJmpNotZero,

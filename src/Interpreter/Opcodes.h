@@ -42,6 +42,7 @@ enum Opcode : VmWord
     Op_free_mem,
     Op_read_mem,
     Op_write_mem,
+    Op_del_str,
     Op_jmp,
     Op_jmpz,
     Op_jmpnz,

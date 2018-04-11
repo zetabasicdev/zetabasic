@@ -81,7 +81,8 @@ Translator::Translator(TItemBuffer<VmWord>& codeBuffer,
     mNamedLabels(),
     mLabelTargets(),
     mNextTemporary(0),
-    mMaxTemporaries(0)
+    mMaxTemporaries(0),
+    mTemporaryTypes()
 {
     // intentionally left blank
 }
@@ -130,9 +131,15 @@ void Translator::endCodeBody()
     // clean up any locals that require it
     for (auto symbol : mSymbolTable.getSymbols()) {
         if (symbol->getType() >= Type_Udt) {
+            auto local = ResultIndex(ResultIndexType::Local, symbol->getLocation());
+
+            auto* udt = mUserDefinedTypeTable.findUdt(symbol->getType());
+            assert(udt);
+            freeUdtStrings(local, 0, udt);
+
             auto code = mCodeBuffer.alloc(2);
             code[0] = Op_free_mem;
-            code[1] = Make1Arg(ResultIndex(ResultIndexType::Local, symbol->getLocation()));
+            code[1] = Make1Arg(local);
         }
     }
 }
@@ -150,9 +157,14 @@ ResultIndex Translator::readMem(const ResultIndex& source, int offset)
     return target;
 }
 
-void Translator::writeMem(const ResultIndex& target, const ResultIndex& value, int offset)
+void Translator::writeMem(const ResultIndex& target, const ResultIndex& value, int offset, bool isString)
 {
     assert(offset <= MemSizeMask);
+
+    // if we move into a string type field, ensure the temporary source of this variable isn't deleted
+    if (isString && value.getType() == ResultIndexType::Temporary)
+        mTemporaryTypes[value.getValue()] = Type_Unknown;
+
     auto ops = mCodeBuffer.alloc(2);
     ops[0] = Op_write_mem;
     ops[1] = Make2Args(target, value) | ((VmWord)offset << MemShift);
@@ -177,7 +189,7 @@ ResultIndex Translator::loadStringConstant(const StringPiece& value)
     int constantIndex = mStringTable.addString(value);
     assert(constantIndex <= MaxOperandSize);
 
-    ResultIndex target(ResultIndexType::Temporary, getTemporary());
+    ResultIndex target(ResultIndexType::Temporary, getTemporary(true));
 
     auto ops = mCodeBuffer.alloc(2);
     ops[0] = Op_load_st;
@@ -223,7 +235,7 @@ ResultIndex Translator::unaryOperator(UnaryExpressionNode::Operator op, Typename
 
 ResultIndex Translator::binaryOperator(BinaryExpressionNode::Operator op, Typename type, const ResultIndex& lhs, const ResultIndex& rhs)
 {
-    ResultIndex target(ResultIndexType::Temporary, getTemporary());
+    ResultIndex target(ResultIndexType::Temporary, getTemporary(type == Type_String));
 
     auto ops = mCodeBuffer.alloc(2);
     ops[0] = 0;
@@ -384,6 +396,10 @@ void Translator::assign(Symbol* symbol, const ResultIndex& result)
 {
     ResultIndex target(ResultIndexType::Local, symbol->getLocation());
 
+    // if we move into a string variable, ensure the temporary source of this variable isn't deleted
+    if (symbol->getType() == Type_String && result.getType() == ResultIndexType::Temporary)
+        mTemporaryTypes[result.getValue()] = Type_Unknown;
+
     auto ops = mCodeBuffer.alloc(2);
     ops[0] = Op_mov;
     ops[1] = Make2Args(target, result);
@@ -463,15 +479,17 @@ ResultIndex Translator::builtInFunction(const StringPiece& name, TNodeList<Expre
         { nullptr, 0 }
     };
     ops[0] = 0;
+    bool isString = false;
     for (int i = 0; builtinFunctions[i].name; ++i) {
         if (name == builtinFunctions[i].name) {
             ops[0] = builtinFunctions[i].opcode;
+            isString = name[name.getLength() - 1] == '$';
             break;
         }
     }
     assert(ops[0] != 0);
 
-    ResultIndex target(ResultIndexType::Temporary, getTemporary());
+    ResultIndex target(ResultIndexType::Temporary, getTemporary(isString));
     switch (indices.size()) {
     case 1:
         ops[1] = Make2Args(target, indices[0]);
@@ -508,6 +526,15 @@ Label Translator::generateLabel()
 
 void Translator::clearTemporaries()
 {
+    // cleanup any string temporaries
+    for (int i = mNextTemporary - 1; i >= 0; --i) {
+        if (mTemporaryTypes[i] == Type_String) {
+            auto ops = mCodeBuffer.alloc(2);
+            ops[0] = Op_del_str;
+            ops[1] = Make1Arg(ResultIndex(ResultIndexType::Temporary, i));
+        }
+    }
+    mTemporaryTypes.clear();
     mNextTemporary = 0;
 }
 
@@ -528,11 +555,12 @@ void Translator::fixupLabels()
     }
 }
 
-int Translator::getTemporary()
+int Translator::getTemporary(bool isString)
 {
     int temporary = mNextTemporary++;
     if (mNextTemporary > mMaxTemporaries)
         mMaxTemporaries = mNextTemporary;
+    mTemporaryTypes.push_back(isString ? Type_String : Type_Unknown);
     return temporary;
 }
 
@@ -550,6 +578,25 @@ Label Translator::getLabelByName(const StringPiece& name)
     return iter->second;
 }
 
+void Translator::freeUdtStrings(const ResultIndex& value, int offset, const UserDefinedType* udt)
+{
+    const UserDefinedTypeField* field = udt->fields;
+    while (field) {
+        if (field->type == Type_String) {
+            auto temp = readMem(value, offset + field->offset);
+            auto code = mCodeBuffer.alloc(2);
+            code[0] = Op_del_str;
+            code[1] = Make1Arg(temp);
+            clearTemporaries();
+        } else if (field->type >= Type_Udt) {
+            // recursively check udts within udts
+            auto subUdt = mUserDefinedTypeTable.findUdt(field->type);
+            assert(subUdt);
+            freeUdtStrings(value, offset + field->offset, subUdt);
+        }
+        field = field->next;
+    }
+}
 
 void Translator::dumpCode()
 {
@@ -579,6 +626,7 @@ void Translator::dumpCode()
         { "free_mem", InstructionType::Args1 },
         { "read_mem", InstructionType::Mem },
         { "write_mem", InstructionType::Mem },
+        { "del_str", InstructionType::Args1 },
         { "jmp", InstructionType::Jmp0 },
         { "jmpz", InstructionType::Jmp1 },
         { "jmpnz", InstructionType::Jmp1 },

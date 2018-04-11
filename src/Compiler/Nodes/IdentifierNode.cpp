@@ -152,11 +152,13 @@ void IdentifierNode::assign(Translator& translator, const ResultIndex& value)
         ResultIndex target = ResultIndex(ResultIndexType::Local, mSymbol->getLocation());
         int offset = 0;
         IdentifierNode* node = mSubNode;
+        Typename type = Type_Unknown;
         while (node) {
             offset += node->mTypeField->offset;
+            type = node->mTypeField->type;
             node = node->mSubNode;
         }
-        translator.writeMem(target, value, offset);
+        translator.writeMem(target, value, offset, type);
     } else {
         // simple variable
         translator.assign(mSymbol, value);

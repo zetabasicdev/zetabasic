@@ -117,6 +117,11 @@ VmWord* ExecuteWriteMem(ExecutionContext* context, VmWord* ip)
     return ip + 2;
 }
 
+VmWord* ExecuteDelStr(ExecutionContext* context, VmWord* ip)
+{
+    return ip + 2;
+}
+
 VmWord* ExecuteJmp(ExecutionContext* context, VmWord* ip)
 {
     uint64_t target = (ip[1] >> JumpShift) & JumpSizeMask;

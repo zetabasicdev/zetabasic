@@ -50,6 +50,7 @@ class ConstantTable;
 class ExpressionNode;
 class StringTable;
 class UserDefinedTypeTable;
+struct UserDefinedType;
 
 class Translator
 {
@@ -68,7 +69,7 @@ public:
     void endCodeBody();
 
     ResultIndex readMem(const ResultIndex& source, int offset);
-    void writeMem(const ResultIndex& target, const ResultIndex& value, int offset);
+    void writeMem(const ResultIndex& target, const ResultIndex& value, int offset, bool isString = false);
 
     ResultIndex loadConstant(int64_t value);
     ResultIndex loadStringConstant(const StringPiece& value);
@@ -117,8 +118,10 @@ private:
 
     int mNextTemporary;
     int mMaxTemporaries;
+    std::vector<Typename> mTemporaryTypes;
 
-    int getTemporary();
+    int getTemporary(bool isString = false);
     Label getLabelByName(const StringPiece& name);
+    void freeUdtStrings(const ResultIndex& value, int offset, const UserDefinedType* udt);
     void dumpCode();
 };
