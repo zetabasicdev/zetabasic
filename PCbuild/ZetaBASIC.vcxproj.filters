@@ -365,9 +365,6 @@
     <ClCompile Include="..\src\Compiler\Nodes\TypeConversionExpressionNode.cpp">
       <Filter>Source Files\Compiler\Nodes</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\Compiler\Nodes\UnaryExpressionOperator.cpp">
-      <Filter>Source Files\Compiler\Nodes</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\Compiler\Nodes\DimStatementNode.cpp">
       <Filter>Source Files\Compiler\Nodes</Filter>
     </ClCompile>
@@ -379,6 +376,9 @@
     </ClCompile>
     <ClCompile Include="..\src\Interpreter\MemoryManager.cpp">
       <Filter>Source Files\Interpreter</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Compiler\Nodes\UnaryExpressionNode.cpp">
+      <Filter>Source Files\Compiler\Nodes</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

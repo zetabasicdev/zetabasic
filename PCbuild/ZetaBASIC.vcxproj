@@ -167,7 +167,7 @@
     <ClCompile Include="..\src\Compiler\Nodes\StringLiteralExpressionNode.cpp" />
     <ClCompile Include="..\src\Compiler\Nodes\TypeConversionExpressionNode.cpp" />
     <ClCompile Include="..\src\Compiler\Nodes\TypeStatementNode.cpp" />
-    <ClCompile Include="..\src\Compiler\Nodes\UnaryExpressionOperator.cpp" />
+    <ClCompile Include="..\src\Compiler\Nodes\UnaryExpressionNode.cpp" />
     <ClCompile Include="..\src\Compiler\Parser.cpp" />
     <ClCompile Include="..\src\Compiler\StringTable.cpp" />
     <ClCompile Include="..\src\Compiler\SymbolTable.cpp" />
