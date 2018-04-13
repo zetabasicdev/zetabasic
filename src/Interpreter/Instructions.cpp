@@ -28,6 +28,8 @@
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+#include <cmath>
+
 #include "Instructions.h"
 #include "MemoryManager.h"
 #include "Program.h"
@@ -52,13 +54,6 @@ static inline int64_t getStackValue2(ExecutionContext* context, VmWord* ip)
 {
     int stackIndex = (ip[1] >> Operand2Shift) & 0x3;
     int stackOffset = int(((ip[1] >> Operand2Shift) & OperandSizeMask) >> 2);
-    return context->stacks[stackIndex].getLocal(stackOffset);
-}
-
-static inline int64_t getStackValue3(ExecutionContext* context, VmWord* ip)
-{
-    int stackIndex = (ip[1] >> Operand3Shift) & 0x3;
-    int stackOffset = int(((ip[1] >> Operand3Shift) & OperandSizeMask) >> 2);
     return context->stacks[stackIndex].getLocal(stackOffset);
 }
 
@@ -567,7 +562,7 @@ VmWord* ExecuteFnLeft(ExecutionContext* context, VmWord* ip)
     int length = 0;
     context->memoryManager->getString(getStackValue1(context, ip), text, length);
     int64_t newLength = getStackValue2(context, ip);
-    
+
     if (newLength > length)
         newLength = length;
     if (newLength < 0)

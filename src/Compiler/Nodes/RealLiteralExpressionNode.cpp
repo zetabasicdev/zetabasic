@@ -29,6 +29,7 @@
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <cstdlib>
+#include <errno.h>
 
 #include "Parser.h"
 #include "RealLiteralExpressionNode.h"

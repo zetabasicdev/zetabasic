@@ -62,7 +62,7 @@ void PrintStatementNode::parse(Parser& parser)
             break;
         parser.eatToken();
         mTrailingSemicolon = true;
-        
+
         expression = ExpressionNode::parseExpression(parser);
     }
 
@@ -77,8 +77,6 @@ void PrintStatementNode::analyze(Analyzer& analyzer)
 
 void PrintStatementNode::translate(Translator& translator)
 {
-    int count = mExpressions.getLength();
-    int ix = 0;
     for (auto& expression : mExpressions) {
         expression.translate(translator);
         translator.print(expression.getType(), expression.getResultIndex());
