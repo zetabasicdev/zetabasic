@@ -71,6 +71,7 @@ const UserDefinedType* UserDefinedTypeTable::findUdt(int id)
 
 UserDefinedType* UserDefinedTypeTable::newUdt()
 {
+    assert(mNextUdtId < kMaxTypes);
     UserDefinedType* udt = mUdtPool.alloc(1);
     udt->id = mNextUdtId++;
     udt->fieldCount = 0;

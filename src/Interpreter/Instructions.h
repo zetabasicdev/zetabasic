@@ -61,6 +61,9 @@ VmWord* ExecuteWriteMem(ExecutionContext* context, VmWord* ip);
 
 VmWord* ExecuteDelStr(ExecutionContext* context, VmWord* ip);
 
+VmWord* ExecuteNewArray(ExecutionContext* context, VmWord* ip);
+VmWord* ExecuteDelArray(ExecutionContext* context, VmWord* ip);
+
 VmWord* ExecuteJmp(ExecutionContext* context, VmWord* ip);
 VmWord* ExecuteJmpZero(ExecutionContext* context, VmWord* ip);
 VmWord* ExecuteJmpNotZero(ExecutionContext* context, VmWord* ip);

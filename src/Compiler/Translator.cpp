@@ -110,9 +110,10 @@ void Translator::startCodeBody()
 
     // at this point, look through local symbols to find ones that need explicit initialization
     for (auto symbol : mSymbolTable.getSymbols()) {
-        if (symbol->getType() >= Type_Udt) {
+        int baseType = symbol->getType() & kMaxTypes;
+        if (baseType >= Type_Udt) {
             // ensure space is reserved for the type instance
-            auto udt = mUserDefinedTypeTable.findUdt(symbol->getType());
+            auto udt = mUserDefinedTypeTable.findUdt(baseType);
             assert(udt);
             assert(udt->size < MemSizeMask);
 
@@ -130,15 +131,23 @@ void Translator::endCodeBody()
 
     // clean up any locals that require it
     for (auto symbol : mSymbolTable.getSymbols()) {
-        if (symbol->getType() >= Type_Udt) {
+        int baseType = symbol->getType() & kMaxTypes;
+        bool isArray = (symbol->getType() & kArray) != 0;
+        if (baseType >= Type_Udt && !isArray) {
             auto local = ResultIndex(ResultIndexType::Local, symbol->getLocation());
 
-            auto* udt = mUserDefinedTypeTable.findUdt(symbol->getType());
+            auto* udt = mUserDefinedTypeTable.findUdt(baseType);
             assert(udt);
             freeUdtStrings(local, 0, udt);
 
             auto code = mCodeBuffer.alloc(2);
             code[0] = Op_free_mem;
+            code[1] = Make1Arg(local);
+        } else if (isArray) {
+            auto local = ResultIndex(ResultIndexType::Local, symbol->getLocation());
+
+            auto code = mCodeBuffer.alloc(2);
+            code[0] = Op_del_array;
             code[1] = Make1Arg(local);
         }
     }
@@ -168,6 +177,22 @@ void Translator::writeMem(const ResultIndex& target, const ResultIndex& value, i
     auto ops = mCodeBuffer.alloc(2);
     ops[0] = Op_write_mem;
     ops[1] = Make2Args(target, value) | ((VmWord)offset << MemShift);
+}
+
+void Translator::newArray(const ResultIndex& target, const ResultIndex& lower, const ResultIndex& upper, Typename type)
+{
+    int baseType = type & kMaxTypes;
+    int elementSize = 8;
+    if (baseType >= Type_Udt) {
+        auto udt = mUserDefinedTypeTable.findUdt(baseType);
+        assert(udt);
+        elementSize = udt->size;
+    }
+    assert(elementSize <= ArrayElementSizeMask);
+
+    auto ops = mCodeBuffer.alloc(2);
+    ops[0] = Op_new_array;
+    ops[1] = Make3Args(target, lower, upper) | (int64_t(elementSize) << ArrayElementShift);
 }
 
 ResultIndex Translator::loadConstant(int64_t value)
@@ -612,7 +637,8 @@ void Translator::dumpCode()
         Args2,
         Args1,
         MemInit,
-        Mem
+        Mem,
+        Array
     };
     static struct Instruction
     {
@@ -627,6 +653,8 @@ void Translator::dumpCode()
         { "read_mem", InstructionType::Mem },
         { "write_mem", InstructionType::Mem },
         { "del_str", InstructionType::Args1 },
+        { "new_array", InstructionType::Array },
+        { "del_array", InstructionType::Args1 },
         { "jmp", InstructionType::Jmp0 },
         { "jmpz", InstructionType::Jmp1 },
         { "jmpnz", InstructionType::Jmp1 },
@@ -742,6 +770,16 @@ void Translator::dumpCode()
                    names[(mCodeBuffer[ix + 1] >> Operand1Shift) & 0x3],
                    ((mCodeBuffer[ix + 1] >> Operand1Shift) & OperandSizeMask) >> 2,
                    (mCodeBuffer[ix + 1] >> MemShift) & MemSizeMask);
+            break;
+        case InstructionType::Array:
+            printf("[%s] #%lld, [%s] #%lld, [%s] #%lld - (%lld)\n",
+                   names[mCodeBuffer[ix + 1] & 0x3],
+                   (mCodeBuffer[ix + 1] & OperandSizeMask) >> 2,
+                   names[(mCodeBuffer[ix + 1] >> Operand1Shift) & 0x3],
+                   ((mCodeBuffer[ix + 1] >> Operand1Shift) & OperandSizeMask) >> 2,
+                   names[(mCodeBuffer[ix + 1] >> Operand2Shift) & 0x3],
+                   ((mCodeBuffer[ix + 1] >> Operand2Shift) & OperandSizeMask) >> 2,
+                   ((mCodeBuffer[ix + 1] >> ArrayElementShift) & ArrayElementSizeMask));
             break;
         default:
             assert(false);

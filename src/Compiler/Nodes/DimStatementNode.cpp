@@ -30,9 +30,11 @@
 
 #include "Analyzer.h"
 #include "DimStatementNode.h"
+#include "ExpressionNode.h"
 #include "Parser.h"
 #include "Symbol.h"
 #include "SymbolTable.h"
+#include "Translator.h"
 #include "UserDefinedTypeTable.h"
 
 DimNode::DimNode()
@@ -43,7 +45,9 @@ DimNode::DimNode()
     mType(Type_Unknown),
     mTypeName(),
     mTypeRange(),
-    mSymbol(nullptr)
+    mSymbol(nullptr),
+    mLowerBound(nullptr),
+    mUpperBound(nullptr)
 {
     // intentionally left blank
 }
@@ -60,6 +64,35 @@ void DimNode::parse(Parser& parser)
     mName = parser.getToken().getText();
     mRange = parser.getToken().getRange();
     parser.eatToken();
+
+    // parse any optional array specifiers
+    bool isArray = false;
+    if (parser.getToken().getTag() == TokenTag::Sym_OpenParen) {
+        parser.eatToken();
+        isArray = true;
+
+        if (parser.getToken().getTag() != TokenTag::Sym_CloseParen) {
+            ExpressionNode* bound = ExpressionNode::parseExpression(parser);
+            if (!bound)
+                parser.raiseError(CompileErrorId::SyntaxError, "Expected Expression");
+
+            if (parser.getToken().getTag() == TokenTag::Key_To) {
+                mLowerBound = bound;
+
+                parser.eatToken();
+                mUpperBound = ExpressionNode::parseExpression(parser);
+                if (!mUpperBound)
+                    parser.raiseError(CompileErrorId::SyntaxError, "Expected Expression");
+            } else {
+                mUpperBound = bound;
+            }
+
+            if (parser.getToken().getTag() != TokenTag::Sym_CloseParen)
+                parser.raiseError(CompileErrorId::SyntaxError, "Expected Closing Parenthesis");
+        }
+
+        parser.eatToken();
+    }
 
     auto specifiedType = Type_Unknown;
     if (parser.getToken().getTag() == TokenTag::Key_As) {
@@ -119,6 +152,9 @@ void DimNode::parse(Parser& parser)
         mType = specifiedType;
     else
         mType = nameType;
+
+    if (isArray)
+        mType |= kArray;
 }
 
 void DimNode::analyze(Analyzer& analyzer)
@@ -128,14 +164,47 @@ void DimNode::analyze(Analyzer& analyzer)
         throw CompileError(CompileErrorId::NameError, mRange, "Identifier Already Defined");
 
     // check for UDT
+    bool isArray = (mType & kArray) != 0;
     if (mType == Type_Udt) {
         auto* udt = analyzer.getUserDefinedTypeTable().findUdt(mTypeName);
         if (!udt)
             throw CompileError(CompileErrorId::NameError, mTypeRange, "Expected Typename");
         mType = udt->id;
+        if (isArray)
+            mType |= kArray;
+    }
+
+    // validate any bounds are integers
+    if (isArray) {
+        if (mLowerBound) {
+            mLowerBound->analyze(analyzer);
+            if (mLowerBound->getType() != Type_Integer)
+                throw CompileError(CompileErrorId::TypeError, mLowerBound->getRange(), "Expected Integer Lower Bound");
+        }
+        mUpperBound->analyze(analyzer);
+        if (mUpperBound->getType() != Type_Integer)
+            throw CompileError(CompileErrorId::TypeError, mUpperBound->getRange(), "Expected Integer Upper Bound");
     }
 
     mSymbol = analyzer.getSymbolTable().getSymbol(mRange, mName, mType);
+}
+
+void DimNode::translate(Translator& translator)
+{
+    if ((mType & kArray) != 0) {
+        ResultIndex lowerResult;
+        if (mLowerBound) {
+            mLowerBound->translate(translator);
+            lowerResult = mLowerBound->getResultIndex();
+        } else {
+            lowerResult = translator.loadConstant(0);
+        }
+            
+        mUpperBound->translate(translator);
+        ResultIndex upperResult = mUpperBound->getResultIndex();
+
+        translator.newArray(ResultIndex(ResultIndexType::Local, mSymbol->getLocation()), lowerResult, upperResult, mType);
+    }
 }
 
 DimStatementNode::DimStatementNode()
@@ -178,5 +247,6 @@ void DimStatementNode::analyze(Analyzer& analyzer)
 
 void DimStatementNode::translate(Translator& translator)
 {
-    // intentionally left blank
+    for (auto& node : mNodes)
+        node.translate(translator);
 }

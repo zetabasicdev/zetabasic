@@ -38,7 +38,8 @@ enum
     MemoryType_Unknown,
     MemoryType_SmallString,
     MemoryType_String,
-    MemoryType_Udt
+    MemoryType_Udt,
+    MemoryType_Array
 };
 
 // Class that manages all dynamic memory for the interpreter, including strings
@@ -62,9 +63,20 @@ public:
     int64_t readFromType(int64_t desc, int offset);
     void writeToType(int64_t desc, int64_t value, int offset);
 
+    int64_t newArray(int64_t lower, int64_t upper, int elementSize);
+    void delArray(int64_t desc);
+
 private:
     int64_t newDesc(int64_t descType);
     void* getDesc(int64_t desc);
 
     std::vector<void*> mDescriptors;
+
+    struct ArrayDesc
+    {
+        int64_t lowerBound;
+        int64_t upperBound;
+        int elementSize;
+        char* data;
+    };
 };

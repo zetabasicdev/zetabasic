@@ -56,6 +56,8 @@ Interpreter::Interpreter(Window& window, const Program& program)
         ExecuteReadMem,
         ExecuteWriteMem,
         ExecuteDelStr,
+        ExecuteNewArray,
+        ExecuteDelArray,
         ExecuteJmp,
         ExecuteJmpZero,
         ExecuteJmpNotZero,

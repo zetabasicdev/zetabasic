@@ -41,3 +41,6 @@ enum
     Type_String,
     Type_Udt
 };
+
+const int kMaxTypes = 0xffffff;
+const int kArray = 0x1000000;

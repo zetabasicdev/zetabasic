@@ -71,6 +71,8 @@ public:
     ResultIndex readMem(const ResultIndex& source, int offset);
     void writeMem(const ResultIndex& target, const ResultIndex& value, int offset, bool isString = false);
 
+    void newArray(const ResultIndex& target, const ResultIndex& lower, const ResultIndex& upper, Typename type);
+
     ResultIndex loadConstant(int64_t value);
     ResultIndex loadStringConstant(const StringPiece& value);
     ResultIndex loadIdentifier(Symbol* symbol);

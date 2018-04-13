@@ -156,6 +156,33 @@ void MemoryManager::writeToType(int64_t desc, int64_t value, int offset)
     mem[offset / 8] = value;
 }
 
+int64_t MemoryManager::newArray(int64_t lower, int64_t upper, int elementSize)
+{
+    assert(upper >= lower);
+    assert(elementSize > 0);
+
+    int64_t desc = newDesc(MemoryType_Array);
+    ArrayDesc* array = new ArrayDesc;
+    array->lowerBound = lower;
+    array->upperBound = upper;
+    array->elementSize = elementSize;
+    if (upper > lower)
+        array->data = new char[elementSize * (upper - lower + 1)];
+    else
+        array->data = nullptr;
+    mDescriptors[desc >> 8] = array;
+    return desc;
+}
+
+void MemoryManager::delArray(int64_t desc)
+{
+    ArrayDesc* array = (ArrayDesc*)getDesc(desc);
+    if (array->data)
+        delete[] array->data;
+    delete array;
+    mDescriptors[desc >> 8] = nullptr;
+}
+
 int64_t MemoryManager::newDesc(int64_t descType)
 {
     int64_t count = int64_t(mDescriptors.size());

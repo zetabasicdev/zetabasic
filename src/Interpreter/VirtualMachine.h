@@ -60,3 +60,7 @@ const int64_t JumpShift = 16;
 // memory offset/size always follows operand 0 and 1
 const int64_t MemSizeMask = 0xffffff;
 const int64_t MemShift = 32;
+
+// array element size always follows 3 operands
+const int64_t ArrayElementSizeMask = 0xffff;
+const int64_t ArrayElementShift = 48;

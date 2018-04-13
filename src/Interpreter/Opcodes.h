@@ -43,6 +43,8 @@ enum Opcode : VmWord
     Op_read_mem,
     Op_write_mem,
     Op_del_str,
+    Op_new_array,
+    Op_del_array,
     Op_jmp,
     Op_jmpz,
     Op_jmpnz,

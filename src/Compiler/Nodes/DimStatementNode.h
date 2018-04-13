@@ -35,6 +35,7 @@
 #include "TNodeList.h"
 #include "Typename.h"
 
+class ExpressionNode;
 class Symbol;
 
 class DimNode
@@ -45,6 +46,7 @@ public:
 
     void parse(Parser& parser);
     void analyze(Analyzer& analyzer);
+    void translate(Translator& translator);
 
     Symbol& getSymbol()
     {
@@ -60,6 +62,8 @@ private:
     StringPiece mTypeName;
     Range mTypeRange;
     Symbol* mSymbol;
+    ExpressionNode* mLowerBound;
+    ExpressionNode* mUpperBound;
 };
 
 class DimStatementNode
