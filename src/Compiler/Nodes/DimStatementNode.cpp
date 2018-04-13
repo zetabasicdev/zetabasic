@@ -154,7 +154,6 @@ DimStatementNode::~DimStatementNode()
 void DimStatementNode::parse(Parser& parser)
 {
     assert(parser.getToken().getTag() == TokenTag::Key_Dim);
-    auto& startRange = parser.getToken().getRange();
     parser.eatToken();
 
     bool first = true;

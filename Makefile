@@ -39,8 +39,10 @@ OBJECTS=\
 	obj/Analyzer.o \
 	obj/AssignmentStatementNode.o \
 	obj/BinaryExpressionNode.o \
+	obj/BooleanLiteralExpressionNode.o \
 	obj/Compiler.o \
 	obj/ConstantTable.o \
+	obj/DimStatementNode.o \
 	obj/EditBuffer.o \
 	obj/Editor.o \
 	obj/EditView.o \
@@ -59,21 +61,25 @@ OBJECTS=\
 	obj/Interpreter.o \
 	obj/LabelStatementNode.o \
 	obj/Lexer.o \
+	obj/MemoryManager.o \
 	obj/ModuleNode.o \
 	obj/Node.o \
 	obj/Parser.o \
 	obj/PrintStatementNode.o \
+	obj/RealLiteralExpressionNode.o \
 	obj/Stack.o \
 	obj/StatementNode.o \
 	obj/StatusBar.o \
 	obj/StringLiteralExpressionNode.o \
-	obj/StringManager.o \
-	obj/StringStack.o \
 	obj/StringTable.o \
 	obj/SymbolTable.o \
 	obj/TextSourceStream.o \
 	obj/Token.o \
 	obj/Translator.o \
+	obj/TypeConversionExpressionNode.o \
+	obj/TypeStatementNode.o \
+	obj/UnaryExpressionNode.o \
+	obj/UserDefinedTypeTable.o \
 	obj/VirtualMachine.o \
 	obj/Window.o \
 	obj/main.o
