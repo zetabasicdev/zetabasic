@@ -118,7 +118,7 @@ void Translator::startCodeBody()
             assert(udt->size < MemSizeMask);
 
             code = mCodeBuffer.alloc(2);
-            code[0] = Op_init_mem;
+            code[0] = Op_new_type;
             code[1] = Make1Arg(ResultIndex(ResultIndexType::Local, symbol->getLocation())) | ((uint64_t)udt->size << MemShift);
         }
     }
@@ -147,7 +147,7 @@ void Translator::endCodeBody()
             auto local = ResultIndex(ResultIndexType::Local, symbol->getLocation());
 
             auto code = mCodeBuffer.alloc(2);
-            code[0] = Op_del_array;
+            code[0] = Op_free_mem;
             code[1] = Make1Arg(local);
         }
     }
@@ -160,7 +160,7 @@ ResultIndex Translator::readMem(const ResultIndex& source, int offset)
     ResultIndex target(ResultIndexType::Temporary, getTemporary());
 
     auto ops = mCodeBuffer.alloc(2);
-    ops[0] = Op_read_mem;
+    ops[0] = Op_read_type;
     ops[1] = Make2Args(target, source) | ((VmWord)offset << MemShift);
 
     return target;
@@ -175,7 +175,7 @@ void Translator::writeMem(const ResultIndex& target, const ResultIndex& value, i
         mTemporaryTypes[value.getValue()] = Type_Unknown;
 
     auto ops = mCodeBuffer.alloc(2);
-    ops[0] = Op_write_mem;
+    ops[0] = Op_write_type;
     ops[1] = Make2Args(target, value) | ((VmWord)offset << MemShift);
 }
 
@@ -555,7 +555,7 @@ void Translator::clearTemporaries()
     for (int i = mNextTemporary - 1; i >= 0; --i) {
         if (mTemporaryTypes[i] == Type_String) {
             auto ops = mCodeBuffer.alloc(2);
-            ops[0] = Op_del_str;
+            ops[0] = Op_free_mem;
             ops[1] = Make1Arg(ResultIndex(ResultIndexType::Temporary, i));
         }
     }
@@ -610,7 +610,7 @@ void Translator::freeUdtStrings(const ResultIndex& value, int offset, const User
         if (field->type == Type_String) {
             auto temp = readMem(value, offset + field->offset);
             auto code = mCodeBuffer.alloc(2);
-            code[0] = Op_del_str;
+            code[0] = Op_free_mem;
             code[1] = Make1Arg(temp);
             clearTemporaries();
         } else if (field->type >= Type_Udt) {
@@ -636,9 +636,9 @@ void Translator::dumpCode()
         Args3,
         Args2,
         Args1,
-        MemInit,
-        Mem,
-        Array
+        NewType,
+        TypeAccess,
+        NewArray
     };
     static struct Instruction
     {
@@ -648,13 +648,11 @@ void Translator::dumpCode()
         { "nop", InstructionType::NoArgs },
         { "end", InstructionType::NoArgs },
         { "reserve", InstructionType::Reserve },
-        { "init_mem", InstructionType::MemInit },
         { "free_mem", InstructionType::Args1 },
-        { "read_mem", InstructionType::Mem },
-        { "write_mem", InstructionType::Mem },
-        { "del_str", InstructionType::Args1 },
-        { "new_array", InstructionType::Array },
-        { "del_array", InstructionType::Args1 },
+        { "new_type", InstructionType::NewType },
+        { "new_array", InstructionType::NewArray },
+        { "read_type", InstructionType::TypeAccess },
+        { "write_type", InstructionType::TypeAccess },
         { "jmp", InstructionType::Jmp0 },
         { "jmpz", InstructionType::Jmp1 },
         { "jmpnz", InstructionType::Jmp1 },
@@ -757,13 +755,13 @@ void Translator::dumpCode()
                    names[mCodeBuffer[ix + 1] & 0x3],
                    (mCodeBuffer[ix + 1] & OperandSizeMask) >> 2);
             break;
-        case InstructionType::MemInit:
+        case InstructionType::NewType:
             printf("[%s] #%lld, %04llX bytes\n", 
                    names[mCodeBuffer[ix + 1] & 0x3], 
                    (mCodeBuffer[ix + 1] & OperandSizeMask) >> 2,
                    (mCodeBuffer[ix + 1] >> MemShift) & MemSizeMask);
             break;
-        case InstructionType::Mem:
+        case InstructionType::TypeAccess:
             printf("[%s] #%lld, [%s] #%lld, offset %04llX\n",
                    names[mCodeBuffer[ix + 1] & 0x3],
                    (mCodeBuffer[ix + 1] & OperandSizeMask) >> 2,
@@ -771,7 +769,7 @@ void Translator::dumpCode()
                    ((mCodeBuffer[ix + 1] >> Operand1Shift) & OperandSizeMask) >> 2,
                    (mCodeBuffer[ix + 1] >> MemShift) & MemSizeMask);
             break;
-        case InstructionType::Array:
+        case InstructionType::NewArray:
             printf("[%s] #%lld, [%s] #%lld, [%s] #%lld - (%lld)\n",
                    names[mCodeBuffer[ix + 1] & 0x3],
                    (mCodeBuffer[ix + 1] & OperandSizeMask) >> 2,

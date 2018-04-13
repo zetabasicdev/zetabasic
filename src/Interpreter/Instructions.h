@@ -54,15 +54,13 @@ VmWord* ExecuteEnd(ExecutionContext* context, VmWord* ip);
 
 VmWord* ExecuteReserve(ExecutionContext* context, VmWord* ip);
 
-VmWord* ExecuteInitMem(ExecutionContext* context, VmWord* ip);
 VmWord* ExecuteFreeMem(ExecutionContext* context, VmWord* ip);
-VmWord* ExecuteReadMem(ExecutionContext* context, VmWord* ip);
-VmWord* ExecuteWriteMem(ExecutionContext* context, VmWord* ip);
 
-VmWord* ExecuteDelStr(ExecutionContext* context, VmWord* ip);
+VmWord* ExecuteNewType(ExecutionContext* context, VmWord* ip);
+VmWord* ExecuteReadType(ExecutionContext* context, VmWord* ip);
+VmWord* ExecuteWriteType(ExecutionContext* context, VmWord* ip);
 
 VmWord* ExecuteNewArray(ExecutionContext* context, VmWord* ip);
-VmWord* ExecuteDelArray(ExecutionContext* context, VmWord* ip);
 
 VmWord* ExecuteJmp(ExecutionContext* context, VmWord* ip);
 VmWord* ExecuteJmpZero(ExecutionContext* context, VmWord* ip);

@@ -34,7 +34,8 @@
 
 MemoryManager::MemoryManager()
     :
-    mDescriptors()
+    mDescriptors(),
+    mNextDescId(1)
 {
     // intentionally left blank
 }
@@ -44,27 +45,45 @@ MemoryManager::~MemoryManager()
     // intentionally left blank
 }
 
+void MemoryManager::delMemory(int64_t desc, bool removeFromMap)
+{
+    void* mem = mDescriptors[desc];
+
+    switch (desc & 0xff) {
+    case MemoryType_String:
+        delete[] (char*)mem;
+        break;
+    case MemoryType_Udt:
+        delete[] (char*)mem;
+        break;
+    case MemoryType_Array:
+    {
+        ArrayDesc* array = (ArrayDesc*)mem;
+        delete[] array->data;
+        delete array;
+        break;
+    }
+    case MemoryType_Unknown:
+    case MemoryType_SmallString:
+        assert(false);
+    default:
+        break;
+    }
+
+    if (removeFromMap)
+        mDescriptors.erase(desc);
+}
+
 int64_t MemoryManager::newString(const char* text, int length)
 {
     if (length == 0)
         return 0;
 
-    int64_t desc = newDesc(MemoryType_String);
     char* mem = new char[length + sizeof(int)];
     *(int*)mem = length;
     memcpy(mem + sizeof(length), text, length);
-    mDescriptors[desc >> 8] = mem;
-    return desc;
-}
 
-void MemoryManager::delString(int64_t desc)
-{
-    if (desc == 0)
-        return;
-
-    char* mem = (char*)getDesc(desc);
-    delete[] mem;
-    mDescriptors[desc >> 8] = nullptr;
+    return newDesc(MemoryType_String, mem);
 }
 
 void MemoryManager::getString(int64_t desc, const char*& text, int& length)
@@ -130,18 +149,9 @@ int MemoryManager::compareStrings(int64_t lhsDesc, int64_t rhsDesc)
 
 int64_t MemoryManager::newType(int size)
 {
-    int64_t desc = newDesc(MemoryType_Udt);
     char* mem = new char[size];
     memset(mem, 0, size);
-    mDescriptors[desc >> 8] = mem;
-    return desc;
-}
-
-void MemoryManager::delType(int64_t desc)
-{
-    char* mem = (char*)getDesc(desc);
-    delete[] mem;
-    mDescriptors[desc >> 8] = nullptr;
+    return newDesc(MemoryType_Udt, mem);
 }
 
 int64_t MemoryManager::readFromType(int64_t desc, int offset)
@@ -161,7 +171,6 @@ int64_t MemoryManager::newArray(int64_t lower, int64_t upper, int elementSize)
     assert(upper >= lower);
     assert(elementSize > 0);
 
-    int64_t desc = newDesc(MemoryType_Array);
     ArrayDesc* array = new ArrayDesc;
     array->lowerBound = lower;
     array->upperBound = upper;
@@ -170,39 +179,19 @@ int64_t MemoryManager::newArray(int64_t lower, int64_t upper, int elementSize)
         array->data = new char[elementSize * (upper - lower + 1)];
     else
         array->data = nullptr;
-    mDescriptors[desc >> 8] = array;
-    return desc;
+
+    return newDesc(MemoryType_Array, array);
 }
 
-void MemoryManager::delArray(int64_t desc)
-{
-    ArrayDesc* array = (ArrayDesc*)getDesc(desc);
-    if (array->data)
-        delete[] array->data;
-    delete array;
-    mDescriptors[desc >> 8] = nullptr;
-}
-
-int64_t MemoryManager::newDesc(int64_t descType)
+int64_t MemoryManager::newDesc(int64_t descType, void* mem)
 {
     int64_t count = int64_t(mDescriptors.size());
-    int64_t index = 0;
-    for (; index < count; ++index)
-        if (!mDescriptors[index])
-            break;
-
-    if (index == count)
-        mDescriptors.push_back(nullptr);
-
-    return (int64_t(index) << 8) | descType;
+    int64_t desc = (mNextDescId << 8) | descType;
+    mDescriptors[desc] = mem;
+    return desc;
 }
 
 void* MemoryManager::getDesc(int64_t desc)
 {
-    int64_t index = desc >> 8;
-    int64_t count = int64_t(mDescriptors.size());
-
-    assert(index >= 0 && index < count);
-    assert(mDescriptors[index]);
-    return mDescriptors[index];
+    return mDescriptors[desc];
 }

@@ -31,7 +31,7 @@
 #pragma once
 
 #include <cstdint>
-#include <vector>
+#include <unordered_map>
 
 enum
 {
@@ -50,27 +50,25 @@ public:
     MemoryManager();
     ~MemoryManager();
 
-    int64_t newString(const char* text, int length);
-    void delString(int64_t desc);
+    void delMemory(int64_t desc, bool removeFromMap = true);
 
+    int64_t newString(const char* text, int length);
     void getString(int64_t desc, const char*& text, int& length);
     int64_t addStrings(int64_t lhsDesc, int64_t rhsDesc);
     int compareStrings(int64_t lhsDesc, int64_t rhsDesc);
 
     int64_t newType(int size);
-    void delType(int64_t desc);
-
     int64_t readFromType(int64_t desc, int offset);
     void writeToType(int64_t desc, int64_t value, int offset);
 
     int64_t newArray(int64_t lower, int64_t upper, int elementSize);
-    void delArray(int64_t desc);
 
 private:
-    int64_t newDesc(int64_t descType);
+    int64_t newDesc(int64_t descType, void* mem);
     void* getDesc(int64_t desc);
 
-    std::vector<void*> mDescriptors;
+    std::unordered_map<int64_t, void*> mDescriptors;
+    int64_t mNextDescId;
 
     struct ArrayDesc
     {

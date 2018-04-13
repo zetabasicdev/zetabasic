@@ -83,46 +83,39 @@ VmWord* ExecuteReserve(ExecutionContext* context, VmWord* ip)
     return ip + 2;
 }
 
-VmWord* ExecuteInitMem(ExecutionContext* context, VmWord* ip)
+VmWord* ExecuteFreeMem(ExecutionContext* context, VmWord* ip)
+{
+    context->memoryManager->delMemory(getStackValue0(context, ip));
+    return ip + 2;
+}
+
+VmWord* ExecuteNewType(ExecutionContext* context, VmWord* ip)
 {
     int size = (int)((ip[1] >> MemShift) & MemSizeMask);
     setStackValue0(context, ip, context->memoryManager->newType(size));
     return ip + 2;
 }
 
-VmWord* ExecuteFreeMem(ExecutionContext* context, VmWord* ip)
-{
-    context->memoryManager->delType(getStackValue0(context, ip));
-    return ip + 2;
-}
-
-VmWord* ExecuteReadMem(ExecutionContext* context, VmWord* ip)
+VmWord* ExecuteReadType(ExecutionContext* context, VmWord* ip)
 {
     int offset = (int)((ip[1] >> MemShift) & MemSizeMask);
     setStackValue0(context, ip, context->memoryManager->readFromType(getStackValue1(context, ip), offset));
     return ip + 2;
 }
 
-VmWord* ExecuteWriteMem(ExecutionContext* context, VmWord* ip)
+VmWord* ExecuteWriteType(ExecutionContext* context, VmWord* ip)
 {
     int offset = (int)((ip[1] >> MemShift) & MemSizeMask);
     context->memoryManager->writeToType(getStackValue0(context, ip), getStackValue1(context, ip), offset);
     return ip + 2;
 }
 
-VmWord* ExecuteDelStr(ExecutionContext* context, VmWord* ip)
-{
-    context->memoryManager->delString(getStackValue0(context, ip));
-    return ip + 2;
-}
-
 VmWord* ExecuteNewArray(ExecutionContext* context, VmWord* ip)
 {
-    return ip + 2;
-}
-
-VmWord* ExecuteDelArray(ExecutionContext* context, VmWord* ip)
-{
+    int64_t lower = getStackValue1(context, ip);
+    int64_t upper = getStackValue2(context, ip);
+    int elementSize = (int)((ip[1] >> ArrayElementShift) & ArrayElementSizeMask);
+    setStackValue0(context, ip, context->memoryManager->newArray(lower, upper, elementSize));
     return ip + 2;
 }
 
