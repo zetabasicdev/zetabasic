@@ -35,6 +35,7 @@
 #include "StringPiece.h"
 #include "Typename.h"
 
+class ExpressionNode;
 class Symbol;
 struct UserDefinedTypeField;
 
@@ -63,6 +64,8 @@ public:
 private:
     StringPiece mName;
 
+    ExpressionNode* mIndexExpression;
+
     enum IdentifierPieceType
     {
         TopLevel,
@@ -77,4 +80,6 @@ private:
     };
 
     IdentifierNode* mSubNode;
+
+    void parseArrayIndex(Parser& parser, IdentifierNode* subNode);
 };

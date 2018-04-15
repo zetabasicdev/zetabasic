@@ -31,6 +31,7 @@
 #include <cassert>
 
 #include "Analyzer.h"
+#include "ExpressionNode.h"
 #include "IdentifierNode.h"
 #include "Parser.h"
 #include "Symbol.h"
@@ -41,6 +42,7 @@
 IdentifierNode::IdentifierNode()
     :
     mName(),
+    mIndexExpression(nullptr),
     mPieceType(IdentifierPieceType::TopLevel),
     mSymbol(nullptr),
     mSubNode(nullptr)
@@ -61,6 +63,9 @@ void IdentifierNode::parse(Parser& parser)
     mRange = parser.getToken().getRange();
     parser.eatToken();
 
+    // ensure any array indices get parsed
+    parseArrayIndex(parser, this);
+
     // parse any sub-nodes for TYPE structures
     IdentifierNode* parentNode = this;
     while (parser.getToken().getTag() == TokenTag::Sym_Period) {
@@ -77,6 +82,9 @@ void IdentifierNode::parse(Parser& parser)
 
         parentNode->mSubNode = subNode;
         parentNode = subNode;
+
+        // ensure any array indices get parsed
+        parseArrayIndex(parser, subNode);
     }
 }
 
@@ -139,9 +147,9 @@ Typename IdentifierNode::getFinalType()
 {
     if (!mSubNode) {
         if (mPieceType == IdentifierPieceType::TopLevel)
-            return mSymbol->getType();
+            return mSymbol->getType() & ~kArray;
         else
-            return mTypeField->type;
+            return mTypeField->type & ~kArray;
     }
     return mSubNode->getFinalType();
 }
@@ -180,4 +188,19 @@ ResultIndex IdentifierNode::retrieve(Translator& translator)
     
     // simple variable
     return translator.loadIdentifier(mSymbol);
+}
+
+void IdentifierNode::parseArrayIndex(Parser& parser, IdentifierNode* subNode)
+{
+    if (parser.getToken().getTag() == TokenTag::Sym_OpenParen) {
+        parser.eatToken();
+
+        subNode->mIndexExpression = ExpressionNode::parseExpression(parser);
+        if (!subNode->mIndexExpression)
+            parser.raiseError(CompileErrorId::SyntaxError, "Expected Index Expression");
+
+        if (parser.getToken().getTag() != TokenTag::Sym_CloseParen)
+            parser.raiseError(CompileErrorId::SyntaxError, "Expected Closing Parenthesis");
+        parser.eatToken();
+    }
 }
